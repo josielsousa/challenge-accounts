@@ -1,0 +1,20 @@
+version: "3"
+
+services: 
+  app:
+    image: josielsousa/golang-alpine-sdk:latest
+    volumes:
+      - .:/src/app
+    working_dir: /src/app
+    ports: 
+      - 3000:3000
+    command: >
+      /bin/sh -c "make build && ./bin/service"
+
+  app-test:
+    image: josielsousa/golang-alpine-sdk:latest
+    volumes:
+      - .:/src/app
+    working_dir: /src/app
+    command: >
+      /bin/sh -c "make test-coverage"

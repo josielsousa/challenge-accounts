@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/josielsousa/challenge-accounts/providers/http"
+	"github.com/josielsousa/challenge-accounts/providers/log"
 )
 
 func main() {
-	fmt.Println("API inicializando...")
+	logger := log.NewLogger()
+	logger.Info("API inicializando...")
 
-	router := &http.RouterProvider{}
-	router.Init()
+	router := http.NewRouter(logger)
+	router.ServeHTTP()
 }

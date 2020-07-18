@@ -12,6 +12,6 @@ func (m *MockAPILogProvider) Info(info string) {
 }
 
 // Error - Mock provider log info
-func (l *MockDataLog) Error(trace string, erro error) {
+func (l *MockAPILogProvider) Error(trace string, erro error) {
 	l.OnError(trace, erro)
 }

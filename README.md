@@ -15,7 +15,7 @@ Após a instalação dos pré-requisitos, para disponibilizar a API, basta execu
 ```
 git clone git@github.com:josielsousa/challenge-accounts.git
 cd challenge-accounts
-docker-compose up app
+docker-compose up api
 ```
 
 Executando com sucesso os comandos acima, a API estará disponível no endereço: http://localhost:3000/
@@ -26,9 +26,11 @@ Executando com sucesso os comandos acima, a API estará disponível no endereço
 
 * [MUX](github.com/gorilla/mux) - Framework utilizado para encapsular e facilitar a disponibilização dos métodos HTTP necessários para a API.
 
-*  [docker](https://www.docker.com/) - Ferramenta utilizada para criação da imagem base utilizada na construção da API.
+* [logrus](https://github.com/sirupsen/logrus) - Framework para formatação dos logs da API.
 
-*  [docker-compose](https://www.docker.com/) - Ferramenta para definir e executar aplicativos `docker` de vários contêineres
+* [docker](https://www.docker.com/) - Ferramenta utilizada para criação da imagem base utilizada na construção da API.
+
+* [docker-compose](https://www.docker.com/) - Ferramenta para definir e executar aplicativos `docker` de vários contêineres
  
 * [YAML](https://yaml.org/) - YAML é um formato de serialização de dados legíveis por humanos, utilizado para configurar os serviços da API para serem executados com o `docker-compose`.
 

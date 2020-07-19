@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/josielsousa/challenge-accounts/repo/db"
 )
 
@@ -24,6 +25,19 @@ func init() {
 func TestDbOpenSuccess(t *testing.T) {
 	t.Run("Teste Abrir conexão com o banco de dados", func(t *testing.T) {
 		srv, err := db.Open(db.Scribble)
+		if err != nil {
+			t.Error(ErrorOpenConnection, err)
+		}
+
+		if srv == nil {
+			t.Error(ErrorOpenConnectionServiceNil)
+		}
+	})
+}
+
+func TestDbOpenGormSuccess(t *testing.T) {
+	t.Run("Teste Abrir conexão com o banco de dados utilizando Gorm", func(t *testing.T) {
+		srv, err := db.Open(db.Gorm)
 		if err != nil {
 			t.Error(ErrorOpenConnection, err)
 		}

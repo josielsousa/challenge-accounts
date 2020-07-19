@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -46,10 +45,9 @@ func mockAccountStorage() model.AccountStorage {
 			return &accountTest, nil
 		},
 
-		OnGetAllAccounts: func() (accounts []string, err error) {
-			jsonBytes, _ := json.Marshal(accountTest)
-			accounts = make([]string, 0)
-			accounts = append(accounts, string(jsonBytes))
+		OnGetAllAccounts: func() (accounts []model.Account, err error) {
+			accounts = make([]model.Account, 0)
+			accounts = append(accounts, accountTest)
 			return accounts, nil
 		},
 	}

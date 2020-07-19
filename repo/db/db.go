@@ -8,8 +8,10 @@ import (
 
 // Constantes para o pacote repo.
 const (
+	Gorm                     = "gorm"
 	Scribble                 = "scribble"
 	EnvDatabaseName          = "DATABASE_NAME"
+	EnvDatabaseNameGorm      = "DATABASE_NAME_GORM"
 	ErrorDataBaseTypeInvalid = "Database escolhido não existe."
 )
 
@@ -21,6 +23,8 @@ type Service struct {
 //Open - Abre a conexão com o banco de dados.
 func Open(dataBase string) (*Service, error) {
 	switch dataBase {
+	case Gorm:
+		return openGorm()
 	case Scribble:
 		return openScribble()
 	default:

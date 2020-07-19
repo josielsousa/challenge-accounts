@@ -4,14 +4,14 @@ import "github.com/josielsousa/challenge-accounts/repo/model"
 
 // MockAccountStorage - Mock account storage
 type MockAccountStorage struct {
-	OnGetAllAccounts func() ([]string, error)
+	OnGetAllAccounts func() ([]model.Account, error)
 	OnGetAccount     func(id string) (*model.Account, error)
 	OnInsert         func(account model.Account) (*model.Account, error)
 	OnUpdate         func(account model.Account) (*model.Account, error)
 }
 
 // GetAllAccounts - Mock provider recuperar todas as accounts.
-func (m *MockAccountStorage) GetAllAccounts() ([]string, error) {
+func (m *MockAccountStorage) GetAllAccounts() ([]model.Account, error) {
 	return m.OnGetAllAccounts()
 }
 

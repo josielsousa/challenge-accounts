@@ -50,7 +50,8 @@ func (s *AccountStorage) GetAllAccounts() ([]model.Account, error) {
 //GetAccount - Recupera uma account conforme o `id` informado.
 func (s *AccountStorage) GetAccount(id string) (*model.Account, error) {
 	account := &model.Account{}
-	err := s.db.Table(model.AccountsTablename).Where(map[string]interface{}{"id": id}).First(&account).Error
+	accountFilter := &accountGorm{ID: id}
+	err := s.db.Table(model.AccountsTablename).Where(accountFilter).First(account).Error
 	if err != nil {
 		return nil, err
 	}

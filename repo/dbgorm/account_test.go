@@ -1,8 +1,6 @@
 package dbgorm_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -136,14 +134,6 @@ func TestStorageGetAllAccounts(t *testing.T) {
 		if err != nil {
 			t.Error(ErrorGetAllAccount, err)
 		}
-
-		allAccountsBits, err := json.Marshal(allAccounts)
-		if err != nil {
-			t.Error(ErrorGetAllAccount, err)
-		}
-
-		a := string(allAccountsBits)
-		fmt.Println("allAccountsBits: ", a)
 
 		if len(allAccounts) <= 0 {
 			t.Error(ErrorGetAccountsEmptyReturn)

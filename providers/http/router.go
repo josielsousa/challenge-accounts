@@ -29,6 +29,12 @@ func NewRouter(srvAccount *service.AccountService, log types.APILogProvider) *Ro
 func (rp *RouterProvider) ServeHTTP() {
 	rp.mux.HandleFunc("/", homeHandler).Methods("GET")
 
+	//Inicia as rotas de accounts e informa qual método interno vai receber a REQUEST
+	rp.mux.HandleFunc("/accounts", rp.srvAccount.GetAllAccounts).Methods("GET")
+	rp.mux.HandleFunc("/accounts", rp.srvAccount.InsertAccount).Methods("POST")
+	rp.mux.HandleFunc("/accounts/{id}", rp.srvAccount.GetAllAccounts).Methods("GET")
+	rp.mux.HandleFunc("/accounts/{id}", rp.srvAccount.UpdateAccount).Methods("PUT")
+
 	rp.logger.Info("API disponibilizada na porta 3000")
 	log.Fatal(http.ListenAndServe(":3000", rp.mux))
 }

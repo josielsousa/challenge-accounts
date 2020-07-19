@@ -7,4 +7,6 @@ coverage.*
 
 # Dependency directories (remove the comment below to include it)
 bin/
+*DB*
+*DBTest*
 go.sum

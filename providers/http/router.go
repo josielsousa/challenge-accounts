@@ -5,20 +5,23 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/josielsousa/challenge-accounts/service"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
 // RouterProvider - Implementação do provider de rotas.
 type RouterProvider struct {
-	mux    *mux.Router
-	logger types.APILogProvider
+	mux        *mux.Router
+	logger     types.APILogProvider
+	srvAccount *service.AccountService
 }
 
 //NewRouter - Instância o novo provider com as dependências `mux, log` inicializadas.
-func NewRouter(log types.APILogProvider) *RouterProvider {
+func NewRouter(srvAccount *service.AccountService, log types.APILogProvider) *RouterProvider {
 	return &RouterProvider{
-		logger: log,
-		mux:    mux.NewRouter(),
+		logger:     log,
+		mux:        mux.NewRouter(),
+		srvAccount: srvAccount,
 	}
 }
 

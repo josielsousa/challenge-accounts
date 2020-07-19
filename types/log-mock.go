@@ -8,10 +8,10 @@ type MockAPILogProvider struct {
 
 // Info - Mock provider log info
 func (m *MockAPILogProvider) Info(info string) {
-	m.OnInfo(log)
+	m.OnInfo(info)
 }
 
 // Error - Mock provider log info
-func (l *MockAPILogProvider) Error(trace string, erro error) {
-	l.OnError(trace, erro)
+func (m *MockAPILogProvider) Error(trace string, erro error) {
+	m.OnError(trace, erro)
 }

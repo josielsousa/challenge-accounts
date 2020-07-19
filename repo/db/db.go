@@ -9,8 +9,6 @@ import (
 // Constantes para o pacote repo.
 const (
 	Gorm                     = "gorm"
-	Scribble                 = "scribble"
-	EnvDatabaseName          = "DATABASE_NAME"
 	EnvDatabaseNameGorm      = "DATABASE_NAME_GORM"
 	ErrorDataBaseTypeInvalid = "Database escolhido não existe."
 )
@@ -25,8 +23,6 @@ func Open(dataBase string) (*Service, error) {
 	switch dataBase {
 	case Gorm:
 		return openGorm()
-	case Scribble:
-		return openScribble()
 	default:
 		return nil, errors.New(ErrorDataBaseTypeInvalid)
 	}

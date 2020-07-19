@@ -11,7 +11,7 @@ import (
 //Constante de mensagens
 const (
 	DatabaseType                             = "nope"
-	DatabaseNameTest                         = "../../DBTestAccount"
+	DatabaseNameTest                         = "../../test.db"
 	ErrorOpenConnection                      = "Error on open connection"
 	ErrorOpenConnectionNotImplemented        = "Error on open connection not implemented"
 	ErrorOpenConnectionServiceNil            = "Error on open connection, service nil"
@@ -19,20 +19,7 @@ const (
 )
 
 func init() {
-	os.Setenv(db.EnvDatabaseName, DatabaseNameTest)
-}
-
-func TestDbOpenSuccess(t *testing.T) {
-	t.Run("Teste Abrir conexão com o banco de dados", func(t *testing.T) {
-		srv, err := db.Open(db.Scribble)
-		if err != nil {
-			t.Error(ErrorOpenConnection, err)
-		}
-
-		if srv == nil {
-			t.Error(ErrorOpenConnectionServiceNil)
-		}
-	})
+	os.Setenv(db.EnvDatabaseNameGorm, DatabaseNameTest)
 }
 
 func TestDbOpenGormSuccess(t *testing.T) {

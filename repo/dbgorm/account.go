@@ -23,7 +23,7 @@ type accountGorm struct {
 	Cpf       string  `gorm:"type:varchar(255)"`
 	Name      string  `gorm:"type:varchar(255)"`
 	Secret    string  `gorm:"type:varchar(255)"`
-	Ballance  float64 `gorm:"type:numeric(18,2)`
+	Ballance  float64 `gorm:"type:numeric(18,2)"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time `sql:"index"`

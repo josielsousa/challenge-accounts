@@ -9,7 +9,7 @@ build: install
 	@echo "Fazendo build..."
 	env GOOS=linux go build -o bin/service cmd/main.go
 
-test: install test-coverage
+test: clean install test-coverage
 
 setup-local: install
 	@go get -u golang.org/x/tools/...

@@ -34,6 +34,11 @@ Executando com sucesso os comandos acima, a API estará disponível no endereço
  
 * [YAML](https://yaml.org/) - YAML é um formato de serialização de dados legíveis por humanos, utilizado para configurar os serviços da API para serem executados com o `docker-compose`.
 
+* [Gorm](github.com/jinzhu/gorm) - ORM para manipulação do acesso ao banco de dados
+
+* [sqlite3](https://www.sqlite.org/index.html) - Banco de dados em memória.
+
+* [go-sqlite3](github.com/mattn/go-sqlite3) - Implementação do driver para acessar o banco de dados sqlite.
 
 ## Autor
 

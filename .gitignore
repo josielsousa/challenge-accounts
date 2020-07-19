@@ -12,3 +12,4 @@ api.db
 # Dependency directories (remove the comment below to include it)
 bin/
 go.sum
+.vscode*

@@ -1,13 +1,11 @@
 package dbgorm
 
 import (
-	"regexp"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/josielsousa/challenge-accounts/repo/model"
-	"github.com/josielsousa/challenge-accounts/types"
 )
 
 //AccountStorage - Assinatura para o storage de account.
@@ -56,13 +54,7 @@ func (s *AccountStorage) GetAccount(id string) (*model.Account, error) {
 
 	err := s.db.Table(model.AccountsTablename).Where(accountFilter).First(account).Error
 	if err != nil {
-		account = &model.Account{}
-
-		notFound, _ := regexp.MatchString(types.ErrorRecordNotFound, err.Error())
-		if !notFound {
-			return account, err
-		}
-		return account, nil
+		return nil, err
 	}
 
 	return account, err

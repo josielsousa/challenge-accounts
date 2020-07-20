@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
@@ -105,7 +106,7 @@ func (s *AccountService) GetAccount(w http.ResponseWriter, req *http.Request) {
 
 	s.logger.Info(fmt.Sprintf("ID: %s", id))
 
-	account, err := s.stgAccount.GetAccount(id)
+	account, err := s.getAccount(id)
 	if err != nil {
 		s.logger.Error("Error on get account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
@@ -119,6 +120,21 @@ func (s *AccountService) GetAccount(w http.ResponseWriter, req *http.Request) {
 	}
 
 	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: success, Data: account})
+}
+
+//JSONDecoder - Realiza o parser do body recebido da request.
+func (s *AccountService) getAccount(id string) (*model.Account, error) {
+	account, err := s.stgAccount.GetAccount(id)
+	if err != nil {
+		notFound, _ := regexp.MatchString(types.ErrorRecordNotFound, err.Error())
+		if !notFound {
+			return nil, err
+		}
+
+		return &model.Account{}, nil
+	}
+
+	return account, nil
 }
 
 //JSONDecoder - Realiza o parser do body recebido da request.

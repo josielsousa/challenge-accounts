@@ -14,7 +14,6 @@ import (
 
 //Constante de mensagens
 const (
-	DatabaseNameTest              = "../../test.db"
 	ErrorInsertAccount            = "Error on insert account"
 	ErrorUpdateAccount            = "Error on update account"
 	ErrorGetAccount               = "Error on get an account by id"
@@ -27,20 +26,20 @@ const (
 )
 
 var (
-	db          *gorm.DB
+	dbAcc       *gorm.DB
 	accountTest model.Account
-	stg         *dbgorm.AccountStorage
+	stgAcc      *dbgorm.AccountStorage
 )
 
-func setup(t *testing.T) *dbgorm.AccountStorage {
-	if db == nil {
-		dbGorm, err := gorm.Open("sqlite3", DatabaseNameTest)
+func setupTestAccounts(t *testing.T) *dbgorm.AccountStorage {
+	if dbAcc == nil {
+		dbGorm, err := gorm.Open("sqlite3", types.DatabaseNameTest)
 		if err != nil {
 			t.Error(types.ErrorOpenConnection, err)
 			return nil
 		}
 
-		db = dbGorm
+		dbAcc = dbGorm
 	}
 
 	accountTest = model.Account{
@@ -48,14 +47,14 @@ func setup(t *testing.T) *dbgorm.AccountStorage {
 		Name: "Teste Account",
 	}
 
-	return dbgorm.NewAccountStorage(db)
+	return dbgorm.NewAccountStorage(dbAcc)
 }
 
 func TestStorageInsertAccount(t *testing.T) {
-	stg = setup(t)
+	stgAcc = setupTestAccounts(t)
 
 	t.Run("Teste Inserir account sucesso", func(t *testing.T) {
-		acc, err := stg.Insert(accountTest)
+		acc, err := stgAcc.Insert(accountTest)
 		if err != nil {
 			t.Error(ErrorInsertAccount, err)
 		}
@@ -67,10 +66,10 @@ func TestStorageInsertAccount(t *testing.T) {
 }
 
 func TestStorageUpdateAccount(t *testing.T) {
-	stg = setup(t)
+	stgAcc = setupTestAccounts(t)
 
 	t.Run("Teste Update account sucesso", func(t *testing.T) {
-		acc, err := stg.Insert(accountTest)
+		acc, err := stgAcc.Insert(accountTest)
 		if err != nil {
 			t.Error(ErrorInsertAccount, err)
 		}
@@ -82,7 +81,7 @@ func TestStorageUpdateAccount(t *testing.T) {
 		newName := "Novo nome"
 		acc.Name = newName
 
-		accUpdate, err := stg.Update(*acc)
+		accUpdate, err := stgAcc.Update(*acc)
 		if err != nil {
 			t.Error(ErrorUpdateAccount, err)
 		}
@@ -94,10 +93,10 @@ func TestStorageUpdateAccount(t *testing.T) {
 }
 
 func TestStorageGetAccount(t *testing.T) {
-	stg = setup(t)
+	stgAcc = setupTestAccounts(t)
 
 	t.Run("Teste Get Account sucesso", func(t *testing.T) {
-		acc, err := stg.Insert(accountTest)
+		acc, err := stgAcc.Insert(accountTest)
 		if err != nil {
 			t.Error(ErrorInsertAccount, err)
 		}
@@ -106,7 +105,7 @@ func TestStorageGetAccount(t *testing.T) {
 			t.Error(ErrorInsertAccountEmptyReturn, err)
 		}
 
-		accByID, err := stg.GetAccount(acc.ID)
+		accByID, err := stgAcc.GetAccount(acc.ID)
 		if err != nil {
 			t.Error(ErrorGetAccount, err)
 		}
@@ -118,10 +117,10 @@ func TestStorageGetAccount(t *testing.T) {
 }
 
 func TestStorageGetAllAccounts(t *testing.T) {
-	stg = setup(t)
+	stgAcc = setupTestAccounts(t)
 
 	t.Run("Teste Get Account sucesso", func(t *testing.T) {
-		acc, err := stg.Insert(accountTest)
+		acc, err := stgAcc.Insert(accountTest)
 		if err != nil {
 			t.Error(ErrorInsertAccount, err)
 		}
@@ -130,7 +129,7 @@ func TestStorageGetAllAccounts(t *testing.T) {
 			t.Error(ErrorInsertAccountEmptyReturn, err)
 		}
 
-		allAccounts, err := stg.GetAllAccounts()
+		allAccounts, err := stgAcc.GetAllAccounts()
 		if err != nil {
 			t.Error(ErrorGetAllAccount, err)
 		}

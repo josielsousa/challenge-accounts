@@ -9,7 +9,6 @@ import (
 // Constantes para o pacote repo.
 const (
 	Gorm                     = "gorm"
-	EnvDatabaseNameGorm      = "DATABASE_NAME_GORM"
 	ErrorDataBaseTypeInvalid = "Database escolhido não existe."
 )
 

@@ -1,7 +1,6 @@
 package db_test
 
 import (
-	"os"
 	"testing"
 
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -11,16 +10,11 @@ import (
 //Constante de mensagens
 const (
 	DatabaseType                             = "nope"
-	DatabaseNameTest                         = "../../test.db"
 	ErrorOpenConnection                      = "Error on open connection"
 	ErrorOpenConnectionNotImplemented        = "Error on open connection not implemented"
 	ErrorOpenConnectionServiceNil            = "Error on open connection, service nil"
 	ErrorOpenConnectionNotImplementedService = "Error on open connection not implemented, service is not nil"
 )
-
-func init() {
-	os.Setenv(db.EnvDatabaseNameGorm, DatabaseNameTest)
-}
 
 func TestDbOpenGormSuccess(t *testing.T) {
 	t.Run("Teste Abrir conexão com o banco de dados utilizando Gorm", func(t *testing.T) {

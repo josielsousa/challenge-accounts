@@ -7,3 +7,9 @@ const (
 	ErrorCreateDatabase = "Erro ao criar o banco de dados"
 	ErrorOpenConnection = "Erro ao abrir a conexão com o banco de dados"
 )
+
+// Constantes de conexão com o banco de dados.
+const (
+	DatabaseName     = "../../api.db"
+	DatabaseNameTest = "../../test.db"
+)

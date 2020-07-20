@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -33,15 +34,18 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request) {
 	account, err := s.JSONDecoder(req)
 	if err != nil {
+		s.logger.Error("Error on decode account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		return
 	}
 
+	createdAt := time.Now()
+	account.CreatedAt = &createdAt
 	account.ID = uuid.New().String()
-	account.CreatedAt = time.Now()
 
 	acc, err := s.stgAccount.Insert(account)
 	if err != nil {
+		s.logger.Error("Error on insert an account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		return
 	}
@@ -55,12 +59,14 @@ func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request)
 func (s *AccountService) UpdateAccount(w http.ResponseWriter, req *http.Request) {
 	account, err := s.JSONDecoder(req)
 	if err != nil {
+		s.logger.Error("Error on decode account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		return
 	}
 
 	acc, err := s.stgAccount.Update(account)
 	if err != nil {
+		s.logger.Error("Error on update an account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		return
 	}
@@ -75,6 +81,7 @@ func (s *AccountService) UpdateAccount(w http.ResponseWriter, req *http.Request)
 func (s *AccountService) GetAllAccounts(w http.ResponseWriter, req *http.Request) {
 	accounts, err := s.stgAccount.GetAllAccounts()
 	if err != nil {
+		s.logger.Error("Error on get all accounts: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		return
 	}
@@ -96,18 +103,22 @@ func (s *AccountService) GetAccount(w http.ResponseWriter, req *http.Request) {
 	params := s.httpHlp.GetParams(req)
 	id := params["id"]
 
+	s.logger.Info(fmt.Sprintf("ID: %s", id))
+
 	account, err := s.stgAccount.GetAccount(id)
 	if err != nil {
+		s.logger.Error("Error on get account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		return
 	}
 
+	success := account != nil && len(account.ID) > 0
 	statusCode := http.StatusOK
-	if account == nil || len(account.ID) <= 0 {
+	if !success {
 		statusCode = http.StatusNotFound
 	}
 
-	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: true, Data: account})
+	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: success, Data: account})
 }
 
 //JSONDecoder - Realiza o parser do body recebido da request.

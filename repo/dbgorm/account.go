@@ -1,11 +1,13 @@
 package dbgorm
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/josielsousa/challenge-accounts/repo/model"
+	"github.com/josielsousa/challenge-accounts/types"
 )
 
 //AccountStorage - Assinatura para o storage de account.
@@ -24,8 +26,8 @@ type accountGorm struct {
 	Name      string  `gorm:"type:varchar(255)"`
 	Secret    string  `gorm:"type:varchar(255)"`
 	Ballance  float64 `gorm:"type:numeric(18,2)"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 	DeletedAt *time.Time `sql:"index"`
 }
 
@@ -51,9 +53,16 @@ func (s *AccountStorage) GetAllAccounts() ([]model.Account, error) {
 func (s *AccountStorage) GetAccount(id string) (*model.Account, error) {
 	account := &model.Account{}
 	accountFilter := &accountGorm{ID: id}
+
 	err := s.db.Table(model.AccountsTablename).Where(accountFilter).First(account).Error
 	if err != nil {
-		return nil, err
+		account = &model.Account{}
+
+		notFound, _ := regexp.MatchString(types.ErrorRecordNotFound, err.Error())
+		if !notFound {
+			return account, err
+		}
+		return account, nil
 	}
 
 	return account, err

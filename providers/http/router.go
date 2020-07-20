@@ -32,7 +32,7 @@ func (rp *RouterProvider) ServeHTTP() {
 	//Inicia as rotas de accounts e informa qual método interno vai receber a REQUEST
 	rp.mux.HandleFunc("/accounts", rp.srvAccount.GetAllAccounts).Methods("GET")
 	rp.mux.HandleFunc("/accounts", rp.srvAccount.InsertAccount).Methods("POST")
-	rp.mux.HandleFunc("/accounts/{id}", rp.srvAccount.GetAllAccounts).Methods("GET")
+	rp.mux.HandleFunc("/accounts/{id}", rp.srvAccount.GetAccount).Methods("GET")
 	rp.mux.HandleFunc("/accounts/{id}", rp.srvAccount.UpdateAccount).Methods("PUT")
 
 	rp.logger.Info("API disponibilizada na porta 3000")

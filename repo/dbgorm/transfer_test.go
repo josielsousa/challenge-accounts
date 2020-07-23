@@ -46,7 +46,7 @@ func setupTestTransfers(t *testing.T) *dbgorm.TransferStorage {
 		ID:                   "",
 		Amount:               3.50,
 		AccountOriginID:      uuid.New().String(),
-		AccountdestinationID: uuid.New().String(),
+		AccountDestinationID: uuid.New().String(),
 	}
 
 	return dbgorm.NewTransferStorage(dbTransfer)

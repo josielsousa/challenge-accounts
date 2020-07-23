@@ -15,8 +15,8 @@ type Account struct {
 	Secret    string     `json:"secret,omitempty"`
 	Ballance  float64    `json:"ballance,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	UpdatedAt *time.Time `json:"-"`
+	DeletedAt *time.Time `json:"-"`
 }
 
 //AccountStorage - Interface que define as assinaturas para o storage de accounts.

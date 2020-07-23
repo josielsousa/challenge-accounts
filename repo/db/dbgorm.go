@@ -16,9 +16,18 @@ func openGorm() (service *Service, err error) {
 	return getServicesGorm(db), nil
 }
 
+//getServicesGorm - Inicializa uma transação no banco de dados.
+func (s *Service) openGormTransaction() *Service {
+	tx := s.conn.(*gorm.DB).Begin()
+	return getServicesGorm(tx)
+}
+
 //getServicesGorm - Retorna as implementações de storage para o gorm.
 func getServicesGorm(db *gorm.DB) *Service {
 	return &Service{
-		Account: dbgorm.NewAccountStorage(db),
+		conn:     db,
+		connType: Gorm,
+		Account:  dbgorm.NewAccountStorage(db),
+		Transfer: dbgorm.NewTransferStorage(db),
 	}
 }

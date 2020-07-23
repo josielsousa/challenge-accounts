@@ -16,10 +16,16 @@ func main() {
 	stg, err := db.Open(db.Gorm)
 	if err != nil {
 		logger.Error(types.ErrorOpenConnection, err)
+		return
 	}
 
+	defer func() {
+		stg.Close()
+	}()
+
+	srvTransfer := service.NewTransferService(stg, logger)
 	srvAccount := service.NewAccountService(stg.Account, logger)
 
-	router := http.NewRouter(srvAccount, logger)
+	router := http.NewRouter(srvAccount, srvTransfer, logger)
 	router.ServeHTTP()
 }

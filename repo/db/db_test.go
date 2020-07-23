@@ -41,3 +41,38 @@ func TestDbOpenFail(t *testing.T) {
 		}
 	})
 }
+
+func TestDbCloseGormSuccess(t *testing.T) {
+	t.Run("Teste Abrir conexão com o banco de dados utilizando Gorm", func(t *testing.T) {
+		srv, err := db.Open(db.Gorm)
+		if err != nil {
+			t.Error(ErrorOpenConnection, err)
+		}
+
+		srv.Close()
+	})
+}
+
+func TestDbRollbackGormSuccess(t *testing.T) {
+	t.Run("Teste Abrir conexão com o banco de dados utilizando Gorm", func(t *testing.T) {
+		srv, err := db.Open(db.Gorm)
+		if err != nil {
+			t.Error(ErrorOpenConnection, err)
+		}
+
+		srv.Rollback()
+		srv.Close()
+	})
+}
+
+func TestDbCommitGormSuccess(t *testing.T) {
+	t.Run("Teste Abrir conexão com o banco de dados utilizando Gorm", func(t *testing.T) {
+		srv, err := db.Open(db.Gorm)
+		if err != nil {
+			t.Error(ErrorOpenConnection, err)
+		}
+
+		srv.Commit()
+		srv.Close()
+	})
+}

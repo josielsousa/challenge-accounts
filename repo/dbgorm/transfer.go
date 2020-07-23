@@ -19,13 +19,13 @@ func (transferGorm) TableName() string {
 
 // Estrutura necessária para que o gorm realize o mapeamento das colunas com os tipos de dados.
 type transferGorm struct {
-	ID                    string  `gorm:"type:uuid;primary_key;"`
-	TransferOriginID      string  `gorm:"type:varchar(255)"`
-	TransferdestinationID string  `gorm:"type:varchar(255)"`
-	Amount                float64 `gorm:"type:numeric(18,2)"`
-	CreatedAt             *time.Time
-	UpdatedAt             *time.Time
-	DeletedAt             *time.Time `sql:"index"`
+	ID                   string  `gorm:"type:uuid;primary_key;"`
+	AccountOriginID      string  `gorm:"type:varchar(255)"`
+	AccountDestinationID string  `gorm:"type:varchar(255)"`
+	Amount               float64 `gorm:"type:numeric(18,2)"`
+	CreatedAt            *time.Time
+	UpdatedAt            *time.Time
+	DeletedAt            *time.Time `sql:"index"`
 }
 
 //NewTransferStorage - Inicializa o storage para transfers no banco de dados com Gorm.

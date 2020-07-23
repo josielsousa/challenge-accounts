@@ -28,7 +28,7 @@ test-coverage:
 	@echo "Rodando testes"
 	@richgo test -tags 'nopie' -failfast -coverprofile=coverage.out ./...
 	@go tool cover -html=coverage.out -o coverage.html
-	@rm -rf ./test.db
+
 	@rm -rf ./DBTestAccount*
 
 clean:

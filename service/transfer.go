@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -9,7 +8,6 @@ import (
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validation"
 	"github.com/josielsousa/challenge-accounts/repo/db"
-	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -119,7 +117,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 }
 
 //GetAllTransfers - Retorna as informações de todas as contas se não existir retorna []
-// 	200: Quando existir transfers para serem retornadas
+//	200: Quando existir transfers para serem retornadas
 //	204: Quando não encontrar transfers.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *TransferService) GetAllTransfers(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
@@ -136,11 +134,4 @@ func (s *TransferService) GetAllTransfers(w http.ResponseWriter, req *http.Reque
 	}
 
 	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: true, Data: transfers})
-}
-
-//JSONDecoder - Realiza o parser do body recebido da request.
-func (s *TransferService) JSONDecoder(req *http.Request) (model.Transfer, error) {
-	transfer := model.Transfer{}
-	err := json.NewDecoder(req.Body).Decode(&transfer)
-	return transfer, err
 }

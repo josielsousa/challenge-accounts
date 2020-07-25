@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"net/http"
 	"regexp"
 	"time"
@@ -47,7 +46,7 @@ func NewAuthService(stgAccount model.AccountStorage, log types.APILogProvider) *
 }
 
 //Login - Realiza a autenticação do usuário na API.
-// 	200: Quando a autenticação for bem sucedida.
+//	200: Quando a autenticação for bem sucedida.
 //	401: Quando o `secret` fornecido for diferente do secret armazenado.
 //	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição
@@ -80,7 +79,18 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 
 	//Tempo de expiração do token
 	expirationTime := time.Now().Add(MaxTimeToExpiration * time.Minute)
+	authToken, err := s.GetToken(acc, jwtKey, expirationTime)
+	if err != nil {
+		s.logger.Error("Error on generate new token by `cpf`: ", err)
+		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+		return
+	}
 
+	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: true, Data: authToken})
+}
+
+//GetToken - Gera um novo token.
+func (s *AuthService) GetToken(acc *model.Account, jwtKey []byte, expirationTime time.Time) (*types.Auth, error) {
 	//JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
 	claims := &types.Claims{
 		AccountID: acc.ID,
@@ -91,17 +101,15 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		s.logger.Error("Error on generate new token by `cpf`: ", err)
-		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
-		return
+		return nil, err
 	}
 
 	authToken := &types.Auth{Token: tokenString}
-	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: true, Data: authToken})
+	return authToken, nil
 }
 
 //ValidateToken - Realiza a validação do token enviado.
-// 	200: Quando a validação for bem sucedida.
+//	200: Quando a validação for bem sucedida.
 //	401: Quando o `token` fornecido for inválido.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request, *types.Claims)) func(http.ResponseWriter, *http.Request) {
@@ -142,11 +150,4 @@ func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request
 		//Invoca a próxima requisição.
 		next(w, req, claims)
 	}
-}
-
-//JSONDecoder - Realiza o parser do body recebido da request.
-func (s *AuthService) JSONDecoder(req *http.Request) (types.Credentials, error) {
-	credential := types.Credentials{}
-	err := json.NewDecoder(req.Body).Decode(&credential)
-	return credential, err
 }

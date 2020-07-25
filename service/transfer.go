@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/josielsousa/challenge-accounts/helpers/decimal"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validator"
 	"github.com/josielsousa/challenge-accounts/repo/db"
@@ -80,7 +81,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 
 	//Inicia a transação
 	tx := s.stg.BeginTransaction()
-	accOrigin.Balance -= transfer.Amount
+	accOrigin.Balance = decimal.Sub(accOrigin.Balance, transfer.Amount)
 
 	_, err = tx.Account.Update(*accOrigin)
 	if err != nil {
@@ -90,7 +91,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 		return
 	}
 
-	accDestination.Balance += transfer.Amount
+	accDestination.Balance = decimal.Add(accDestination.Balance, transfer.Amount)
 	_, err = tx.Account.Update(*accDestination)
 	if err != nil {
 		s.logger.Error("Error on update balance account destination transfer: ", err)

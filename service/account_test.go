@@ -16,9 +16,11 @@ import (
 )
 
 const (
-	ErrorScenarioError         = "Deveria retornar status 500; retornou %d"
-	ErrorScenarioSuccess       = "Deveria retornar status 200; retornou %d"
-	ErrorScenarioErrorNotFound = "Deveria retornar status 404; retornou %d"
+	ErrorScenarioError               = "Deveria retornar status 500; retornou %d"
+	ErrorScenarioSuccess             = "Deveria retornar status 200; retornou %d"
+	ErrorScenarioCreated             = "Deveria retornar status 201; retornou %d"
+	ErrorScenarioErrorNotFound       = "Deveria retornar status 404; retornou %d"
+	ErrorScenarioUnprocessableEntity = "Deveria retornar status 422; retornou %d"
 )
 
 var (
@@ -90,7 +92,7 @@ func TestServiceInsertAccount(t *testing.T) {
 		srvAcc.InsertAccount(mockRps, mockReq)
 		//Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusCreated {
-			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
+			t.Errorf(ErrorScenarioCreated, mockRps.Result().StatusCode)
 		}
 	})
 
@@ -107,7 +109,7 @@ func TestServiceInsertAccount(t *testing.T) {
 
 		//Força o retorno de um erro inesperado ao realizar a persistência no banco de dados.
 		stgAcc.OnInsert = func(account model.Account) (*model.Account, error) {
-			return nil, errors.New("Erro Inesperado")
+			return nil, errors.New(types.ErrorUnexpected)
 		}
 
 		srvAcc.InsertAccount(mockRps, mockReq)

@@ -85,7 +85,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 	_, err = tx.Account.Update(*accOrigin)
 	if err != nil {
 		s.logger.Error("Error on update ballance account origin transfer: ", err)
-		s.httpHlp.ThrowError(w, http.StatusNotFound, types.ErrorUnexpected)
+		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		tx.Rollback()
 		return
 	}
@@ -94,7 +94,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 	_, err = tx.Account.Update(*accDestination)
 	if err != nil {
 		s.logger.Error("Error on update ballance account destination transfer: ", err)
-		s.httpHlp.ThrowError(w, http.StatusNotFound, types.ErrorUnexpected)
+		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		tx.Rollback()
 		return
 	}

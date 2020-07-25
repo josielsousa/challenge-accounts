@@ -10,6 +10,7 @@ import (
 //Constante de mensagens
 const (
 	DatabaseType                             = "nope"
+	ErrorOpenTransaction                     = "Error on open transaction"
 	ErrorOpenConnection                      = "Error on open connection"
 	ErrorOpenConnectionNotImplemented        = "Error on open connection not implemented"
 	ErrorOpenConnectionServiceNil            = "Error on open connection, service nil"
@@ -72,6 +73,24 @@ func TestDbCommitGormSuccess(t *testing.T) {
 			t.Error(ErrorOpenConnection, err)
 		}
 
+		srv.Commit()
+		srv.Close()
+	})
+}
+
+func TestDbOpenTransactionGormSuccess(t *testing.T) {
+	t.Run("Teste Abrir conexão com o banco de dados utilizando Gorm", func(t *testing.T) {
+		srv, err := db.Open(db.Gorm)
+		if err != nil {
+			t.Error(ErrorOpenConnection, err)
+		}
+
+		tx := srv.BeginTransaction()
+		if tx == nil {
+			t.Error(ErrorOpenTransaction, err)
+		}
+
+		tx.Rollback()
 		srv.Commit()
 		srv.Close()
 	})

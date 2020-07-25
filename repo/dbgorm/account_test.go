@@ -1,6 +1,7 @@
 package dbgorm_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -21,7 +22,8 @@ const (
 	ErrorInsertAccountEmptyReturn = "Error on insert account, empty return"
 	ErrorInsertAccountIdDiffer    = "Error on insert account, id differ returning"
 	ErrorUpdateAccountNameDiffer  = "Error on update, name returns differ original name"
-	ErrorGetAccountIdDiffer       = "Error on get account, id returns differ original id"
+	ErrorGetAccountIdDiffer       = "Error on get account, id %s returns differ original id %s"
+	ErrorGetAccountCpfDiffer      = "Error on get account, Cpf %s returns differ original Cpf %s"
 	ErrorGetAccountsEmptyReturn   = "Error on get all accounts, no content"
 )
 
@@ -111,7 +113,31 @@ func TestStorageGetAccount(t *testing.T) {
 		}
 
 		if acc.ID != accByID.ID {
-			t.Error(ErrorUpdateAccountNameDiffer, err)
+			t.Error(fmt.Sprintf(ErrorGetAccountIdDiffer, acc.ID, accByID.ID))
+		}
+	})
+}
+func TestStorageGetAccountByCPF(t *testing.T) {
+	stgAcc = setupTestAccounts(t)
+
+	t.Run("Teste Get Account por CPF sucesso", func(t *testing.T) {
+		accountTest.Cpf = "123456789"
+		acc, err := stgAcc.Insert(accountTest)
+		if err != nil {
+			t.Error(ErrorInsertAccount, err)
+		}
+
+		if acc.ID != accountTest.ID {
+			t.Error(ErrorInsertAccountEmptyReturn, err)
+		}
+
+		accByID, err := stgAcc.GetAccountByCPF(acc.Cpf)
+		if err != nil {
+			t.Error(ErrorGetAccount, err)
+		}
+
+		if acc.Cpf != accByID.Cpf {
+			t.Error(fmt.Sprintf(ErrorGetAccountCpfDiffer, acc.ID, accByID.ID))
 		}
 	})
 }

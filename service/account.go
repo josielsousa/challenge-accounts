@@ -8,25 +8,38 @@ import (
 	"github.com/google/uuid"
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
+	"github.com/josielsousa/challenge-accounts/helpers/validation"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
+// Mesnagens de validação para `accounts`.
+const (
+	ErrorAccountExist = "Já existe uma conta criada com o CPF informado."
+)
+
+//Inicializa as regras customizadas.
+func init() {
+	validation.InitCustomRule()
+}
+
 // AccountService - Implementação do service para as accounts.
 type AccountService struct {
-	authHlp    *auth.Helper
-	httpHlp    *httpHelper.Helper
-	stgAccount model.AccountStorage
-	logger     types.APILogProvider
+	authHlp       *auth.Helper
+	httpHlp       *httpHelper.Helper
+	validationHlp *validation.Helper
+	stgAccount    model.AccountStorage
+	logger        types.APILogProvider
 }
 
 //NewAccountService - Instância o service com a dependência `log` inicializada.
 func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider) *AccountService {
 	return &AccountService{
-		logger:     log,
-		stgAccount: stgAccount,
-		authHlp:    auth.NewHelper(),
-		httpHlp:    httpHelper.NewHelper(),
+		logger:        log,
+		stgAccount:    stgAccount,
+		authHlp:       auth.NewHelper(),
+		httpHlp:       httpHelper.NewHelper(),
+		validationHlp: validation.NewHelper(),
 	}
 }
 
@@ -34,10 +47,22 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 //	200: Sucesso na inserção
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request) {
-	account, err := s.JSONDecoder(req)
+	account := s.validationHlp.ValidateDataAccount(w, req)
+	if account == nil {
+		return
+	}
+
+	accExist, err := s.stgAccount.GetAccountByCPF(account.Cpf)
 	if err != nil {
-		s.logger.Error("Error on decode account: ", err)
+		s.logger.Error("Error on verify account exists: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+		return
+	}
+
+	exist := accExist != nil && len(accExist.ID) > 0
+	if exist {
+		s.logger.Info("Account exists")
+		s.httpHlp.ThrowError(w, http.StatusUnprocessableEntity, ErrorAccountExist)
 		return
 	}
 
@@ -53,7 +78,7 @@ func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request)
 	}
 
 	account.Secret = string(secretHash)
-	acc, err := s.stgAccount.Insert(account)
+	acc, err := s.stgAccount.Insert(*account)
 	if err != nil {
 		s.logger.Error("Error on insert an account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
@@ -151,7 +176,7 @@ func (s *AccountService) GetAccountBallance(w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	accountBallance := model.Account{Ballance: account.Ballance}
+	accountBallance := model.AccountBallance{Ballance: account.Ballance}
 	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: success, Data: accountBallance})
 }
 

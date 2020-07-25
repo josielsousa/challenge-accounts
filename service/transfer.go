@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
+	"github.com/josielsousa/challenge-accounts/helpers/validation"
 	"github.com/josielsousa/challenge-accounts/repo/db"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
@@ -19,19 +20,26 @@ const (
 	ErrorInsufficientOriginBallance = "Conta de origem sem saldo disponível"
 )
 
+//Inicializa as regras customizadas.
+func init() {
+	validation.InitCustomRule()
+}
+
 // TransferService - Implementação do service para as transfers.
 type TransferService struct {
-	stg     *db.Service
-	logger  types.APILogProvider
-	httpHlp *httpHelper.Helper
+	stg           *db.Service
+	logger        types.APILogProvider
+	httpHlp       *httpHelper.Helper
+	validationHlp *validation.Helper
 }
 
 //NewTransferService - Instância o service com a dependência `log` inicializada.
 func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferService {
 	return &TransferService{
-		stg:     stg,
-		logger:  log,
-		httpHlp: httpHelper.NewHelper(),
+		stg:           stg,
+		logger:        log,
+		httpHlp:       httpHelper.NewHelper(),
+		validationHlp: validation.NewHelper(),
 	}
 }
 
@@ -42,10 +50,8 @@ func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferServ
 //	422: Quando não houver saldo disponível
 //	500: Erro inesperado durante o processamento da requisição
 func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
-	transfer, err := s.JSONDecoder(req)
-	if err != nil {
-		s.logger.Error("Error on decode transfer: ", err)
-		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+	transfer := s.validationHlp.ValidateDataTransfer(w, req)
+	if transfer == nil {
 		return
 	}
 

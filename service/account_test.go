@@ -46,6 +46,10 @@ func mockAccountStorage() model.AccountStorage {
 			return &accountTest, nil
 		},
 
+		OnGetAccountByCPF: func(cpf string) (*model.Account, error) {
+			return &accountTest, nil
+		},
+
 		OnUpdate: func(account model.Account) (*model.Account, error) {
 			return &accountTest, nil
 		},
@@ -77,7 +81,7 @@ func TestServiceInsertAccount(t *testing.T) {
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
-		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:8080/accounts", bytesBody)
+		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -95,7 +99,7 @@ func TestServiceInsertAccount(t *testing.T) {
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
-		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:8080/accounts", bytesBody)
+		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -121,7 +125,7 @@ func TestServiceUpdateAccount(t *testing.T) {
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
-		mockReq := httptest.NewRequest(http.MethodPut, "http://localhost:8080/accounts", bytesBody)
+		mockReq := httptest.NewRequest(http.MethodPut, "http://localhost:3000/accounts", bytesBody)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -139,7 +143,7 @@ func TestServiceUpdateAccount(t *testing.T) {
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
-		mockReq := httptest.NewRequest(http.MethodPut, "http://localhost:8080/accounts", bytesBody)
+		mockReq := httptest.NewRequest(http.MethodPut, "http://localhost:3000/accounts", bytesBody)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -162,7 +166,7 @@ func TestServiceGetAccount(t *testing.T) {
 	t.Run("Teste Get account sucesso", func(t *testing.T) {
 		//FakeBody para request
 		service = setup()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/accounts", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -184,7 +188,7 @@ func TestServiceGetAccount(t *testing.T) {
 
 	t.Run("Teste Get account erro não encontrado", func(t *testing.T) {
 		service = setup()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/accounts", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -204,7 +208,7 @@ func TestServiceGetAccount(t *testing.T) {
 
 	t.Run("Teste Get account erro inesperado", func(t *testing.T) {
 		service = setup()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/accounts", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -227,7 +231,7 @@ func TestServiceGetAllAccount(t *testing.T) {
 	t.Run("Teste Get All account sucesso", func(t *testing.T) {
 		//FakeBody para request
 		service = setup()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/accounts", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -241,7 +245,7 @@ func TestServiceGetAllAccount(t *testing.T) {
 
 	t.Run("Teste Get All account lista vazia", func(t *testing.T) {
 		service = setup()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/accounts", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -262,7 +266,7 @@ func TestServiceGetAllAccount(t *testing.T) {
 
 	t.Run("Teste Get All account erro inesperado", func(t *testing.T) {
 		service = setup()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/accounts", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()

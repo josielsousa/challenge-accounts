@@ -6,7 +6,7 @@ import (
 
 // Credentials - estrutura utilizada para realizar a autenticação.
 type Credentials struct {
-	CPF    string `json:"cpf"`
+	Cpf    string `json:"cpf"`
 	Secret string `json:"secret"`
 }
 

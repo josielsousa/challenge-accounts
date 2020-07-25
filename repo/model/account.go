@@ -9,14 +9,19 @@ const (
 
 //Account - Estrutura da entidade `account`
 type Account struct {
-	ID        string     `json:"id,omitempty"`
-	Cpf       string     `json:"cpf,omitempty"`
-	Name      string     `json:"name,omitempty"`
-	Secret    string     `json:"secret,omitempty"`
-	Ballance  float64    `json:"ballance,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	ID        string     `json:"id"`
+	Cpf       string     `json:"cpf"`
+	Name      string     `json:"name"`
+	Secret    string     `json:"secret"`
+	Ballance  float64    `json:"ballance"`
+	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"-"`
 	DeletedAt *time.Time `json:"-"`
+}
+
+//AccountBallance - Estrutura utilizada para serializar o ballacne da entidade `account`
+type AccountBallance struct {
+	Ballance float64 `json:"ballance"`
 }
 
 //AccountStorage - Interface que define as assinaturas para o storage de accounts.

@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
+	"github.com/josielsousa/challenge-accounts/helpers/validation"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -25,21 +26,28 @@ const (
 // JWT string chave utilizada para geração do token.
 var jwtKey = []byte("api-challenge-accounts")
 
+//Inicializa as regras customizadas.
+func init() {
+	validation.InitCustomRule()
+}
+
 // AuthService - Implementação do service para autenticação.
 type AuthService struct {
-	authHlp    *auth.Helper
-	httpHlp    *httpHelper.Helper
-	logger     types.APILogProvider
-	stgAccount model.AccountStorage
+	authHlp       *auth.Helper
+	httpHlp       *httpHelper.Helper
+	validationHlp *validation.Helper
+	logger        types.APILogProvider
+	stgAccount    model.AccountStorage
 }
 
 //NewAuthService - Instância o service.
 func NewAuthService(stgAccount model.AccountStorage, log types.APILogProvider) *AuthService {
 	return &AuthService{
-		logger:     log,
-		stgAccount: stgAccount,
-		authHlp:    auth.NewHelper(),
-		httpHlp:    httpHelper.NewHelper(),
+		logger:        log,
+		stgAccount:    stgAccount,
+		authHlp:       auth.NewHelper(),
+		httpHlp:       httpHelper.NewHelper(),
+		validationHlp: validation.NewHelper(),
 	}
 }
 
@@ -49,14 +57,12 @@ func NewAuthService(stgAccount model.AccountStorage, log types.APILogProvider) *
 //	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
-	credential, err := s.JSONDecoder(req)
-	if err != nil {
-		s.logger.Error("Error on decode credentials: ", err)
-		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+	credential := s.validationHlp.ValidateDataLogin(w, req)
+	if credential == nil {
 		return
 	}
 
-	acc, err := s.stgAccount.GetAccountByCPF(credential.CPF)
+	acc, err := s.stgAccount.GetAccountByCPF(credential.Cpf)
 	if err != nil {
 		s.logger.Error("Error on recovery account by `cpf`: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)

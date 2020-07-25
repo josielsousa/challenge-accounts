@@ -2,12 +2,11 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
@@ -15,9 +14,10 @@ import (
 
 // AccountService - Implementação do service para as accounts.
 type AccountService struct {
+	authHlp    *auth.Helper
+	httpHlp    *httpHelper.Helper
 	stgAccount model.AccountStorage
 	logger     types.APILogProvider
-	httpHlp    *httpHelper.Helper
 }
 
 //NewAccountService - Instância o service com a dependência `log` inicializada.
@@ -25,6 +25,7 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 	return &AccountService{
 		logger:     log,
 		stgAccount: stgAccount,
+		authHlp:    auth.NewHelper(),
 		httpHlp:    httpHelper.NewHelper(),
 	}
 }
@@ -44,6 +45,14 @@ func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request)
 	account.CreatedAt = &createdAt
 	account.ID = uuid.New().String()
 
+	secretHash, err := s.authHlp.Hash(account.Secret)
+	if err != nil {
+		s.logger.Error("Error on hash secret account: ", err)
+		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+		return
+	}
+
+	account.Secret = string(secretHash)
 	acc, err := s.stgAccount.Insert(account)
 	if err != nil {
 		s.logger.Error("Error on insert an account: ", err)
@@ -51,7 +60,7 @@ func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: true, Data: acc})
+	s.httpHlp.ThrowSuccess(w, http.StatusCreated, types.SuccessResponse{Success: true, Data: acc})
 }
 
 //UpdateAccount - Realiza a atualização de uma account conforme os dados do `body` da requisição
@@ -96,17 +105,15 @@ func (s *AccountService) GetAllAccounts(w http.ResponseWriter, req *http.Request
 }
 
 //GetAccount - Retorna as informações da account, conforme o id informado.
-// 	200: Quando existir accounts para serem retornadas
-//	404: Quando não encontrar accounts.
+// 	200: Quando existir account para ser retornada
+//	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AccountService) GetAccount(w http.ResponseWriter, req *http.Request) {
 	//Recebe os parâmetros da request e seleciona o ID
 	params := s.httpHlp.GetParams(req)
 	id := params["id"]
 
-	s.logger.Info(fmt.Sprintf("ID: %s", id))
-
-	account, err := s.getAccount(id)
+	account, err := s.stgAccount.GetAccount(id)
 	if err != nil {
 		s.logger.Error("Error on get account: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
@@ -114,27 +121,38 @@ func (s *AccountService) GetAccount(w http.ResponseWriter, req *http.Request) {
 	}
 
 	success := account != nil && len(account.ID) > 0
-	statusCode := http.StatusOK
 	if !success {
-		statusCode = http.StatusNotFound
+		s.httpHlp.ThrowError(w, http.StatusNotFound, types.ErroAccountNotFound)
+		return
 	}
 
-	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: success, Data: account})
+	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: success, Data: account})
 }
 
-//JSONDecoder - Realiza o parser do body recebido da request.
-func (s *AccountService) getAccount(id string) (*model.Account, error) {
+//GetAccountBallance - Retorna as informações da account, conforme o id informado.
+// 	200: Quando existir account para ser retornada
+//	404: Quando não encontrar a account.
+//	500: Erro inesperado durante o processamento da requisição
+func (s *AccountService) GetAccountBallance(w http.ResponseWriter, req *http.Request) {
+	//Recebe os parâmetros da request e seleciona o ID
+	params := s.httpHlp.GetParams(req)
+	id := params["id"]
+
 	account, err := s.stgAccount.GetAccount(id)
 	if err != nil {
-		notFound, _ := regexp.MatchString(types.ErrorRecordNotFound, err.Error())
-		if !notFound {
-			return nil, err
-		}
-
-		return &model.Account{}, nil
+		s.logger.Error("Error on get account: ", err)
+		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+		return
 	}
 
-	return account, nil
+	success := account != nil && len(account.ID) > 0
+	if !success {
+		s.httpHlp.ThrowError(w, http.StatusNotFound, types.ErroAccountNotFound)
+		return
+	}
+
+	accountBallance := model.Account{Ballance: account.Ballance}
+	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: success, Data: accountBallance})
 }
 
 //JSONDecoder - Realiza o parser do body recebido da request.

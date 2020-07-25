@@ -20,6 +20,6 @@ type Transfer struct {
 
 //TransferStorage - Interface que define as assinaturas para o storage de transfers.
 type TransferStorage interface {
-	GetAllTransfers() ([]Transfer, error)
+	GetAllTransfers(accountID string) ([]Transfer, error)
 	Insert(transfer Transfer) (*Transfer, error)
 }

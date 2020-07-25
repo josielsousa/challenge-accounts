@@ -25,4 +25,5 @@ type AccountStorage interface {
 	GetAccount(id string) (*Account, error)
 	Insert(account Account) (*Account, error)
 	Update(account Account) (*Account, error)
+	GetAccountByCPF(cpf string) (*Account, error)
 }

@@ -23,9 +23,10 @@ func main() {
 		stg.Close()
 	}()
 
+	srvAuth := service.NewAuthService(stg.Account, logger)
 	srvTransfer := service.NewTransferService(stg, logger)
 	srvAccount := service.NewAccountService(stg.Account, logger)
 
-	router := http.NewRouter(srvAccount, srvTransfer, logger)
+	router := http.NewRouter(srvAuth, srvAccount, srvTransfer, logger)
 	router.ServeHTTP()
 }

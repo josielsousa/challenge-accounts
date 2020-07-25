@@ -80,7 +80,7 @@ func TestStorageGetAllTransfers(t *testing.T) {
 			t.Error(ErrorInsertTransferEmptyReturn, err)
 		}
 
-		allTransfers, err := stgTransfer.GetAllTransfers()
+		allTransfers, err := stgTransfer.GetAllTransfers(transfer.AccountOriginID)
 		if err != nil {
 			t.Error(ErrorGetAllTransfer, err)
 		}

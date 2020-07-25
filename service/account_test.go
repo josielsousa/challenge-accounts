@@ -84,7 +84,7 @@ func TestServiceInsertAccount(t *testing.T) {
 
 		service.InsertAccount(mockRps, mockReq)
 		//Verificação do comportamento de acordo com o cenário
-		if mockRps.Result().StatusCode != http.StatusOK {
+		if mockRps.Result().StatusCode != http.StatusCreated {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
 		}
 	})

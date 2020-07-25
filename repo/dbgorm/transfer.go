@@ -35,10 +35,12 @@ func NewTransferStorage(db *gorm.DB) *TransferStorage {
 	return &TransferStorage{db: db}
 }
 
-//GetAllTransfers - Recupera todas as transfers.
-func (s *TransferStorage) GetAllTransfers() ([]model.Transfer, error) {
+//GetAllTransfers - Recupera todas as transfers da `account` informada.
+func (s *TransferStorage) GetAllTransfers(accountID string) ([]model.Transfer, error) {
 	transfers := make([]model.Transfer, 0)
-	err := s.db.Table(model.TransferTablename).Find(&transfers).Error
+	filter := &transferGorm{AccountOriginID: accountID}
+
+	err := s.db.Table(model.TransferTablename).Where(filter).Find(&transfers).Error
 	if err != nil {
 		return nil, err
 	}

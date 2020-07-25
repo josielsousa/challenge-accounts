@@ -103,6 +103,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 	createdAt := time.Now()
 	transfer.CreatedAt = &createdAt
 	transfer.ID = uuid.New().String()
+	transfer.AccountOriginID = claims.AccountID
 
 	trf, err := tx.Transfer.Insert(transfer)
 	if err != nil {

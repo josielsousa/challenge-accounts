@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
@@ -14,10 +15,11 @@ import (
 
 //Constantes utilizadas no serviço de autenticação.
 const (
-	MaxTimeToExpiration      = 3
-	InfoTokenExpired         = "Token expirado."
-	ErrorTokenInvalid        = "Token inválido."
-	ErrorSignatureKeyInvalid = "A chave de assinatura do token é inválida."
+	MaxTimeToExpiration       = 3
+	InfoTokenExpired          = "Token expirado."
+	ErrorTokenInvalid         = "Token inválido."
+	ErrorTokeSignatureInvalid = "token signature is invalid"
+	ErrorSignatureKeyInvalid  = "A chave de assinatura do token é inválida."
 )
 
 // JWT string chave utilizada para geração do token.
@@ -111,7 +113,8 @@ func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request
 
 		jwtToken, err := jwt.ParseWithClaims(tokenHeader, claims, getJwtKey)
 		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
+			tokeSignatureInvalid, _ := regexp.MatchString(ErrorTokeSignatureInvalid, err.Error())
+			if err == jwt.ErrSignatureInvalid || tokeSignatureInvalid {
 				s.logger.Error("Error on parser token claims: ", err)
 				s.httpHlp.ThrowError(w, http.StatusUnauthorized, ErrorSignatureKeyInvalid)
 				return

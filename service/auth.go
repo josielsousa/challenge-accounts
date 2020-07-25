@@ -26,11 +26,6 @@ const (
 // JWT string chave utilizada para geração do token.
 var jwtKey = []byte("api-challenge-accounts")
 
-//Inicializa as regras customizadas.
-func init() {
-	validation.InitCustomRule()
-}
-
 // AuthService - Implementação do service para autenticação.
 type AuthService struct {
 	authHlp       *auth.Helper

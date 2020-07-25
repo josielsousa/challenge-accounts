@@ -20,11 +20,6 @@ const (
 	ErrorInsufficientOriginBallance = "Conta de origem sem saldo disponível"
 )
 
-//Inicializa as regras customizadas.
-func init() {
-	validation.InitCustomRule()
-}
-
 // TransferService - Implementação do service para as transfers.
 type TransferService struct {
 	stg           *db.Service
@@ -111,7 +106,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 	transfer.ID = uuid.New().String()
 	transfer.AccountOriginID = claims.AccountID
 
-	trf, err := tx.Transfer.Insert(transfer)
+	trf, err := tx.Transfer.Insert(*transfer)
 	if err != nil {
 		s.logger.Error("Error on insert an transfer: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)

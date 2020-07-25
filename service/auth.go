@@ -15,7 +15,7 @@ import (
 
 //Constantes utilizadas no serviço de autenticação.
 const (
-	MaxTimeToExpiration       = 3
+	MaxTimeToExpiration       = 5
 	InfoTokenExpired          = "Token expirado."
 	ErrorTokenInvalid         = "Token inválido."
 	ErrorTokeSignatureInvalid = "token signature is invalid"
@@ -131,10 +131,9 @@ func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request
 			return
 		}
 
-		minutesToExpiration := MaxTimeToExpiration * time.Minute
 		minutesElapsedLastAuth := time.Unix(claims.ExpiresAt, 0).Sub(time.Now())
-		if minutesElapsedLastAuth > minutesToExpiration {
-			s.logger.Info("Token expired: ")
+		if minutesElapsedLastAuth <= 0 {
+			s.logger.Info("Token expired")
 			s.httpHlp.ThrowError(w, http.StatusUnauthorized, InfoTokenExpired)
 			return
 		}

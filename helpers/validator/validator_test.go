@@ -1,4 +1,4 @@
-package validation_test
+package validator_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/josielsousa/challenge-accounts/helpers/validation"
+	"github.com/josielsousa/challenge-accounts/helpers/validator"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -16,19 +16,19 @@ var (
 	accountTest    model.Account
 	transferTest   model.Transfer
 	credentialTest types.Credentials
-	validationHlp  *validation.Helper
+	validatorHlp   *validator.Helper
 )
 
 func init() {
-	validation.InitCustomRule()
+	validator.InitCustomRule()
 }
 
 func setup() {
 	accountTest = model.Account{
-		Cpf:      "XXXX",
-		Name:     "Teste Pessoa",
-		Ballance: 99.99,
-		Secret:   "xxSecretXx",
+		Cpf:     "XXXX",
+		Name:    "Teste Pessoa",
+		Balance: 99.99,
+		Secret:  "xxSecretXx",
 	}
 
 	transferTest = model.Transfer{
@@ -41,7 +41,7 @@ func setup() {
 		Secret: "xXSecretXx",
 	}
 
-	validationHlp = validation.NewHelper()
+	validatorHlp = validator.NewHelper()
 }
 
 func TestValidateDataAccount(t *testing.T) {
@@ -53,7 +53,7 @@ func TestValidateDataAccount(t *testing.T) {
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 		mockRps := httptest.NewRecorder()
 
-		acc := validationHlp.ValidateDataAccount(mockRps, mockReq)
+		acc := validatorHlp.ValidateDataAccount(mockRps, mockReq)
 		if acc == nil {
 			t.Error("Error on validate account request")
 		}
@@ -67,7 +67,7 @@ func TestValidateDataAccount(t *testing.T) {
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 		mockRps := httptest.NewRecorder()
 
-		acc := validationHlp.ValidateDataAccount(mockRps, mockReq)
+		acc := validatorHlp.ValidateDataAccount(mockRps, mockReq)
 		if acc != nil || mockRps.Result().StatusCode != http.StatusUnprocessableEntity {
 			t.Errorf("Error on validate account, required field not validate.")
 		}
@@ -83,7 +83,7 @@ func TestValidateDataTransfer(t *testing.T) {
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/transfers", bytesBody)
 		mockRps := httptest.NewRecorder()
 
-		transfer := validationHlp.ValidateDataTransfer(mockRps, mockReq)
+		transfer := validatorHlp.ValidateDataTransfer(mockRps, mockReq)
 		if transfer == nil {
 			t.Error("Error on validate transfer request")
 		}
@@ -97,7 +97,7 @@ func TestValidateDataTransfer(t *testing.T) {
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/transfers", bytesBody)
 		mockRps := httptest.NewRecorder()
 
-		transfer := validationHlp.ValidateDataTransfer(mockRps, mockReq)
+		transfer := validatorHlp.ValidateDataTransfer(mockRps, mockReq)
 		if transfer != nil || mockRps.Result().StatusCode != http.StatusUnprocessableEntity {
 			t.Errorf("Error on validate transfer, required field not validate.")
 		}
@@ -113,7 +113,7 @@ func TestValidateDataLogin(t *testing.T) {
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/login", bytesBody)
 		mockRps := httptest.NewRecorder()
 
-		credential := validationHlp.ValidateDataLogin(mockRps, mockReq)
+		credential := validatorHlp.ValidateDataLogin(mockRps, mockReq)
 		if credential == nil {
 			t.Error("Error on validate login request")
 		}
@@ -127,7 +127,7 @@ func TestValidateDataLogin(t *testing.T) {
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/login", bytesBody)
 		mockRps := httptest.NewRecorder()
 
-		credential := validationHlp.ValidateDataLogin(mockRps, mockReq)
+		credential := validatorHlp.ValidateDataLogin(mockRps, mockReq)
 		if credential != nil || mockRps.Result().StatusCode != http.StatusUnprocessableEntity {
 			t.Errorf("Error on validate login, required field not validate.")
 		}

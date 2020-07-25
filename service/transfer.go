@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/helpers/validation"
+	"github.com/josielsousa/challenge-accounts/helpers/validator"
 	"github.com/josielsousa/challenge-accounts/repo/db"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -15,24 +15,24 @@ import (
 const (
 	ErrorOriginAccountNotFound      = "Conta de origem não encontrada"
 	ErrorDestinationAccountNotFound = "Conta de destino não encontrada"
-	ErrorInsufficientOriginBallance = "Conta de origem sem saldo disponível"
+	ErrorInsufficientOriginBalance  = "Conta de origem sem saldo disponível"
 )
 
 // TransferService - Implementação do service para as transfers.
 type TransferService struct {
-	stg           *db.Service
-	logger        types.APILogProvider
-	httpHlp       *httpHelper.Helper
-	validationHlp *validation.Helper
+	stg          *db.Service
+	logger       types.APILogProvider
+	httpHlp      *httpHelper.Helper
+	validatorHlp *validator.Helper
 }
 
 //NewTransferService - Instância o service com a dependência `log` inicializada.
 func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferService {
 	return &TransferService{
-		stg:           stg,
-		logger:        log,
-		httpHlp:       httpHelper.NewHelper(),
-		validationHlp: validation.NewHelper(),
+		stg:          stg,
+		logger:       log,
+		httpHlp:      httpHelper.NewHelper(),
+		validatorHlp: validator.NewHelper(),
 	}
 }
 
@@ -43,7 +43,7 @@ func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferServ
 //	422: Quando não houver saldo disponível
 //	500: Erro inesperado durante o processamento da requisição
 func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
-	transfer := s.validationHlp.ValidateDataTransfer(w, req)
+	transfer := s.validatorHlp.ValidateDataTransfer(w, req)
 	if transfer == nil {
 		return
 	}
@@ -72,28 +72,28 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 		return
 	}
 
-	if accOrigin.Ballance <= 0 || accOrigin.Ballance < transfer.Amount {
-		s.logger.Info(ErrorInsufficientOriginBallance)
-		s.httpHlp.ThrowError(w, http.StatusUnprocessableEntity, ErrorInsufficientOriginBallance)
+	if accOrigin.Balance <= 0 || accOrigin.Balance < transfer.Amount {
+		s.logger.Info(ErrorInsufficientOriginBalance)
+		s.httpHlp.ThrowError(w, http.StatusUnprocessableEntity, ErrorInsufficientOriginBalance)
 		return
 	}
 
 	//Inicia a transação
 	tx := s.stg.BeginTransaction()
-	accOrigin.Ballance -= transfer.Amount
+	accOrigin.Balance -= transfer.Amount
 
 	_, err = tx.Account.Update(*accOrigin)
 	if err != nil {
-		s.logger.Error("Error on update ballance account origin transfer: ", err)
+		s.logger.Error("Error on update balance account origin transfer: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		tx.Rollback()
 		return
 	}
 
-	accDestination.Ballance += transfer.Amount
+	accDestination.Balance += transfer.Amount
 	_, err = tx.Account.Update(*accDestination)
 	if err != nil {
-		s.logger.Error("Error on update ballance account destination transfer: ", err)
+		s.logger.Error("Error on update balance account destination transfer: ", err)
 		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
 		tx.Rollback()
 		return

@@ -13,15 +13,15 @@ type Account struct {
 	Cpf       string     `json:"cpf"`
 	Name      string     `json:"name"`
 	Secret    string     `json:"secret"`
-	Ballance  float64    `json:"ballance"`
+	Balance   float64    `json:"balance"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"-"`
 	DeletedAt *time.Time `json:"-"`
 }
 
-//AccountBallance - Estrutura utilizada para serializar o ballacne da entidade `account`
-type AccountBallance struct {
-	Ballance float64 `json:"ballance"`
+//AccountBalance - Estrutura utilizada para serializar o balance da entidade `account`
+type AccountBalance struct {
+	Balance float64 `json:"balance"`
 }
 
 //AccountStorage - Interface que define as assinaturas para o storage de accounts.

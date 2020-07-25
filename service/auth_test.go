@@ -42,11 +42,11 @@ func mockLogAuth() {
 
 func mockAccAuthStorage() model.AccountStorage {
 	accountAuthTest = model.Account{
-		ID:       uuid.New().String(),
-		Cpf:      "XXXX",
-		Name:     "Teste Pessoa",
-		Ballance: 99.99,
-		Secret:   secret,
+		ID:      uuid.New().String(),
+		Cpf:     "XXXX",
+		Name:    "Teste Pessoa",
+		Balance: 99.99,
+		Secret:  secret,
 	}
 
 	stgAccAuth = &mocks.MockAccountStorage{

@@ -38,10 +38,10 @@ func mockLogAcc() {
 
 func mockAccountStorage() model.AccountStorage {
 	accountTest = model.Account{
-		Cpf:      "XXXX",
-		Name:     "Teste Pessoa",
-		Ballance: 99.99,
-		Secret:   "xxSecretXx",
+		Cpf:     "XXXX",
+		Name:    "Teste Pessoa",
+		Balance: 99.99,
+		Secret:  "xxSecretXx",
 	}
 
 	stgAcc = &mocks.MockAccountStorage{
@@ -203,11 +203,11 @@ func TestServiceGetAllAccount(t *testing.T) {
 	})
 }
 
-func TestServiceGetAccountBallance(t *testing.T) {
+func TestServiceGetAccountBalance(t *testing.T) {
 	t.Run("Teste Get account sucesso", func(t *testing.T) {
 		//FakeBody para request
 		srvAcc = setupAccountService()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/ballance", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/balance", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -220,7 +220,7 @@ func TestServiceGetAccountBallance(t *testing.T) {
 			return &accountTest, nil
 		}
 
-		srvAcc.GetAccountBallance(mockRps, mockReq)
+		srvAcc.GetAccountBalance(mockRps, mockReq)
 		//Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusOK {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
@@ -229,7 +229,7 @@ func TestServiceGetAccountBallance(t *testing.T) {
 
 	t.Run("Teste Get account erro não encontrado", func(t *testing.T) {
 		srvAcc = setupAccountService()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/ballance", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/balance", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -239,7 +239,7 @@ func TestServiceGetAccountBallance(t *testing.T) {
 			return nil, nil
 		}
 
-		srvAcc.GetAccountBallance(mockRps, mockReq)
+		srvAcc.GetAccountBalance(mockRps, mockReq)
 
 		//Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusNotFound {
@@ -249,7 +249,7 @@ func TestServiceGetAccountBallance(t *testing.T) {
 
 	t.Run("Teste Get account erro inesperado", func(t *testing.T) {
 		srvAcc = setupAccountService()
-		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/ballance", nil)
+		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/balance", nil)
 
 		//Mock writer para teste
 		mockRps := httptest.NewRecorder()
@@ -259,7 +259,7 @@ func TestServiceGetAccountBallance(t *testing.T) {
 			return nil, errors.New("Erro Inesperado")
 		}
 
-		srvAcc.GetAccountBallance(mockRps, mockReq)
+		srvAcc.GetAccountBalance(mockRps, mockReq)
 
 		//Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {

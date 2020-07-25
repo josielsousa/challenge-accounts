@@ -1,4 +1,4 @@
-package validation
+package validator
 
 import (
 	"errors"
@@ -27,6 +27,24 @@ func NewHelper() *Helper {
 // InitCustomRule - Inicializa a regra geral para verificar os campos do tipo `string`.
 func InitCustomRule() {
 	govalidator.AddCustomRule("string", func(field string, rule string, message string, value interface{}) error {
+		if value == nil {
+			return nil
+		}
+
+		typeField := reflect.TypeOf(value).String()
+		err := fmt.Errorf(ErrorFieldNotString, field)
+		if message != "" {
+			err = errors.New(message)
+		}
+
+		if typeField != "string" {
+			return err
+		}
+
+		return nil
+	})
+
+	govalidator.AddCustomRule("precision", func(field string, rule string, message string, value interface{}) error {
 		if value == nil {
 			return nil
 		}

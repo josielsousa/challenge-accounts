@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/helpers/validation"
+	"github.com/josielsousa/challenge-accounts/helpers/validator"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -19,26 +19,26 @@ const (
 
 //Inicializa as regras customizadas.
 func init() {
-	validation.InitCustomRule()
+	validator.InitCustomRule()
 }
 
 // AccountService - Implementação do service para as accounts.
 type AccountService struct {
-	authHlp       *auth.Helper
-	httpHlp       *httpHelper.Helper
-	validationHlp *validation.Helper
-	stgAccount    model.AccountStorage
-	logger        types.APILogProvider
+	authHlp      *auth.Helper
+	httpHlp      *httpHelper.Helper
+	validatorHlp *validator.Helper
+	stgAccount   model.AccountStorage
+	logger       types.APILogProvider
 }
 
 //NewAccountService - Instância o service com a dependência `log` inicializada.
 func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider) *AccountService {
 	return &AccountService{
-		logger:        log,
-		stgAccount:    stgAccount,
-		authHlp:       auth.NewHelper(),
-		httpHlp:       httpHelper.NewHelper(),
-		validationHlp: validation.NewHelper(),
+		logger:       log,
+		stgAccount:   stgAccount,
+		authHlp:      auth.NewHelper(),
+		httpHlp:      httpHelper.NewHelper(),
+		validatorHlp: validator.NewHelper(),
 	}
 }
 
@@ -46,7 +46,7 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 //	200: Sucesso na inserção
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request) {
-	account := s.validationHlp.ValidateDataAccount(w, req)
+	account := s.validatorHlp.ValidateDataAccount(w, req)
 	if account == nil {
 		return
 	}
@@ -107,11 +107,11 @@ func (s *AccountService) GetAllAccounts(w http.ResponseWriter, req *http.Request
 	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: true, Data: accounts})
 }
 
-//GetAccountBallance - Retorna as informações da account, conforme o id informado.
+//GetAccountBalance - Retorna as informações da account, conforme o id informado.
 //	200: Quando existir account para ser retornada
 //	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição
-func (s *AccountService) GetAccountBallance(w http.ResponseWriter, req *http.Request) {
+func (s *AccountService) GetAccountBalance(w http.ResponseWriter, req *http.Request) {
 	//Recebe os parâmetros da request e seleciona o ID
 	params := s.httpHlp.GetParams(req)
 	id := params["id"]
@@ -129,6 +129,6 @@ func (s *AccountService) GetAccountBallance(w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	accountBallance := model.AccountBallance{Ballance: account.Ballance}
-	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: success, Data: accountBallance})
+	accountBalance := model.AccountBalance{Balance: account.Balance}
+	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: success, Data: accountBalance})
 }

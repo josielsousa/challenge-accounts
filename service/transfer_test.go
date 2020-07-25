@@ -46,11 +46,11 @@ func mockTransferStorage() *db.Service {
 	}
 
 	accountTransferTest = model.Account{
-		ID:       originalID,
-		Cpf:      "XXXX",
-		Name:     "Teste Pessoa",
-		Ballance: 99.99,
-		Secret:   secret,
+		ID:      originalID,
+		Cpf:     "XXXX",
+		Name:    "Teste Pessoa",
+		Balance: 99.99,
+		Secret:  secret,
 	}
 
 	transferTest = model.Transfer{
@@ -165,7 +165,7 @@ func TestDoTransfers(t *testing.T) {
 		//FakeBody para request
 		srvTransfer = setupTransferService()
 		transferTest.Amount = 0.5
-		accountTransferTest.Ballance = 0.2
+		accountTransferTest.Balance = 0.2
 		mockRps, mockReq := getMockRequestTransfer(http.MethodPost)
 
 		srvTransfer.DoTransfer(mockRps, mockReq, claims)

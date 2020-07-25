@@ -39,7 +39,7 @@ func (rp *RouterProvider) ServeHTTP() {
 	//Inicia as rotas de accounts e informa qual método interno vai receber as requisições.
 	rp.mux.HandleFunc("/accounts", rp.srvAccount.GetAllAccounts).Methods("GET")
 	rp.mux.HandleFunc("/accounts", rp.srvAccount.InsertAccount).Methods("POST")
-	rp.mux.HandleFunc("/accounts/{id}/ballance", rp.srvAccount.GetAccountBallance).Methods("GET")
+	rp.mux.HandleFunc("/accounts/{id}/balance", rp.srvAccount.GetAccountBalance).Methods("GET")
 
 	//Inicia as rotas de transfer e informa qual método interno vai receber as requisições.
 	rp.mux.HandleFunc("/transfers", rp.srvAuth.ValidateToken(rp.srvTransfer.GetAllTransfers)).Methods("GET")

@@ -4,7 +4,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Add - Adiciona o `amount` informado, no balance atual.
+// Add - Adiciona o `amount` informado, no `balance` atual.
 func Add(balance, amount float64) float64 {
 	amountDecimal := decimal.NewFromFloat(amount)
 	balanceDecimal := decimal.NewFromFloat(balance)
@@ -14,8 +14,8 @@ func Add(balance, amount float64) float64 {
 	return total
 }
 
-// Sub - Subtrai o `amount` informado, no balance atual.
-func Sub(balance, amount float64) float64 {
+// Sub - Subtrai o `amount` informado, no `balance` atual.
+func Sub(amount, balance float64) float64 {
 	amountDecimal := decimal.NewFromFloat(amount)
 	balanceDecimal := decimal.NewFromFloat(balance)
 

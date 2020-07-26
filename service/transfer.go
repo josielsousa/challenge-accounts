@@ -81,7 +81,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 
 	//Inicia a transação
 	tx := s.stg.BeginTransaction()
-	accOrigin.Balance = decimal.Sub(accOrigin.Balance, transfer.Amount)
+	accOrigin.Balance = decimal.Sub(transfer.Amount, accOrigin.Balance)
 
 	_, err = tx.Account.Update(*accOrigin)
 	if err != nil {

@@ -38,7 +38,7 @@ func mockLogAcc() {
 
 func mockAccountStorage() model.AccountStorage {
 	accountTest = model.Account{
-		Cpf:     "XXXX",
+		Cpf:     "18447253082",
 		Name:    "Teste Pessoa",
 		Balance: 99.99,
 		Secret:  "xxSecretXx",

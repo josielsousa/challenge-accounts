@@ -25,7 +25,7 @@ func init() {
 
 func setup() {
 	accountTest = model.Account{
-		Cpf:     "XXXX",
+		Cpf:     "18447253082",
 		Name:    "Teste Pessoa",
 		Balance: 99.99,
 		Secret:  "xxSecretXx",
@@ -37,7 +37,7 @@ func setup() {
 	}
 
 	credentialTest = types.Credentials{
-		Cpf:    "xxxx",
+		Cpf:    "18447253082",
 		Secret: "xXSecretXx",
 	}
 

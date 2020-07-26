@@ -41,13 +41,13 @@ func mockLogTransfer() {
 func mockTransferStorage() *db.Service {
 	originalID := uuid.New().String()
 	claims = &types.Claims{
-		Username:  "XXXXX",
+		Username:  "18447253082",
 		AccountID: originalID,
 	}
 
 	accountTransferTest = model.Account{
 		ID:      originalID,
-		Cpf:     "XXXX",
+		Cpf:     "18447253082",
 		Name:    "Teste Pessoa",
 		Balance: 99.99,
 		Secret:  secret,

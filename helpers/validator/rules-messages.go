@@ -11,14 +11,14 @@ const (
 
 // Define as regras para validação dos campos de `account`
 var validateRulesAccount = map[string][]string{
-	"cpf":    {"required", "string"},
+	"cpf":    {"required", "cpf"},
 	"name":   {"required", "string"},
 	"secret": {"required", "string"},
 }
 
 // Define as mensagens para validação dos campos de `account`
 var validateMessagesAccount = govalidator.MapData{
-	"cpf":    {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
+	"cpf":    {"required:O campo é obrigatório", "cpf: O campo tem formato inválido"},
 	"name":   {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
 	"secret": {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
 }
@@ -37,12 +37,12 @@ var validateMessagesTransfer = govalidator.MapData{
 
 // Define as regras para validação dos campos de `login`
 var validateRulesLogin = map[string][]string{
-	"cpf":    {"required", "string"},
+	"cpf":    {"required", "cpf"},
 	"secret": {"required", "string"},
 }
 
 // Define as mensagens para validação dos campos de `login`
 var validateMessagesLogin = govalidator.MapData{
-	"cpf":    {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
+	"cpf":    {"required:O campo é obrigatório", "cpf: O campo tem formato inválido"},
 	"secret": {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
 }

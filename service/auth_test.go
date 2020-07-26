@@ -43,7 +43,7 @@ func mockLogAuth() {
 func mockAccAuthStorage() model.AccountStorage {
 	accountAuthTest = model.Account{
 		ID:      uuid.New().String(),
-		Cpf:     "XXXX",
+		Cpf:     "18447253082",
 		Name:    "Teste Pessoa",
 		Balance: 99.99,
 		Secret:  secret,
@@ -63,7 +63,7 @@ func setupAuthService() *srv.AuthService {
 	mockAccAuthStorage()
 
 	credentialTest = types.Credentials{
-		Cpf:    "XXXX",
+		Cpf:    "18447253082",
 		Secret: secret,
 	}
 

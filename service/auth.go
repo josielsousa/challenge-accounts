@@ -3,6 +3,7 @@ package service
 import (
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
@@ -15,11 +16,13 @@ import (
 
 //Constantes utilizadas no serviço de autenticação.
 const (
-	MaxTimeToExpiration       = 5
-	InfoTokenExpired          = "Token expirado."
-	ErrorTokenInvalid         = "Token inválido."
-	ErrorTokeSignatureInvalid = "token signature is invalid"
-	ErrorSignatureKeyInvalid  = "A chave de assinatura do token é inválida."
+	MaxTimeToExpiration        = 5
+	InfoTokenEmpty             = "Token vazio."
+	InfoTokenExpired           = "Token expirado."
+	ErrorTokenInvalid          = "Token inválido."
+	ErrorTokenMalformed        = "token is malformed"
+	ErrorTokenSignatureInvalid = "token signature is invalid"
+	ErrorSignatureKeyInvalid   = "A chave de assinatura do token é inválida."
 )
 
 // JWT string chave utilizada para geração do token.
@@ -111,6 +114,7 @@ func (s *AuthService) GetToken(acc *model.Account, jwtKey []byte, expirationTime
 //ValidateToken - Realiza a validação do token enviado.
 //	200: Quando a validação for bem sucedida.
 //	401: Quando o `token` fornecido for inválido.
+//	400: Quando o token estiver vazio / nulo
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request, *types.Claims)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
@@ -120,10 +124,17 @@ func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request
 			return jwtKey, nil
 		}
 
+		if len(strings.Trim(tokenHeader, " ")) <= 0 || tokenHeader == "null" {
+			s.logger.Info("Error on parser token claims ")
+			s.httpHlp.ThrowError(w, http.StatusBadRequest, InfoTokenEmpty)
+			return
+		}
+
 		jwtToken, err := jwt.ParseWithClaims(tokenHeader, claims, getJwtKey)
 		if err != nil {
-			tokeSignatureInvalid, _ := regexp.MatchString(ErrorTokeSignatureInvalid, err.Error())
-			if err == jwt.ErrSignatureInvalid || tokeSignatureInvalid {
+			tokenMalFormed, _ := regexp.MatchString(ErrorTokenMalformed, err.Error())
+			tokenSignatureInvalid, _ := regexp.MatchString(ErrorTokenSignatureInvalid, err.Error())
+			if err == jwt.ErrSignatureInvalid || tokenSignatureInvalid || tokenMalFormed {
 				s.logger.Error("Error on parser token claims: ", err)
 				s.httpHlp.ThrowError(w, http.StatusUnauthorized, ErrorSignatureKeyInvalid)
 				return

@@ -18,10 +18,11 @@ import (
 
 const (
 	ErrorGetNewToken           = "Erro inesperado ao recuperar novo token"
+	ErrorTokenEmpty            = "Token vazio. Deveria retornar status 401; retornou %d"
 	ErrorTokenExpired          = "Token expirado. Deveria retornar status 401; retornou %d"
 	ErrorTokenInvalid          = "Token inválido. Deveria retornar status 401; retornou %d"
 	ErrorScenarioUnauthorized  = "Deveria retornar status 401; retornou %d"
-	ErrorTokenErrorUnexpected  = "Token inválido. Deveria retornar status 500; retornou %d"
+	ErrorTokenErrorUnexpected  = "Erro inesperado . Deveria retornar status 500; retornou %d"
 	ErrorTokenSignatureInvalid = "Token inválido. Deveria retornar status 401; retornou %d"
 )
 
@@ -109,6 +110,20 @@ func TestAuthServiceLogin(t *testing.T) {
 	})
 }
 
+// Gera um novo token
+func generateToken(duration time.Duration, t *testing.T) *types.Auth {
+	//Tempo de expiração do token
+	jwtKey := []byte("api-challenge-accounts")
+	expirationTime := time.Now().Add(duration)
+	accessToken, err := srvAuth.GetToken(&accountAuthTest, jwtKey, expirationTime)
+	if err != nil {
+		t.Error(ErrorGetNewToken, err)
+		return nil
+	}
+
+	return accessToken
+}
+
 func TestAuthServiceValidateToken(t *testing.T) {
 	t.Run("Teste validate token sucesso", func(t *testing.T) {
 		//FakeBody para request
@@ -116,11 +131,9 @@ func TestAuthServiceValidateToken(t *testing.T) {
 		mockRps, mockReq := getMockRequestAuth()
 
 		//Tempo de expiração do token
-		jwtKey := []byte("api-challenge-accounts")
-		expirationTime := time.Now().Add(1 * time.Minute)
-		accessToken, err := srvAuth.GetToken(&accountAuthTest, jwtKey, expirationTime)
-		if err != nil {
-			t.Error(ErrorGetNewToken, err)
+		duration := (1 * time.Minute)
+		accessToken := generateToken(duration, t)
+		if accessToken == nil {
 			return
 		}
 
@@ -143,11 +156,9 @@ func TestAuthServiceValidateToken(t *testing.T) {
 		mockRps, mockReq := getMockRequestAuth()
 
 		//Tempo de expiração do token
-		jwtKey := []byte("api-challenge-accounts")
-		expirationTime := time.Now().Add(1 * time.Millisecond)
-		accessToken, err := srvAuth.GetToken(&accountAuthTest, jwtKey, expirationTime)
-		if err != nil {
-			t.Error(ErrorGetNewToken, err)
+		duration := (1 * time.Millisecond)
+		accessToken := generateToken(duration, t)
+		if accessToken == nil {
 			return
 		}
 
@@ -167,24 +178,6 @@ func TestAuthServiceValidateToken(t *testing.T) {
 		}
 	})
 
-	t.Run("Teste validate token erro inesperado", func(t *testing.T) {
-		//FakeBody para request
-		srvAuth = setupAuthService()
-		mockRps, mockReq := getMockRequestAuth()
-
-		mockReq.Header.Add("Access-Token", "token_invalid")
-		retAuth := srvAuth.ValidateToken(func(wNext http.ResponseWriter, reqNext *http.Request, claims *types.Claims) {
-
-		})
-
-		retAuth(mockRps, mockReq)
-
-		//Verificação do comportamento de acordo com o cenário
-		if mockRps.Result().StatusCode != http.StatusInternalServerError {
-			t.Errorf(ErrorTokenErrorUnexpected, mockRps.Result().StatusCode)
-		}
-	})
-
 	t.Run("Teste validate token signature invalido", func(t *testing.T) {
 		//FakeBody para request
 		srvAuth = setupAuthService()
@@ -201,6 +194,24 @@ func TestAuthServiceValidateToken(t *testing.T) {
 		//Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusUnauthorized {
 			t.Errorf(ErrorTokenSignatureInvalid, mockRps.Result().StatusCode)
+		}
+	})
+
+	t.Run("Teste validate token vazio", func(t *testing.T) {
+		//FakeBody para request
+		srvAuth = setupAuthService()
+		mockRps, mockReq := getMockRequestAuth()
+
+		mockReq.Header.Add("Access-Token", "")
+		retAuth := srvAuth.ValidateToken(func(wNext http.ResponseWriter, reqNext *http.Request, claims *types.Claims) {
+
+		})
+
+		retAuth(mockRps, mockReq)
+
+		//Verificação do comportamento de acordo com o cenário
+		if mockRps.Result().StatusCode != http.StatusBadRequest {
+			t.Errorf(ErrorTokenEmpty, mockRps.Result().StatusCode)
 		}
 	})
 }

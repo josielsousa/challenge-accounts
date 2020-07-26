@@ -44,6 +44,7 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 
 //InsertAccount - Realiza a inserção de uma account conforme os dados do `body` da requisição
 //	200: Sucesso na inserção
+//	422: Erro - Os dados de entrada são válidos porém existe uma `account` para o CPF informado.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request) {
 	account := s.validatorHlp.ValidateDataAccount(w, req)

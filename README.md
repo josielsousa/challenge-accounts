@@ -30,18 +30,12 @@ cd challenge-accounts
 docker-compose up api-test
 ```
 
-  
-
-  
 
 Após a execução de todos testes unitários, será criado um arquivo chamado `coverage.html`, contendo o resumo da cobertura dos testes realizados.
 
   
-  
+### Rotas / Endpoints - `Accounts`
 
-### Rotas / Endpoints
-
-  
 
 *  `/accounts` - `POST` - Rota utilizada para criação de uma nova `account`
 
@@ -62,7 +56,7 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 	| balance | NÃO | Saldo inicial da conta que será criada.
 
 
-Payload Retornos: 
+	Payload Retornos: 
 
 *  Status Code `200` - Sucesso, conta criada 
 	```json
@@ -181,6 +175,62 @@ Payload Retornos:
 	```
 
 ---
+  
+### Rotas / Endpoints - `Login`
+
+
+*  `/login` - `POST` - Rota utilizada para autenticação de usuário que possua `account`.
+
+	Payload de entrada:
+	```json
+	{
+		"cpf": "14394183901",
+		"secret": "secret2"
+	}
+	```
+	| Atributo| Obrigatório | Descrição
+	|--|--|--|
+	| cpf | SIM | Número de CPF do usuário. Deve ser utilizado um número válido
+	| secret | SIM | Senha para ser utilizada na autenticação do usuário, deve ser a mesma informada na criação da `account`
+
+
+	Payload Retornos: 
+
+*  Status Code `200` - Quando a autenticação for bem sucedida.
+	```json
+	{
+	  "data": {
+	    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjE0Mzk0MTgzOTAxIiwiYWNjb3VudF9pZCI6IjY4OWIyNjI5LWYwMmEtNDEyZS04NzNmLWNmYWFiMzQ0YjQxMyIsImV4cGlyZXNfYXQiOjE1OTU4MDU4NzZ9.TtJjppQasSjNlpR6Y_ljeA9wWzFzCSKHc8RuWaKT3lw"
+	  },
+	  "success": true
+	}
+	```
+
+	| Atributo| Descrição
+	|--|--|
+	| data | Retorna o `token` _JWT_ para acesso as rotas privadas.
+	| success | Boolean - Indica o status de sucesso para a requisição
+
+* Status Code `401` - Quando o `secret` fornecido for diferente do `secret` armazenado.
+	```json
+	{
+	  "error": "Não autenticado"
+	}
+	```
+
+* Status Code `404`  - Quando não encontrar a account.
+	```json
+	{
+	  "error": "Conta não encontrada"
+	}
+	```
+
+* Status Code `500` -  Erro inesperado durante o processamento da requisição
+	```json
+	{
+	  "error": "Erro Inesperado"
+	}
+	```
 
 
 ### Tecnologias utilizadas

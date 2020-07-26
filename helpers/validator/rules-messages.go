@@ -11,18 +11,16 @@ const (
 
 // Define as regras para validação dos campos de `account`
 var validateRulesAccount = map[string][]string{
-	"cpf":     {"required", "string"},
-	"name":    {"required", "string"},
-	"secret":  {"required", "string"},
-	"balance": {"required", "numeric_between:0.01,999999999.99"},
+	"cpf":    {"required", "string"},
+	"name":   {"required", "string"},
+	"secret": {"required", "string"},
 }
 
 // Define as mensagens para validação dos campos de `account`
 var validateMessagesAccount = govalidator.MapData{
-	"cpf":     {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
-	"name":    {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
-	"secret":  {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
-	"balance": {"required:O campo é obrigatório", "numeric_between: O campo deve possuir valor entre 0,01 e 999.999.999,99"},
+	"cpf":    {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
+	"name":   {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
+	"secret": {"required:O campo é obrigatório", "string: O campo tem formato inválido"},
 }
 
 // Define as regras para validação dos campos de `transfer`

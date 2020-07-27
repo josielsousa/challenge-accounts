@@ -37,10 +37,12 @@ func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferServ
 	}
 }
 
-//DoTransfer - Realiza a transferência entre as `transfers` conforme a requisição
+//DoTransfer - Realiza a transferência entre as `accounts` conforme os dados enviados na requisição.
 //	200: Sucesso na inserção
-//	404: Quando a conta origem não for encontrada
-//	404: Quando a conta destino não for encontrada
+//	400: Quando o `token` estiver vazio / nulo
+//	401: Quando o `token` fornecido for inválido.
+//	404: Quando a `account` origem não for encontrada
+//	404: Quando a `account` destino não for encontrada
 //	422: Quando não houver saldo disponível
 //	500: Erro inesperado durante o processamento da requisição
 func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
@@ -56,7 +58,8 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 		return
 	}
 
-	if accOrigin == nil {
+	successAccOrigin := accOrigin != nil && len(accOrigin.ID) > 0
+	if !successAccOrigin {
 		s.httpHlp.ThrowError(w, http.StatusNotFound, ErrorOriginAccountNotFound)
 		return
 	}
@@ -68,7 +71,8 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 		return
 	}
 
-	if accDestination == nil {
+	successAccDestination := accDestination != nil && len(accDestination.ID) > 0
+	if !successAccDestination {
 		s.httpHlp.ThrowError(w, http.StatusNotFound, ErrorDestinationAccountNotFound)
 		return
 	}
@@ -120,6 +124,8 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 //GetAllTransfers - Retorna as informações de todas as contas se não existir retorna []
 //	200: Quando existir transfers para serem retornadas
 //	204: Quando não encontrar transfers.
+//	400: Quando o token estiver vazio / nulo
+//	401: Quando o `token` fornecido for inválido.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *TransferService) GetAllTransfers(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
 	transfers, err := s.stg.Transfer.GetAllTransfers(claims.AccountID)

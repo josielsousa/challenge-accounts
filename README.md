@@ -10,6 +10,8 @@ Possuir `docker` e `docker-compose` instalados.
 
 -  [docker-compose](https://docs.docker.com/compose/install/)
 
+---
+
 ### Instalação
 
 Após a instalação dos pré-requisitos, para disponibilizar a API, basta executar os próximos comandos:
@@ -19,6 +21,8 @@ git clone git@github.com:josielsousa/challenge-accounts.git
 cd challenge-accounts
 docker-compose up api
 ```
+
+---
 
 ### Testes unitários
 
@@ -33,6 +37,7 @@ docker-compose up api-test
 
 Após a execução de todos testes unitários, será criado um arquivo chamado `coverage.html`, contendo o resumo da cobertura dos testes realizados.
 
+  ---
   
 ### Rotas / Endpoints - `Accounts`
 
@@ -124,6 +129,14 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 	      "secret": "$2a$10$bKLye7aAf/f.D/tgHH4vDuo6KDK17mKFM.Thmt/aSLFzJTP4Bndny",
 	      "balance": 0,
 	      "created_at": "2020-07-26T23:05:01.010789798Z"
+	    },
+	    {
+	      "id": "41a721e6-16d3-45ae-8604-b6239fea31ae",
+	      "cpf": "04075532151",
+	      "name": "Juliana Alice Luana Nunes",
+	      "secret": "$2a$10$e3hj/3mVf4.K8cb.s50aKOrN2SXF2ZWYLJeigev1hJCjOXxYI68te",
+	      "balance": 99.5,
+	      "created_at": "2020-07-26T23:47:48.877912737Z"
 	    }
 	  ],
 	  "success": true
@@ -232,7 +245,116 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 	}
 	```
 
+---
+  
+### Rotas / Endpoints - `Transfers`
 
+	
+O Header `Access-Token` é obrigatório para utilização dos `endpoints` de transferência, deve ser um `token` válido, obtido através do endpoint `/login`.  Esses são os possíveis retornos durante a validação do `token` informado: 
+
+
+* Status Code `400` -  Quando o `token` estiver vazio / nulo
+	```json
+	{
+	  "error": "Token vazio."
+	}
+	```
+
+* Status Code `401` -  Quando o `token` fornecido for inválido.
+	```json
+	{
+	  "error": "A chave de assinatura do token é inválida."
+	}
+	```
+
+* Status Code `401` -  Quando o `token` estiver expirado.
+	```json
+	{
+	  "error": "Token expirado."
+	}
+	```
+
+* Status Code `500` -  Erro inesperado durante o processamento da requisição
+	```json
+	{
+	  "error": "Erro Inesperado"
+	}
+	```
+---
+
+*  `/transfers` - `POST` - Realiza a transferência entre as `accounts`
+
+	Payload de entrada:
+
+	```json
+	{
+		"account_destination_id": "689b2629-f02a-412e-873f-cfaab344b413",
+		"amount": 0.01
+	}
+	```
+	| Atributo| Obrigatório | Descrição
+	|--|--|--|
+	| account_destination_id | SIM | Identificador universal UUID da conta de destino do `amount`
+	| amount | SIM | Valor que será transferido da `account_origin_id` para a `account_destination_id` 
+
+
+	Payload Retornos: 
+
+*  Status Code `200` - Quando a autenticação for bem sucedida.
+	```json
+	{
+	  "data": {
+	    "id": "ae4c2025-ac57-48ab-a5ed-b9266fe52314",
+	    "account_origin_id": "41a721e6-16d3-45ae-8604-b6239fea31ae",
+	    "account_destination_id": "689b2629-f02a-412e-873f-cfaab344b413",
+	    "amount": 0.01,
+	    "created_at": "2020-07-26T23:48:58.858125762Z"
+	  },
+	  "success": true
+	}
+	```
+
+	| Atributo| Descrição
+	|--|--|
+	| data | Retorna os dados da transferência realizada
+	| id | Identificador universal UUID da transferência realizada.
+	| account_origin_id | Identificador universal UUID da conta de origem do `amount`
+	| account_destination_id | Identificador universal UUID da conta de destino do `amount`
+	| amount | Valor que foi transferido da `account_origin_id` para a `account_destination_id` 
+	| created_at | Data de realização da transferência 
+	| success | Boolean - Indica o status de sucesso para a requisição
+
+
+* Status Code `404` -  Quando a `account` origem não for encontrada
+	A conta de origem será recuperada do token informado.
+	```json
+	{
+	  "error": "Conta de origem não encontrada"
+	}
+	```
+
+* Status Code `404` -  Quando a `account` destino não for encontrada
+	```json
+	{
+	  "error": "Conta de destino não encontrada"
+	}
+	```
+
+* Status Code `422` -  Quando não houver saldo disponível suficiente na `account` de origem.
+	```json
+	{
+	 "error": "Conta de origem sem saldo disponível"
+	}
+	```
+
+* Status Code `500` -  Erro inesperado durante o processamento da requisição
+	```json
+	{
+	  "error": "Erro Inesperado"
+	}
+	```
+
+---
 ### Tecnologias utilizadas
 
 *  [GO](https://golang.org) - A linguagem usada
@@ -258,7 +380,7 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 *  [decimal](github.com/shopspring/decimal) - Utilizado para realizar os cálculos nas transferências realizadas, mantendo assim a integridade do saldo nas contas.
 
 *  [jwt](https://jwt.io/) e [jwt-go/v4](github.com/dgrijalva/jwt-go/v4) - Utilizado na geração dos tokens para acesso as rotas privadas de transferências.
-
+---
 ### Autor
 
 *  **Josiel Sousa** - [josielsousa](https://github.com/josielsousa)

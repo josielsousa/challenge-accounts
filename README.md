@@ -186,6 +186,9 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 	```
 
 	Payload de retorno:
+
+*  Status Code `200` - Sucesso, conta encontrada, saldo retornado: 
+
 	```json
 	{
 		"data": {
@@ -350,7 +353,7 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 
 	Payload Retornos: 
 
-*  Status Code `200` - Quando a autenticação for bem sucedida.
+*  Status Code `200` - Quando a transferência for bem sucedida.
 	```json
 	{
 	  "data": {
@@ -413,7 +416,7 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 
 	Payload Retornos: 
 
-*  Status Code `200` - Quando a autenticação for bem sucedida.
+*  Status Code `200` - Quando existir transferências a serem retornadas.
 	```json
 	{
 	  "data": [

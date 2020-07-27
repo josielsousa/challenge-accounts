@@ -47,7 +47,7 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 	Exemplo de requisição : 
 	```bash 
-	curl --request POST \
+	curl --request POST -v \
 	  --url http://localhost:3000/accounts \
 	  --header 'content-type: application/json' \
 	  --data '{
@@ -121,7 +121,7 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 	Exemplo de requisição : 
 	```bash 
-	curl --request GET --url http://localhost:3000/accounts
+	curl --request GET -v --url http://localhost:3000/accounts
 	```
 
 * Status Code `204` -  Requisição executada com sucesso, porém não possui dados de retorno, lista de `accounts` vazia.
@@ -181,7 +181,7 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 	Exemplo de requisição : 
 	```bash 
-	curl --request GET \
+	curl --request GET -v \
 	  --url http://localhost:3000/accounts/{id}/balance
 	```
 
@@ -223,7 +223,7 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 	Exemplo de requisição : 
 	```bash 
-	curl --request POST \
+	curl --request POST -v \
 	  --url http://localhost:3000/login \
 	  --header 'content-type: application/json' \
 	  --data '{
@@ -323,7 +323,7 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 
 	Exemplo de requisição : 
 	```bash 
-	curl --request POST \
+	curl --request POST -v \
 	  --url http://localhost:3000/transfers \
 	  --header 'access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjA0MDc1NTMyMTUxIiwiYWNjb3VudF9pZCI6IjQxYTcyMWU2LTE2ZDMtNDVhZS04NjA0LWI2MjM5ZmVhMzFhZSIsImV4cGlyZXNfYXQiOjE1OTU4MDk4MTh9.NAA7z3TQW5qD_P6Gl92vcfMuFba5J4k-LI-iLiWb5x4' \
 	  --header 'content-type: application/json' \
@@ -402,7 +402,7 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 
 	Exemplo de requisição : 
 	```bash 
-	curl --request GET \
+	curl --request GET -v \
 	  --url http://localhost:3000/transfers \
 	  --header 'access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjA0MDc1NTMyMTUxIiwiYWNjb3VudF9pZCI6IjQxYTcyMWU2LTE2ZDMtNDVhZS04NjA0LWI2MjM5ZmVhMzFhZSIsImV4cGlyZXNfYXQiOjE1OTU4MDk4MTh9.NAA7z3TQW5qD_P6Gl92vcfMuFba5J4k-LI-iLiWb5x4' \
 	  --header 'content-type: application/json'
@@ -478,6 +478,9 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 *  [decimal](github.com/shopspring/decimal) - Utilizado para realizar os cálculos nas transferências realizadas, mantendo assim a integridade do saldo nas contas.
 
 *  [jwt](https://jwt.io/) e [jwt-go/v4](github.com/dgrijalva/jwt-go/v4) - Utilizado na geração dos tokens para acesso as rotas privadas de transferências.
+
+* [curl](https://curl.haxx.se/) - Utilizado nos exemplos de requisição dessa documentação.
+
 ---
 ### Autor
 

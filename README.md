@@ -44,6 +44,21 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 *  `/accounts` - `POST` - Rota utilizada para criação de uma nova `account`
 
+
+	Exemplo de requisição : 
+	```bash 
+	curl --request POST \
+	  --url http://localhost:3000/accounts \
+	  --header 'content-type: application/json' \
+	  --data '{
+		"cpf": "04075532151",
+		"name": "Juliana Alice Luana Nunes",
+		"secret": "secret",
+		"balance": 99.50
+	}'
+	```
+
+
 	Payload de entrada:
 	```json
 	{
@@ -104,9 +119,14 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 *  `/accounts` - `GET` - Rota utilizada para listagem de todas as `accounts`
 
 
+	Exemplo de requisição : 
+	```bash 
+	curl --request GET --url http://localhost:3000/accounts
+	```
+
 * Status Code `204` -  Requisição executada com sucesso, porém não possui dados de retorno, lista de `accounts` vazia.
 		
-	Payload de retorno: Não possui
+	Payload de retorno: Não se aplica.
 
 * Status Code `200` -  Quando existir accounts para serem retornadas
 
@@ -158,6 +178,13 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 *  `/accounts/{id}/balance` - `GET` - Rota utilizada para recuperar o saldo de uma  `account`
 
+
+	Exemplo de requisição : 
+	```bash 
+	curl --request GET \
+	  --url http://localhost:3000/accounts/{id}/balance
+	```
+
 	Payload de retorno:
 	```json
 	{
@@ -193,6 +220,17 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
 
 
 *  `/login` - `POST` - Rota utilizada para autenticação de usuário que possua `account`.
+
+	Exemplo de requisição : 
+	```bash 
+	curl --request POST \
+	  --url http://localhost:3000/login \
+	  --header 'content-type: application/json' \
+	  --data '{
+		"cpf": "04075532151",
+		"secret": "secret"
+	}'
+	```
 
 	Payload de entrada:
 	```json
@@ -249,7 +287,6 @@ Após a execução de todos testes unitários, será criado um arquivo chamado `
   
 ### Rotas / Endpoints - `Transfers`
 
-	
 O Header `Access-Token` é obrigatório para utilização dos `endpoints` de transferência, deve ser um `token` válido, obtido através do endpoint `/login`.  Esses são os possíveis retornos durante a validação do `token` informado: 
 
 
@@ -283,6 +320,19 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 ---
 
 *  `/transfers` - `POST` - Realiza a transferência entre as `accounts`
+
+	Exemplo de requisição : 
+	```bash 
+	curl --request POST \
+	  --url http://localhost:3000/transfers \
+	  --header 'access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjA0MDc1NTMyMTUxIiwiYWNjb3VudF9pZCI6IjQxYTcyMWU2LTE2ZDMtNDVhZS04NjA0LWI2MjM5ZmVhMzFhZSIsImV4cGlyZXNfYXQiOjE1OTU4MDk4MTh9.NAA7z3TQW5qD_P6Gl92vcfMuFba5J4k-LI-iLiWb5x4' \
+	  --header 'content-type: application/json' \
+	  --data '{
+		"account_destination_id": "689b2629-f02a-412e-873f-cfaab344b413",
+		"amount": 0.33
+	}'
+	```
+
 
 	Payload de entrada:
 
@@ -346,14 +396,62 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 	 "error": "Conta de origem sem saldo disponível"
 	}
 	```
+---
 
-* Status Code `500` -  Erro inesperado durante o processamento da requisição
+*  `/transfers` - `GET` - Recupera todas as transferências realizadas para o usuário autenticado, a `account` será recuperar a através do `token` informado no header `Access-Token`
+
+	Exemplo de requisição : 
+	```bash 
+	curl --request GET \
+	  --url http://localhost:3000/transfers \
+	  --header 'access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjA0MDc1NTMyMTUxIiwiYWNjb3VudF9pZCI6IjQxYTcyMWU2LTE2ZDMtNDVhZS04NjA0LWI2MjM5ZmVhMzFhZSIsImV4cGlyZXNfYXQiOjE1OTU4MDk4MTh9.NAA7z3TQW5qD_P6Gl92vcfMuFba5J4k-LI-iLiWb5x4' \
+	  --header 'content-type: application/json'
+	```
+
+	Payload de entrada: Não se aplica, a `account` será obtida através do `token` informado.
+
+
+	Payload Retornos: 
+
+*  Status Code `200` - Quando a autenticação for bem sucedida.
 	```json
 	{
-	  "error": "Erro Inesperado"
+	  "data": [
+	    {
+	      "id": "ae4c2025-ac57-48ab-a5ed-b9266fe52314",
+	      "account_origin_id": "41a721e6-16d3-45ae-8604-b6239fea31ae",
+	      "account_destination_id": "689b2629-f02a-412e-873f-cfaab344b413",
+	      "amount": 0.01,
+	      "created_at": "2020-07-26T23:48:58.858125762Z"
+	    },
+	    {
+	      "id": "a854fd37-3770-4a64-b8d0-d47321ccd870",
+	      "account_origin_id": "41a721e6-16d3-45ae-8604-b6239fea31ae",
+	      "account_destination_id": "689b2629-f02a-412e-873f-cfaab344b413",
+	      "amount": 0.01,
+	      "created_at": "2020-07-26T23:57:31.34448352Z"
+	    },
+	    {
+	      "id": "23000c5b-a8a5-4380-934a-a24afa79ecc2",
+	      "account_origin_id": "41a721e6-16d3-45ae-8604-b6239fea31ae",
+	      "account_destination_id": "689b2629-f02a-412e-873f-cfaab344b413",
+	      "amount": 0.33,
+	      "created_at": "2020-07-27T00:25:34.391882336Z"
+	    }
+	  ],
+	  "success": true
 	}
 	```
 
+	| Atributo| Descrição
+	|--|--|
+	| data | Retorna uma lista com todas as transferências realizadas
+	| success | Boolean - Indica o status de sucesso para a requisição
+
+
+* Status Code `204` -  Requisição executada com sucesso, porém não possui dados de retorno, lista de `transfers` vazia.
+		
+	Payload de retorno: Não se aplica.
 ---
 ### Tecnologias utilizadas
 

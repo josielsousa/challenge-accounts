@@ -17,7 +17,7 @@ Possuir `docker` e `docker-compose` instalados.
 Após a instalação dos pré-requisitos, para disponibilizar a API, basta executar os próximos comandos:
 
 ```bash
-git clone git@github.com:josielsousa/challenge-accounts.git
+git clone https://github.com/josielsousa/challenge-accounts.git
 cd challenge-accounts
 docker-compose up api
 ```
@@ -29,7 +29,7 @@ docker-compose up api
 A API foi construída possuindo testes unitários, para executar os testes, basta executar os seguintes comandos:
 
 ```bash
-git clone git@github.com:josielsousa/challenge-accounts.git
+git clone https://github.com/josielsousa/challenge-accounts.git
 cd challenge-accounts
 docker-compose up api-test
 ```

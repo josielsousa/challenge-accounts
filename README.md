@@ -481,6 +481,8 @@ O Header `Access-Token` é obrigatório para utilização dos `endpoints` de tra
 
 * [curl](https://curl.haxx.se/) - Utilizado nos exemplos de requisição dessa documentação.
 
+* [4devs - Gerador de Pessoas](https://www.4devs.com.br/gerador_de_pessoas) - Mock utilizado para gerar dados válidos durante testes e documentação da API.
+
 ---
 ### Autor
 

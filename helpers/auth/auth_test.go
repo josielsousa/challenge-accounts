@@ -2,6 +2,7 @@ package auth_test
 
 import (
 	"testing"
+
 	auth "github.com/josielsousa/challenge-accounts/helpers/auth"
 )
 

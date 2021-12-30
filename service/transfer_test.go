@@ -9,12 +9,13 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	_ "github.com/mattn/go-sqlite3"
+
 	"github.com/josielsousa/challenge-accounts/repo/db"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/repo/model/mocks"
 	srv "github.com/josielsousa/challenge-accounts/service"
 	"github.com/josielsousa/challenge-accounts/types"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -103,73 +104,73 @@ func getMockRequestTransfer(method string) (*httptest.ResponseRecorder, *http.Re
 
 func TestDoTransfers(t *testing.T) {
 	t.Run("Teste realizar uma transferência com sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		mockRps, mockReq := getMockRequestTransfer(http.MethodPost)
 
 		srvTransfer.DoTransfer(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusCreated {
 			t.Errorf(ErrorScenarioCreated, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste realizar uma transferência com erro parâmetros de entrada 422", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		transferTest = model.Transfer{}
 		mockRps, mockReq := getMockRequestTransfer(http.MethodPost)
 
 		srvTransfer.DoTransfer(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusUnprocessableEntity {
 			t.Errorf(ErrorScenarioUnprocessableEntity, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste realizar uma transferência com erro 500", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		mockRps, mockReq := getMockRequestTransfer(http.MethodPost)
 
-		//Força o retorno da account
+		// Força o retorno da account
 		stgAccTransfer.OnGetAccount = func(id string) (*model.Account, error) {
 			return nil, errors.New(types.ErrorUnexpected)
 		}
 
 		srvTransfer.DoTransfer(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {
 			t.Errorf(ErrorScenarioError, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste realizar uma transferência com erro not found 404", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		mockRps, mockReq := getMockRequestTransfer(http.MethodPost)
 
-		//Força o retorno da account
+		// Força o retorno da account
 		stgAccTransfer.OnGetAccount = func(id string) (*model.Account, error) {
 			return nil, nil
 		}
 
 		srvTransfer.DoTransfer(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusNotFound {
 			t.Errorf(ErrorScenarioErrorNotFound, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste realizar uma transferência com saldo insuficiente", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		transferTest.Amount = 0.5
 		accountTransferTest.Balance = 0.2
 		mockRps, mockReq := getMockRequestTransfer(http.MethodPost)
 
 		srvTransfer.DoTransfer(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusUnprocessableEntity {
 			t.Errorf(ErrorScenarioUnprocessableEntity, mockRps.Result().StatusCode)
 		}
@@ -178,50 +179,50 @@ func TestDoTransfers(t *testing.T) {
 
 func TestGetAllTransfers(t *testing.T) {
 	t.Run("Teste recuperar todas as transfências com sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		mockRps, mockReq := getMockRequestTransfer(http.MethodGet)
 
 		srvTransfer.GetAllTransfers(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusOK {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste recuperar todas as transfências com sucesso, porem sem dados", func(t *testing.T) {
-		//FakeBody para request
-		//FakeBody para request
+		// FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		mockRps, mockReq := getMockRequestTransfer(http.MethodGet)
 
-		//Força o retorno da transfers vazia
+		// Força o retorno da transfers vazia
 		stgTransfer.OnGetAllTransfers = func(accountId string) ([]model.Transfer, error) {
 			transfers := make([]model.Transfer, 0)
 			return transfers, nil
 		}
 
 		srvTransfer.GetAllTransfers(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusNoContent {
 			t.Errorf(ErrorScenarioSuccessNoContent, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste recuperar todas as transfências com erro", func(t *testing.T) {
-		//FakeBody para request
-		//FakeBody para request
+		// FakeBody para request
+		// FakeBody para request
 		srvTransfer = setupTransferService()
 		mockRps, mockReq := getMockRequestTransfer(http.MethodGet)
 
-		//Força o retorno da transfers vazia
+		// Força o retorno da transfers vazia
 		stgTransfer.OnGetAllTransfers = func(accountId string) ([]model.Transfer, error) {
 			transfers := make([]model.Transfer, 0)
 			return transfers, errors.New("Erro Inesperado")
 		}
 
 		srvTransfer.GetAllTransfers(mockRps, mockReq, claims)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {
 			t.Errorf(ErrorScenarioError, mockRps.Result().StatusCode)
 		}

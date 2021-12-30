@@ -5,10 +5,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
+
 	"github.com/josielsousa/challenge-accounts/repo/model"
 )
 
-//TransferStorage - Assinatura para o storage de transfer.
+// TransferStorage - Assinatura para o storage de transfer.
 type TransferStorage struct {
 	db *gorm.DB
 }
@@ -28,14 +29,14 @@ type transferGorm struct {
 	DeletedAt            *time.Time `sql:"index"`
 }
 
-//NewTransferStorage - Inicializa o storage para transfers no banco de dados com Gorm.
+// NewTransferStorage - Inicializa o storage para transfers no banco de dados com Gorm.
 func NewTransferStorage(db *gorm.DB) *TransferStorage {
 	db.AutoMigrate(&model.Transfer{})
 
 	return &TransferStorage{db: db}
 }
 
-//GetAllTransfers - Recupera todas as transfers da `account` informada.
+// GetAllTransfers - Recupera todas as transfers da `account` informada.
 func (s *TransferStorage) GetAllTransfers(accountID string) ([]model.Transfer, error) {
 	transfers := make([]model.Transfer, 0)
 	filter := &transferGorm{AccountOriginID: accountID}
@@ -48,7 +49,7 @@ func (s *TransferStorage) GetAllTransfers(accountID string) ([]model.Transfer, e
 	return transfers, err
 }
 
-//Insert - Insere uma nova transfer.
+// Insert - Insere uma nova transfer.
 func (s *TransferStorage) Insert(transfer model.Transfer) (*model.Transfer, error) {
 	if len(transfer.ID) <= 0 {
 		transfer.ID = uuid.New().String()

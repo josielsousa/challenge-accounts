@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
+
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validator"
@@ -14,7 +15,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
-//Constantes utilizadas no serviço de autenticação.
+// Constantes utilizadas no serviço de autenticação.
 const (
 	MaxTimeToExpiration        = 5
 	InfoTokenEmpty             = "Token vazio."
@@ -37,7 +38,7 @@ type AuthService struct {
 	stgAccount   model.AccountStorage
 }
 
-//NewAuthService - Instância o service.
+// NewAuthService - Instância o service.
 func NewAuthService(stgAccount model.AccountStorage, log types.APILogProvider) *AuthService {
 	return &AuthService{
 		logger:       log,
@@ -48,7 +49,7 @@ func NewAuthService(stgAccount model.AccountStorage, log types.APILogProvider) *
 	}
 }
 
-//Login - Realiza a autenticação do usuário na API.
+// Login - Realiza a autenticação do usuário na API.
 //	200: Quando a autenticação for bem sucedida.
 //	401: Quando o `secret` fornecido for diferente do secret armazenado.
 //	404: Quando não encontrar a account.
@@ -72,7 +73,7 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//Verifica se o secret informado na autenticação, é o mesmo armazenado na `account`.
+	// Verifica se o secret informado na autenticação, é o mesmo armazenado na `account`.
 	err = s.authHlp.VerifySecret(acc.Secret, credential.Secret)
 	if err != nil {
 		s.logger.Error("Error on recovery account by `cpf`: ", err)
@@ -80,7 +81,7 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//Tempo de expiração do token
+	// Tempo de expiração do token
 	expirationTime := time.Now().Add(MaxTimeToExpiration * time.Minute)
 	authToken, err := s.GetToken(acc, jwtKey, expirationTime)
 	if err != nil {
@@ -92,9 +93,9 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 	s.httpHlp.ThrowSuccess(w, http.StatusOK, types.SuccessResponse{Success: true, Data: authToken})
 }
 
-//GetToken - Gera um novo token.
+// GetToken - Gera um novo token.
 func (s *AuthService) GetToken(acc *model.Account, jwtKey []byte, expirationTime time.Time) (*types.Auth, error) {
-	//JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
+	// JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
 	claims := &types.Claims{
 		AccountID: acc.ID,
 		Username:  acc.Cpf,
@@ -111,7 +112,7 @@ func (s *AuthService) GetToken(acc *model.Account, jwtKey []byte, expirationTime
 	return authToken, nil
 }
 
-//ValidateToken - Realiza a validação do token enviado.
+// ValidateToken - Realiza a validação do token enviado.
 //	Quando a validação for bem sucedida, executa a próxima rota informada.
 //	401: Quando o `token` fornecido for inválido.
 //	400: Quando o token estiver vazio / nulo
@@ -158,7 +159,7 @@ func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request
 			return
 		}
 
-		//Invoca a próxima requisição.
+		// Invoca a próxima requisição.
 		next(w, req, claims)
 	}
 }

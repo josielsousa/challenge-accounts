@@ -8,18 +8,19 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/thedevsaddam/govalidator"
+
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
-	"github.com/thedevsaddam/govalidator"
 )
 
-//Helper - Define a struct para o helper de validação.
+// Helper - Define a struct para o helper de validação.
 type Helper struct {
 	httpHlp *httpHelper.Helper
 }
 
-//NewHelper - Instância helper validação.
+// NewHelper - Instância helper validação.
 func NewHelper() *Helper {
 	return &Helper{
 		httpHlp: httpHelper.NewHelper(),
@@ -28,7 +29,7 @@ func NewHelper() *Helper {
 
 // InitCustomRule - Inicializa a regra geral para verificar os campos do tipo `string`.
 func InitCustomRule() {
-	govalidator.AddCustomRule("string", func(field string, rule string, message string, value interface{}) error {
+	govalidator.AddCustomRule("string", func(field, rule, message string, value interface{}) error {
 		if value == nil {
 			return nil
 		}
@@ -46,8 +47,8 @@ func InitCustomRule() {
 		return nil
 	})
 
-	govalidator.AddCustomRule("cpf", func(field string, rule string, message string, value interface{}) error {
-		//Parâmetros iniciais para validação:
+	govalidator.AddCustomRule("cpf", func(field, rule, message string, value interface{}) error {
+		// Parâmetros iniciais para validação:
 		//	sizeWithoutDigits = Tamanho do CPF sem os dígitos informados.
 		//	position = Peso inicial para validação dos dígitos.
 		const (
@@ -59,7 +60,6 @@ func InitCustomRule() {
 		val := value.(string)
 
 		if !helper.IsCPFValid(val, sizeWithoutDigits, position) {
-
 			if message == "" {
 				message = "The CPF is invalid."
 			}
@@ -68,10 +68,9 @@ func InitCustomRule() {
 		}
 		return nil
 	})
-
 }
 
-//ValidateDataAccount - Realiza a validação dos dados enviados para as request de `account`.
+// ValidateDataAccount - Realiza a validação dos dados enviados para as request de `account`.
 func (h *Helper) ValidateDataAccount(w http.ResponseWriter, req *http.Request) *model.Account {
 	var account model.Account
 	opts := govalidator.Options{
@@ -91,7 +90,7 @@ func (h *Helper) ValidateDataAccount(w http.ResponseWriter, req *http.Request) *
 	return &account
 }
 
-//ValidateDataTransfer - Realiza a validação dos dados enviados para as request de `transfer`.
+// ValidateDataTransfer - Realiza a validação dos dados enviados para as request de `transfer`.
 func (h *Helper) ValidateDataTransfer(w http.ResponseWriter, req *http.Request) *model.Transfer {
 	var transfer model.Transfer
 	opts := govalidator.Options{
@@ -111,7 +110,7 @@ func (h *Helper) ValidateDataTransfer(w http.ResponseWriter, req *http.Request) 
 	return &transfer
 }
 
-//ValidateDataLogin - Realiza a validação dos dados enviados para as request de `login`.
+// ValidateDataLogin - Realiza a validação dos dados enviados para as request de `login`.
 func (h *Helper) ValidateDataLogin(w http.ResponseWriter, req *http.Request) *types.Credentials {
 	var credentials types.Credentials
 	opts := govalidator.Options{
@@ -131,12 +130,12 @@ func (h *Helper) ValidateDataLogin(w http.ResponseWriter, req *http.Request) *ty
 	return &credentials
 }
 
-//IsCPFValid - Verifica se o CPF informado é válido, calculando os dígitos verificadores.
-func (h *Helper) IsCPFValid(doc string, size int, position int) bool {
+// IsCPFValid - Verifica se o CPF informado é válido, calculando os dígitos verificadores.
+func (h *Helper) IsCPFValid(doc string, size, position int) bool {
 	// Removes special characters.
 	h.removeSpecialChars(&doc)
 
-	//Se o documento estiver vazio, retorna falso
+	// Se o documento estiver vazio, retorna falso
 	if len(doc) <= 0 {
 		return false
 	}
@@ -157,7 +156,7 @@ func (h *Helper) IsCPFValid(doc string, size int, position int) bool {
 	return doc == data+digit
 }
 
-//removeSpecialChars - Remove os caracteres não númericos.
+// removeSpecialChars - Remove os caracteres não númericos.
 func (h *Helper) removeSpecialChars(value *string) string {
 	if value == nil {
 		return ""
@@ -168,7 +167,7 @@ func (h *Helper) removeSpecialChars(value *string) string {
 	return normalized
 }
 
-//allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11
+// allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11
 func (h *Helper) allEquals(value string) bool {
 	base := value[0]
 	for i := 1; i < len(value); i++ {
@@ -180,12 +179,11 @@ func (h *Helper) allEquals(value string) bool {
 	return true
 }
 
-//calculateDigit - Calcula o digito verificador do documento informado conforme seu tipo.
+// calculateDigit - Calcula o digito verificador do documento informado conforme seu tipo.
 //	position - representa o peso para a regra de cálculo do digito verificador.
 // CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2
 // CNPJ pesos: 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2
 func calculateDigit(value string, position int) string {
-
 	var sum int
 	for _, r := range value {
 		sum += int(r-'0') * position

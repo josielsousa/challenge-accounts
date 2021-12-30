@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/repo/model/mocks"
 	srv "github.com/josielsousa/challenge-accounts/service"
@@ -79,66 +80,66 @@ func setupAccountService() *srv.AccountService {
 
 func TestServiceInsertAccount(t *testing.T) {
 	t.Run("Teste Inserir account sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAcc = setupAccountService()
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
 		srvAcc.InsertAccount(mockRps, mockReq)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusCreated {
 			t.Errorf(ErrorScenarioCreated, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste Inserir account erro inesperado", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAcc = setupAccountService()
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Força o retorno de um erro inesperado ao realizar a persistência no banco de dados.
+		// Força o retorno de um erro inesperado ao realizar a persistência no banco de dados.
 		stgAcc.OnInsert = func(account model.Account) (*model.Account, error) {
 			return nil, errors.New(types.ErrorUnexpected)
 		}
 
 		srvAcc.InsertAccount(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {
 			t.Errorf(ErrorScenarioError, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste Inserir account erro on GetAccountByCPF", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAcc = setupAccountService()
 		body, _ := json.Marshal(accountTest)
 
 		bytesBody := bytes.NewReader(body)
 		mockReq := httptest.NewRequest(http.MethodPost, "http://localhost:3000/accounts", bytesBody)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Força o retorno da account
+		// Força o retorno da account
 		stgAcc.OnGetAccountByCPF = func(id string) (*model.Account, error) {
 			return nil, errors.New(types.ErrorUnexpected)
 		}
 
 		srvAcc.InsertAccount(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {
 			t.Errorf(ErrorScenarioError, mockRps.Result().StatusCode)
 		}
@@ -147,15 +148,15 @@ func TestServiceInsertAccount(t *testing.T) {
 
 func TestServiceGetAllAccount(t *testing.T) {
 	t.Run("Teste Get All account sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAcc = setupAccountService()
 		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
 		srvAcc.GetAllAccounts(mockRps, mockReq)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusOK {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
 		}
@@ -165,10 +166,10 @@ func TestServiceGetAllAccount(t *testing.T) {
 		srvAcc = setupAccountService()
 		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Força o retorno da account
+		// Força o retorno da account
 		stgAcc.OnGetAllAccounts = func() ([]model.Account, error) {
 			accounts := make([]model.Account, 0)
 			return accounts, nil
@@ -176,7 +177,7 @@ func TestServiceGetAllAccount(t *testing.T) {
 
 		srvAcc.GetAllAccounts(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusNoContent {
 			t.Errorf(ErrorScenarioErrorNotFound, mockRps.Result().StatusCode)
 		}
@@ -186,17 +187,17 @@ func TestServiceGetAllAccount(t *testing.T) {
 		srvAcc = setupAccountService()
 		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts", nil)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Força o retorno da account
+		// Força o retorno da account
 		stgAcc.OnGetAllAccounts = func() ([]model.Account, error) {
 			return nil, errors.New("Erro Inesperado")
 		}
 
 		srvAcc.GetAllAccounts(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {
 			t.Errorf(ErrorScenarioError, mockRps.Result().StatusCode)
 		}
@@ -205,23 +206,23 @@ func TestServiceGetAllAccount(t *testing.T) {
 
 func TestServiceGetAccountBalance(t *testing.T) {
 	t.Run("Teste Get account sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAcc = setupAccountService()
 		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/balance", nil)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Gera o id
+		// Gera o id
 		accountTest.ID = uuid.New().String()
 
-		//Força o retorno da account
+		// Força o retorno da account
 		stgAcc.OnGetAccount = func(id string) (*model.Account, error) {
 			return &accountTest, nil
 		}
 
 		srvAcc.GetAccountBalance(mockRps, mockReq)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusOK {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
 		}
@@ -231,17 +232,17 @@ func TestServiceGetAccountBalance(t *testing.T) {
 		srvAcc = setupAccountService()
 		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/balance", nil)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Força não encontrar a account
+		// Força não encontrar a account
 		stgAcc.OnGetAccount = func(id string) (*model.Account, error) {
 			return nil, nil
 		}
 
 		srvAcc.GetAccountBalance(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusNotFound {
 			t.Errorf(ErrorScenarioErrorNotFound, mockRps.Result().StatusCode)
 		}
@@ -251,17 +252,17 @@ func TestServiceGetAccountBalance(t *testing.T) {
 		srvAcc = setupAccountService()
 		mockReq := httptest.NewRequest(http.MethodGet, "http://localhost:3000/accounts/1/balance", nil)
 
-		//Mock writer para teste
+		// Mock writer para teste
 		mockRps := httptest.NewRecorder()
 
-		//Força não encontrar a account
+		// Força não encontrar a account
 		stgAcc.OnGetAccount = func(id string) (*model.Account, error) {
 			return nil, errors.New("Erro Inesperado")
 		}
 
 		srvAcc.GetAccountBalance(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusInternalServerError {
 			t.Errorf(ErrorScenarioError, mockRps.Result().StatusCode)
 		}

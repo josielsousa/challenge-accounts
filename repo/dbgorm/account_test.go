@@ -6,14 +6,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
-	"github.com/josielsousa/challenge-accounts/repo/dbgorm"
-	"github.com/josielsousa/challenge-accounts/types"
 	_ "github.com/mattn/go-sqlite3"
 
+	"github.com/josielsousa/challenge-accounts/repo/dbgorm"
 	"github.com/josielsousa/challenge-accounts/repo/model"
+	"github.com/josielsousa/challenge-accounts/types"
 )
 
-//Constante de mensagens
+// Constante de mensagens
 const (
 	ErrorInsertAccount            = "Error on insert account"
 	ErrorUpdateAccount            = "Error on update account"
@@ -117,6 +117,7 @@ func TestStorageGetAccount(t *testing.T) {
 		}
 	})
 }
+
 func TestStorageGetAccountByCPF(t *testing.T) {
 	stgAcc = setupTestAccounts(t)
 

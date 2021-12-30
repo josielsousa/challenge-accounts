@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validator"
@@ -17,7 +18,7 @@ const (
 	ErrorAccountExist = "Já existe uma conta criada com o CPF informado."
 )
 
-//Inicializa as regras customizadas.
+// Inicializa as regras customizadas.
 func init() {
 	validator.InitCustomRule()
 }
@@ -31,7 +32,7 @@ type AccountService struct {
 	logger       types.APILogProvider
 }
 
-//NewAccountService - Instância o service com a dependência `log` inicializada.
+// NewAccountService - Instância o service com a dependência `log` inicializada.
 func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider) *AccountService {
 	return &AccountService{
 		logger:       log,
@@ -42,7 +43,7 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 	}
 }
 
-//InsertAccount - Realiza a inserção de uma account conforme os dados do `body` da requisição
+// InsertAccount - Realiza a inserção de uma account conforme os dados do `body` da requisição
 //	200: Sucesso na inserção
 //	422: Erro - Os dados de entrada são válidos porém existe uma `account` para o CPF informado.
 //	500: Erro inesperado durante o processamento da requisição
@@ -88,7 +89,7 @@ func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request)
 	s.httpHlp.ThrowSuccess(w, http.StatusCreated, types.SuccessResponse{Success: true, Data: acc})
 }
 
-//GetAllAccounts - Retorna as informações de todas as contas se não existir retorna []
+// GetAllAccounts - Retorna as informações de todas as contas se não existir retorna []
 //	200: Quando existir accounts para serem retornadas
 //	204: Quando não encontrar accounts.
 //	500: Erro inesperado durante o processamento da requisição
@@ -108,12 +109,12 @@ func (s *AccountService) GetAllAccounts(w http.ResponseWriter, req *http.Request
 	s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: true, Data: accounts})
 }
 
-//GetAccountBalance - Retorna as informações da account, conforme o id informado.
+// GetAccountBalance - Retorna as informações da account, conforme o id informado.
 //	200: Quando existir account para ser retornada
 //	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição
 func (s *AccountService) GetAccountBalance(w http.ResponseWriter, req *http.Request) {
-	//Recebe os parâmetros da request e seleciona o ID
+	// Recebe os parâmetros da request e seleciona o ID
 	params := s.httpHlp.GetParams(req)
 	id := params["id"]
 

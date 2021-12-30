@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/josielsousa/challenge-accounts/helpers/decimal"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validator"
@@ -27,7 +28,7 @@ type TransferService struct {
 	validatorHlp *validator.Helper
 }
 
-//NewTransferService - Instância o service com a dependência `log` inicializada.
+// NewTransferService - Instância o service com a dependência `log` inicializada.
 func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferService {
 	return &TransferService{
 		stg:          stg,
@@ -37,7 +38,7 @@ func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferServ
 	}
 }
 
-//DoTransfer - Realiza a transferência entre as `accounts` conforme os dados enviados na requisição.
+// DoTransfer - Realiza a transferência entre as `accounts` conforme os dados enviados na requisição.
 //	200: Sucesso na inserção
 //	400: Quando o `token` estiver vazio / nulo
 //	401: Quando o `token` fornecido for inválido.
@@ -83,7 +84,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 		return
 	}
 
-	//Inicia a transação
+	// Inicia a transação
 	tx := s.stg.BeginTransaction()
 	accOrigin.Balance = decimal.Sub(transfer.Amount, accOrigin.Balance)
 
@@ -121,7 +122,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 	s.httpHlp.ThrowSuccess(w, http.StatusCreated, types.SuccessResponse{Success: true, Data: trf})
 }
 
-//GetAllTransfers - Retorna as informações de todas as contas se não existir retorna []
+// GetAllTransfers - Retorna as informações de todas as contas se não existir retorna []
 //	200: Quando existir transfers para serem retornadas
 //	204: Quando não encontrar transfers.
 //	400: Quando o token estiver vazio / nulo

@@ -10,7 +10,7 @@ type Credentials struct {
 	Secret string `json:"secret"`
 }
 
-//Claims - Estrutura utilizada para trafegar as informações do token
+// Claims - Estrutura utilizada para trafegar as informações do token
 type Claims struct {
 	Username  string `json:"username"`
 	AccountID string `json:"account_id"`

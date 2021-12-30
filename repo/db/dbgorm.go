@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/jinzhu/gorm"
+
 	"github.com/josielsousa/challenge-accounts/repo/dbgorm"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -16,13 +17,13 @@ func openGorm() (service *Service, err error) {
 	return getServicesGorm(db), nil
 }
 
-//getServicesGorm - Inicializa uma transação no banco de dados.
+// getServicesGorm - Inicializa uma transação no banco de dados.
 func (s *Service) openGormTransaction() *Service {
 	tx := s.conn.(*gorm.DB).Begin()
 	return getServicesGorm(tx)
 }
 
-//getServicesGorm - Retorna as implementações de storage para o gorm.
+// getServicesGorm - Retorna as implementações de storage para o gorm.
 func getServicesGorm(db *gorm.DB) *Service {
 	return &Service{
 		conn:     db,

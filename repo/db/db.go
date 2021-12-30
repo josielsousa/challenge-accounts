@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/jinzhu/gorm"
+
 	"github.com/josielsousa/challenge-accounts/repo/model"
 )
 
@@ -21,7 +22,7 @@ type Service struct {
 	Transfer model.TransferStorage
 }
 
-//Open - Abre a conexão com o banco de dados.
+// Open - Abre a conexão com o banco de dados.
 func Open(dataBase string) (*Service, error) {
 	switch dataBase {
 	case Gorm:
@@ -31,7 +32,7 @@ func Open(dataBase string) (*Service, error) {
 	}
 }
 
-//Close - Fecha a conexão com o banco de dados.
+// Close - Fecha a conexão com o banco de dados.
 func (s *Service) Close() {
 	switch s.connType {
 	case Gorm:
@@ -43,7 +44,7 @@ func (s *Service) Close() {
 	}
 }
 
-//BeginTransaction - Inicia a transação no banco de dados.
+// BeginTransaction - Inicia a transação no banco de dados.
 func (s *Service) BeginTransaction() *Service {
 	switch s.connType {
 	case Gorm:
@@ -53,7 +54,7 @@ func (s *Service) BeginTransaction() *Service {
 	return nil
 }
 
-//Rollback - Realiza o rollback da transação no banco de dados.
+// Rollback - Realiza o rollback da transação no banco de dados.
 func (s *Service) Rollback() {
 	switch s.connType {
 	case Gorm:
@@ -61,7 +62,7 @@ func (s *Service) Rollback() {
 	}
 }
 
-//Commit - Realiza o commit da transação no banco de dados.
+// Commit - Realiza o commit da transação no banco de dados.
 func (s *Service) Commit() {
 	switch s.connType {
 	case Gorm:

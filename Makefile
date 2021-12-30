@@ -35,7 +35,7 @@ clean:
 	@rm -f build/${APP_NAME}
 
 .PHONY: compile
-compile: clean install-dependencies
+compile: clean install-dependencies gofmt
 	@echo "==> Compiling releases"
 	$(call goBuild,${APP_NAME},cmd)
 	zip -r build/${APP_NAME}.zip  build/${APP_NAME}
@@ -66,3 +66,22 @@ test-coverage:
 docker-build: compile
 	@echo "==> Compiling docker images"
 	docker image build --label "challange.accounts.vcs-ref=$(VCS_REF)" -t josielsousa/${APP_NAME}:${ENVIRONMENT_STAGE} build -f build/api.dockerfile
+
+.PHONY: metalint
+metalint:
+ifeq (, $(shell which $$(go env GOPATH)/bin/golangci-lint))
+	@echo "==> installing golangci-lint"
+	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin
+	go install ./...
+endif
+	$$(go env GOPATH)/bin/golangci-lint run --fix --allow-parallel-runners -c ./.golangci.yml ./...
+
+.PHONY: gofmt
+gofmt: 
+	@echo "==> Formating code"
+	go mod tidy
+	go install github.com/daixiang0/gci@latest
+	gci -local ${PROJECT_PATH} -w .
+	go install mvdan.cc/gofumpt@latest
+	gofumpt -w -extra .
+	go fmt ./...

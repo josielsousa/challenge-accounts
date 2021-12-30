@@ -6,11 +6,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
+
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
-//AccountStorage - Assinatura para o storage de account.
+// AccountStorage - Assinatura para o storage de account.
 type AccountStorage struct {
 	db *gorm.DB
 }
@@ -31,14 +32,14 @@ type accountGorm struct {
 	DeletedAt *time.Time `sql:"index"`
 }
 
-//NewAccountStorage - Inicializa o storage para accounts no banco de dados com Gorm.
+// NewAccountStorage - Inicializa o storage para accounts no banco de dados com Gorm.
 func NewAccountStorage(db *gorm.DB) *AccountStorage {
 	db.AutoMigrate(&accountGorm{})
 
 	return &AccountStorage{db: db}
 }
 
-//GetAllAccounts - Recupera todas as accounts.
+// GetAllAccounts - Recupera todas as accounts.
 func (s *AccountStorage) GetAllAccounts() ([]model.Account, error) {
 	accounts := make([]model.Account, 0)
 	err := s.db.Table(model.AccountsTablename).Find(&accounts).Error
@@ -49,7 +50,7 @@ func (s *AccountStorage) GetAllAccounts() ([]model.Account, error) {
 	return accounts, err
 }
 
-//getAccountFilter - Recupera uma account conforme o filtro informado.
+// getAccountFilter - Recupera uma account conforme o filtro informado.
 func (s *AccountStorage) getAccountFilter(filter *accountGorm) (*model.Account, error) {
 	account := &model.Account{}
 	err := s.db.Table(model.AccountsTablename).Where(filter).First(account).Error
@@ -65,19 +66,19 @@ func (s *AccountStorage) getAccountFilter(filter *accountGorm) (*model.Account, 
 	return account, err
 }
 
-//GetAccount - Recupera uma account conforme o `id` informado.
+// GetAccount - Recupera uma account conforme o `id` informado.
 func (s *AccountStorage) GetAccount(id string) (*model.Account, error) {
 	accountFilter := &accountGorm{ID: id}
 	return s.getAccountFilter(accountFilter)
 }
 
-//GetAccountByCPF - Recupera uma account conforme o `cpf` informado.
+// GetAccountByCPF - Recupera uma account conforme o `cpf` informado.
 func (s *AccountStorage) GetAccountByCPF(cpf string) (*model.Account, error) {
 	accountFilter := &accountGorm{Cpf: cpf}
 	return s.getAccountFilter(accountFilter)
 }
 
-//Insert - Insere uma nova account.
+// Insert - Insere uma nova account.
 func (s *AccountStorage) Insert(account model.Account) (*model.Account, error) {
 	if len(account.ID) <= 0 {
 		account.ID = uuid.New().String()
@@ -91,7 +92,7 @@ func (s *AccountStorage) Insert(account model.Account) (*model.Account, error) {
 	return &account, err
 }
 
-//Update - Atualiza a account informada.
+// Update - Atualiza a account informada.
 func (s *AccountStorage) Update(account model.Account) (*model.Account, error) {
 	err := s.db.Table(model.AccountsTablename).Model(&accountGorm{}).Updates(account).Error
 	if err != nil {

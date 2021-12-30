@@ -5,14 +5,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
-	"github.com/josielsousa/challenge-accounts/repo/dbgorm"
-	"github.com/josielsousa/challenge-accounts/types"
 	_ "github.com/mattn/go-sqlite3"
 
+	"github.com/josielsousa/challenge-accounts/repo/dbgorm"
 	"github.com/josielsousa/challenge-accounts/repo/model"
+	"github.com/josielsousa/challenge-accounts/types"
 )
 
-//Constante de mensagens
+// Constante de mensagens
 const (
 	ErrorInsertTransfer            = "Error on insert transfer"
 	ErrorUpdateTransfer            = "Error on update transfer"

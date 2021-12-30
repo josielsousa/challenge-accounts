@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/repo/model/mocks"
@@ -84,26 +85,26 @@ func getMockRequestAuth() (*httptest.ResponseRecorder, *http.Request) {
 
 func TestAuthServiceLogin(t *testing.T) {
 	t.Run("Teste login sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAuth = setupAuthService()
 		mockRps, mockReq := getMockRequestAuth()
 
 		srvAuth.Login(mockRps, mockReq)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusOK {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste login secret diferente error", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAuth = setupAuthService()
 
 		credentialTest.Secret = "new_secret"
 		mockRps, mockReq := getMockRequestAuth()
 
 		srvAuth.Login(mockRps, mockReq)
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusUnauthorized {
 			t.Errorf(ErrorScenarioUnauthorized, mockRps.Result().StatusCode)
 		}
@@ -112,7 +113,7 @@ func TestAuthServiceLogin(t *testing.T) {
 
 // Gera um novo token
 func generateToken(duration time.Duration, t *testing.T) *types.Auth {
-	//Tempo de expiração do token
+	// Tempo de expiração do token
 	jwtKey := []byte("api-challenge-accounts")
 	expirationTime := time.Now().Add(duration)
 	accessToken, err := srvAuth.GetToken(&accountAuthTest, jwtKey, expirationTime)
@@ -126,11 +127,11 @@ func generateToken(duration time.Duration, t *testing.T) *types.Auth {
 
 func TestAuthServiceValidateToken(t *testing.T) {
 	t.Run("Teste validate token sucesso", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAuth = setupAuthService()
 		mockRps, mockReq := getMockRequestAuth()
 
-		//Tempo de expiração do token
+		// Tempo de expiração do token
 		duration := (1 * time.Minute)
 		accessToken := generateToken(duration, t)
 		if accessToken == nil {
@@ -139,77 +140,73 @@ func TestAuthServiceValidateToken(t *testing.T) {
 
 		mockReq.Header.Add("Access-Token", accessToken.Token)
 		retAuth := srvAuth.ValidateToken(func(wNext http.ResponseWriter, reqNext *http.Request, claims *types.Claims) {
-
 		})
 
 		retAuth(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusOK {
 			t.Errorf(ErrorScenarioSuccess, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste validate token expirado", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAuth = setupAuthService()
 		mockRps, mockReq := getMockRequestAuth()
 
-		//Tempo de expiração do token
+		// Tempo de expiração do token
 		duration := (1 * time.Millisecond)
 		accessToken := generateToken(duration, t)
 		if accessToken == nil {
 			return
 		}
 
-		//Força a expiração do token
+		// Força a expiração do token
 		time.Sleep(2 * time.Millisecond)
 
 		mockReq.Header.Add("Access-Token", accessToken.Token)
 		retAuth := srvAuth.ValidateToken(func(wNext http.ResponseWriter, reqNext *http.Request, claims *types.Claims) {
-
 		})
 
 		retAuth(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusUnauthorized {
 			t.Errorf(ErrorTokenExpired, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste validate token signature invalido", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAuth = setupAuthService()
 		mockRps, mockReq := getMockRequestAuth()
 
 		tokenInvalid := `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjAxNjgxNjY4MTYwIiwiYWNjb3VudF9pZCI6ImY5MmFiYzg2LTU2ZGEtNDMxZi04YTAyLWM0ODlkZDI2NWUwMyIsImV4cGlyZXNfYXQiOjE1OTU2ODg3NTV9.EalkFJT0IyjR1RfPfW5Rbsx1jxhviF1lPOrsGqkqq:)`
 		mockReq.Header.Add("Access-Token", tokenInvalid)
 		retAuth := srvAuth.ValidateToken(func(wNext http.ResponseWriter, reqNext *http.Request, claims *types.Claims) {
-
 		})
 
 		retAuth(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusUnauthorized {
 			t.Errorf(ErrorTokenSignatureInvalid, mockRps.Result().StatusCode)
 		}
 	})
 
 	t.Run("Teste validate token vazio", func(t *testing.T) {
-		//FakeBody para request
+		// FakeBody para request
 		srvAuth = setupAuthService()
 		mockRps, mockReq := getMockRequestAuth()
 
 		mockReq.Header.Add("Access-Token", "")
 		retAuth := srvAuth.ValidateToken(func(wNext http.ResponseWriter, reqNext *http.Request, claims *types.Claims) {
-
 		})
 
 		retAuth(mockRps, mockReq)
 
-		//Verificação do comportamento de acordo com o cenário
+		// Verificação do comportamento de acordo com o cenário
 		if mockRps.Result().StatusCode != http.StatusBadRequest {
 			t.Errorf(ErrorTokenEmpty, mockRps.Result().StatusCode)
 		}

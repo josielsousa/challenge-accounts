@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 )
 
@@ -21,7 +22,7 @@ func TestHelperGetParams(t *testing.T) {
 		id := "35"
 		vars := map[string]string{"id": id}
 
-		//Criando nova fake request para teste
+		// Criando nova fake request para teste
 		url := fmt.Sprintf("http://localhost:3000/accounts/%s", vars["id"])
 		mockReq := httptest.NewRequest(http.MethodGet, url, nil)
 		mockReq = mux.SetURLVars(mockReq, vars)
@@ -37,7 +38,7 @@ func TestHelperGetParams(t *testing.T) {
 
 func TestHelperThrowError(t *testing.T) {
 	t.Run("Teste Throw Error", func(t *testing.T) {
-		//Criando nova fake request e mockRps para teste
+		// Criando nova fake request e mockRps para teste
 		mockRps := httptest.NewRecorder()
 
 		hlp := httpHelper.NewHelper()
@@ -51,7 +52,7 @@ func TestHelperThrowError(t *testing.T) {
 
 func TestHelperThrowSuccess(t *testing.T) {
 	t.Run("Teste Throw Success", func(t *testing.T) {
-		//Criando nova fake request e mockRps para teste
+		// Criando nova fake request e mockRps para teste
 		mockRps := httptest.NewRecorder()
 
 		hlp := httpHelper.NewHelper()

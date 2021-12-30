@@ -1,39 +1,68 @@
-export TERM=xterm-256color
-export CLICOLOR_FORCE=true
-export RICHGO_FORCE_COLOR=1
+OS ?= linux
+APP_NAME=challange-accounts
+PROJECT_PATH ?= github.com/josielsousa/challenge-accounts
+PKG ?= $(PROJECT_PATH)
+ENVIRONMENT_STAGE=dev
 
-default: test
+# docker files
+DOCKER_FILE=build/api.dockerfile
+DOCKER_COMPOSE_FILE=labs/docker-compose.yml
 
-# Faz o Build
-build: install
-	@echo "Fazendo build..."
-	env GOOS=linux go build -o bin/service cmd/main.go
+# git tags to add into release file
+GIT_COMMIT=$(shell git rev-parse HEAD)
+GIT_BUILD_TIME=$(shell date '+%Y-%m-%d__%I:%M:%S%p')
+VCS_REF = $(if $(GITHUB_SHA),$(GITHUB_SHA),$(shell git rev-parse HEAD))
 
-test: clean install test-coverage
+define goBuild
+	@echo "==> Go Building $2"
+	@env GOOS=${OS} GOARCH=amd64 go build -v -o  build/$1 \
+	-ldflags "-X main.BuildGitCommit=$(GIT_COMMIT) -X main.BuildTime=$(GIT_BUILD_TIME)" \
+	${PKG}/$2
+endef
 
-setup-local: install
-	@go get -u golang.org/x/tools/...
-	@go get -u golang.org/x/lint/golint
-	@go get -u github.com/haya14busa/goverage
-	@go get -u github.com/kyoh86/richgo
-	@go get github.com/joho/godotenv/cmd/godotenv
+default: test-coverage
 
-# Instala dependencias
-install:
-	@echo "Baixando depedencias..."
-	@go mod verify
+.PHONY: install-dependencies
+install-dependencies:
+	@echo "Installing dependencies"
+	go mod tidy
 
-# Roda teste unitarios e gera coverage
-test-coverage: 
-	@echo "Rodando testes"
-	@richgo test -tags 'nopie' -failfast -coverprofile=coverage.out ./...
-	@go tool cover -html=coverage.out -o coverage.html
-	@rm -rf ./test.db
-	@rm -rf ./DBTestAccount*
 
+.PHONY: clean
 clean:
-	@rm -rf ./bin
-	@rm -rf go.sum
-	@rm -rf coverage*
-	@rm -rf ./test.db
-	@rm -rf ./DBTestAccount*
+	@echo "==> Cleaning releases"
+	@GOOS=${OS} go clean -i -x ./...
+	@rm -f build/${APP_NAME}
+
+.PHONY: compile
+compile: clean install-dependencies
+	@echo "==> Compiling releases"
+	$(call goBuild,${APP_NAME},cmd)
+	zip -r build/${APP_NAME}.zip  build/${APP_NAME}
+
+.PHONY: setup-down
+setup-down:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) -p ${APP_NAME} down
+
+.PHONY: setup-dev
+setup-dev: setup-down
+	@echo "==> Starting dev docker-compose"
+	docker-compose -f $(DOCKER_COMPOSE_FILE) -p ${APP_NAME} up --build
+
+.PHONY: test
+test:
+	@echo "==> Running Tests"
+	@go install github.com/rakyll/gotest@latest
+	gotest -race -failfast -timeout 5m -count=1 -v ./...
+
+.PHONY: test-coverage
+test-coverage:
+	@echo "==> Running tests"
+	go install github.com/rakyll/gotest@latest
+	@gotest -race -failfast -timeout 5m -count=1 -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out -o coverage.html
+
+.PHONY: docker-build
+docker-build: compile
+	@echo "==> Compiling docker images"
+	docker image build --label "challange.accounts.vcs-ref=$(VCS_REF)" -t josielsousa/${APP_NAME}:${ENVIRONMENT_STAGE} build -f build/api.dockerfile

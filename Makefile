@@ -47,7 +47,7 @@ setup-down:
 .PHONY: setup-dev
 setup-dev: setup-down
 	@echo "==> Starting dev docker-compose"
-	docker-compose -f $(DOCKER_COMPOSE_FILE) -p ${APP_NAME} up --build
+	docker-compose -f $(DOCKER_COMPOSE_FILE) -p ${APP_NAME} up --build -d
 
 .PHONY: test
 test:

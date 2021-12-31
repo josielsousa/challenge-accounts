@@ -3,7 +3,7 @@ package accounts
 import (
 	"time"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/vos"
+	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
 // Account - Estrutura da entidade `account`
@@ -12,7 +12,7 @@ type Account struct {
 	Name      string
 	Secret    string
 	Balance   int
-	CPF       vos.CPF
+	CPF       cpf.CPF
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

@@ -1,4 +1,4 @@
-package vos
+package hash
 
 import (
 	"errors"

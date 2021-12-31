@@ -182,7 +182,6 @@ func (h *Helper) allEquals(value string) bool {
 // calculateDigit - Calcula o digito verificador do documento informado conforme seu tipo.
 //	position - representa o peso para a regra de cálculo do digito verificador.
 // CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2
-// CNPJ pesos: 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2
 func calculateDigit(value string, position int) string {
 	var sum int
 	for _, r := range value {

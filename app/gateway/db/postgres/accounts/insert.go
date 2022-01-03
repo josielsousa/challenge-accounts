@@ -38,8 +38,8 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
 		query,
 		acc.ID,
 		acc.Name,
-		acc.CPF,
-		acc.Secret,
+		acc.CPF.String(),
+		acc.Secret.String(),
 		acc.Balance,
 		acc.CreatedAt,
 	).Scan(

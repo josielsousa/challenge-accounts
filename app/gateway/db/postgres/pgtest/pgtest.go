@@ -86,13 +86,19 @@ func StartupNewPool() (teardownFn func(), err error) {
 	return teardownFn, nil
 }
 
-func NewDB(t *testing.T, dbName string) *pgxpool.Pool {
+func NewDB(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 
-	dbName = strings.ToLower(dbName)
-	_, _ = concurrent_conn.Exec(context.Background(), fmt.Sprintf("drop database %s", dbName))
+	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt64(&instances), time.Now().UnixNano())
+	ccConfig := concurrent_conn.Config()
 
-	connString := strings.Replace(concurrent_conn.Config().ConnString(), concurrent_conn.Config().ConnConfig.Database, dbName, 1)
+	_, err := concurrent_conn.Exec(
+		context.Background(),
+		fmt.Sprintf("create database %s", dbName),
+	)
+	require.NoError(t, err)
+
+	connString := strings.Replace(ccConfig.ConnString(), ccConfig.ConnConfig.Database, dbName, 1)
 	newPool, err := pgxpool.Connect(context.Background(), connString)
 	require.NoError(t, err)
 

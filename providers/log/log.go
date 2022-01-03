@@ -22,6 +22,11 @@ func (api *APILogProvider) Info(info string) {
 }
 
 // Error - Log o erro informado.
-func (api *APILogProvider) Error(trace string, erro error) {
-	api.log.Error(trace, erro)
+func (api *APILogProvider) Error(trace string, err error) {
+	api.log.Error(trace, err)
+}
+
+// Error - Log o erro informado.
+func (api *APILogProvider) WithError(trace string, err error) {
+	api.log.WithError(err).Error(trace)
 }

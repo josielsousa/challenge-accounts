@@ -1,7 +1,10 @@
 package main
 
 import (
-	"github.com/josielsousa/challenge-accounts/providers/log"
+	"github.com/sirupsen/logrus"
+
+	"github.com/josielsousa/challenge-accounts/app/configuration"
+	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
 )
 
 //import (
@@ -35,6 +38,21 @@ import (
 // }
 
 func main() {
-	logger := log.NewLogger()
-	logger.Info("API inicializando...")
+	logger := logrus.New()
+	logger.Info("api inicializando...")
+
+	cfg, err := configuration.LoadConfig()
+	if err != nil {
+		logger.WithError(err).Error("on loading configuration")
+	}
+
+	log := logger.WithField("app", cfg.API.AppName)
+
+	dbPool, err := postgres.ConnectPool(cfg.Postgres.URL(), log, postgres.LogLevelError)
+	if err != nil {
+		logger.WithError(err).Error("on connect with database")
+	}
+
+	defer dbPool.Close()
+	logger.Info("api avaiable...")
 }

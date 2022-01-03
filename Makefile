@@ -5,7 +5,7 @@ PKG ?= $(PROJECT_PATH)
 ENVIRONMENT_STAGE=dev
 
 # docker files
-DOCKER_FILE=build/api.dockerfile
+DOCKER_FILE=api.dockerfile
 DOCKER_COMPOSE_FILE=labs/docker-compose.yml
 
 # git tags to add into release file
@@ -65,7 +65,7 @@ test-coverage:
 .PHONY: docker-build
 docker-build: compile
 	@echo "==> Compiling docker images"
-	docker image build --label "challange.accounts.vcs-ref=$(VCS_REF)" -t josielsousa/${APP_NAME}:${ENVIRONMENT_STAGE} build -f build/api.dockerfile
+	docker image build --label "challange.accounts.vcs-ref=$(VCS_REF)" -t josielsousa/${APP_NAME}:${ENVIRONMENT_STAGE} build -f api.dockerfile
 
 .PHONY: metalint
 metalint:

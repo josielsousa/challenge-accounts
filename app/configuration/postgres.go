@@ -15,17 +15,6 @@ type PostgresConfig struct {
 	Hostname     string `envconfig:"HOSTNAME"`
 }
 
-func (p PostgresConfig) DSN() string {
-	dbConn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s pool_min_conns=%s pool_max_conns=%s",
-		p.User, p.Password, p.Host, p.Port, p.DatabaseName, p.PoolMinSize, p.PoolMaxSize)
-
-	if p.Hostname != "" {
-		dbConn = fmt.Sprintf("%s application_name=%s", dbConn, p.Hostname)
-	}
-
-	return dbConn
-}
-
 func (p PostgresConfig) URL() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		p.User, p.Password, p.Host, p.Port, p.DatabaseName)

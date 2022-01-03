@@ -14,8 +14,10 @@ FROM gcr.io/distroless/static-debian10
 
 WORKDIR /app
 
-COPY challange-accounts /app/challange-accounts
+COPY --from=builder /build/challange-accounts /
+
+COPY app/gateway/db/postgres/migrations /migrations
 
 EXPOSE 3000
 
-ENTRYPOINT [ "/app/challange-accounts" ]
+ENTRYPOINT [ "/challange-accounts" ]

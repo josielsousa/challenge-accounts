@@ -48,7 +48,7 @@ func main() {
 
 	log := logger.WithField("app", cfg.API.AppName)
 
-	dbPool, err := postgres.ConnectPool(cfg.Postgres.URL(), log, postgres.LogLevelError)
+	dbPool, err := postgres.ConnectPoolWithMigrations(cfg.Postgres.URL(), log, postgres.LogLevelError)
 	if err != nil {
 		logger.WithError(err).Error("on connect with database")
 	}

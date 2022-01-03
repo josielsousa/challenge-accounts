@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	ErrInvalidAmount     = errors.New("invalid amount")
-	ErrInsufficientFunds = errors.New("insufficient amount")
+	ErrInvalidAmount        = errors.New("invalid amount")
+	ErrAccountAlreadyExists = errors.New("account already exists")
+	ErrInsufficientFunds    = errors.New("insufficient amount")
 )
 
 // Account - Estrutura da entidade `account`

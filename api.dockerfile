@@ -1,10 +1,8 @@
 FROM gcr.io/distroless/static-debian10
 
-WORKDIR /app
+ADD --chown=nonroot:nonroot build/challange-accounts /challange-accounts
 
-COPY challange-accounts /
-
-COPY app/gateway/db/postgres/migrations /migrations
+COPY --chown=nonroot:nonroot app/gateway/db/postgres/migrations /migrations
 
 EXPOSE 3000
 

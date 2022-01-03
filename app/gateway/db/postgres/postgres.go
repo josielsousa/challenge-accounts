@@ -27,7 +27,7 @@ func Connect(dbURL string, log *logrus.Entry) (*pgx.Conn, error) {
 		return nil, fmt.Errorf("on pg pool connect config: %w", err)
 	}
 
-	err = runMigrations(dbURL)
+	err = RunMigrationsConn(dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("on run migrations: %w", err)
 	}
@@ -35,7 +35,15 @@ func Connect(dbURL string, log *logrus.Entry) (*pgx.Conn, error) {
 	return db, err
 }
 
-func ConnectPool(dbURL string, log *logrus.Entry, logLevel LogLevel) (*pgxpool.Pool, error) {
+func ConnectPoolWithMigrations(dbURL string, log *logrus.Entry, logLevel LogLevel) (*pgxpool.Pool, error) {
+	return connectPool(dbURL, log, logLevel, true)
+}
+
+func ConnectPoolWithoutMigrations(dbURL string, log *logrus.Entry, logLevel LogLevel) (*pgxpool.Pool, error) {
+	return connectPool(dbURL, log, logLevel, false)
+}
+
+func connectPool(dbURL string, log *logrus.Entry, logLevel LogLevel, runMigrations bool) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("on pgx pool parse config: %w", err)
@@ -52,15 +60,17 @@ func ConnectPool(dbURL string, log *logrus.Entry, logLevel LogLevel) (*pgxpool.P
 		return nil, fmt.Errorf("on pg pool connect config: %w", err)
 	}
 
-	err = runMigrations(dbURL)
-	if err != nil {
-		return nil, fmt.Errorf("on run migrations: %w", err)
+	if runMigrations {
+		err = RunMigrationsConn(dbURL)
+		if err != nil {
+			return nil, fmt.Errorf("on run migrations: %w", err)
+		}
 	}
 
 	return db, err
 }
 
-func runMigrations(dbUrl string) error {
+func RunMigrationsConn(dbUrl string) error {
 	m, err := GetMigrationHandler(dbUrl)
 	if err != nil {
 		return fmt.Errorf("on get migration handler: %w", err)

@@ -41,6 +41,7 @@ func TestRepository_Insert(t *testing.T) {
 						Secret:  secret,
 						CPF:     newCpf,
 					},
+					ctx: context.Background(),
 				}
 			},
 			wantErr: nil,

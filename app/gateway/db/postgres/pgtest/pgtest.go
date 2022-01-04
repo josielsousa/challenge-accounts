@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/ory/dockertest"
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
@@ -19,6 +20,10 @@ import (
 var (
 	instances       int64
 	concurrent_conn *pgxpool.Pool
+)
+
+const (
+	defaultContainerName = "pg-test-challenge-accounts"
 )
 
 func StartupNewPool() (teardownFn func(), err error) {
@@ -32,28 +37,23 @@ func StartupNewPool() (teardownFn func(), err error) {
 		return nil, fmt.Errorf("on new pool: could not connect to docker: %w", err)
 	}
 
+	if err = pool.Client.Ping(); err != nil {
+		return nil, fmt.Errorf("on ping docker client: %w", err)
+	}
+
 	atomic.AddInt64(&instances, 1)
 	ttName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt64(&instances), time.Now().UnixNano())
 	dbName := strings.ToLower(ttName)
 
-	opts := dockertest.RunOptions{
-		Repository: "postgres",
-		Tag:        "14-alpine",
-		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + dbName},
-	}
-
-	resource, err := pool.RunWithOptions(&opts)
+	resource, err := getDockerResource(pool, dbName)
 	if err != nil {
-		return nil, fmt.Errorf("could not start resource: %w", err)
+		return nil, fmt.Errorf("on docker resource: %w", err)
 	}
 
 	port := resource.GetPort("5432/tcp")
 	if err = pool.Retry(pingDatabase(port, log)); err != nil {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
-
-	// default max age is 120 seconds
-	resource.Expire(120)
 
 	dbURL := getPostgresConnString(port, "postgres")
 	defaultPGPool, err := postgres.ConnectPoolWithoutMigrations(dbURL, log, postgres.LogLevelWarn)
@@ -67,6 +67,7 @@ func StartupNewPool() (teardownFn func(), err error) {
 	}
 
 	// create default database
+	dbURL = getPostgresConnString(port, dbName)
 	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL, log, postgres.LogLevelWarn)
 	if err != nil {
 		return nil, err
@@ -75,22 +76,53 @@ func StartupNewPool() (teardownFn func(), err error) {
 	concurrent_conn = dbPool
 
 	teardownFn = func() {
+		pool.RemoveContainerByName(defaultContainerName)
 		dbPool.Close()
 
 		dropDB(dbName, defaultPGPool)
 		defaultPGPool.Close()
-
 		resource.Close()
 	}
 
 	return teardownFn, nil
 }
 
+func getDockerResource(pool *dockertest.Pool, dbName string) (*dockertest.Resource, error) {
+	container, _ := pool.Client.InspectContainer(defaultContainerName)
+	if container != nil && container.State.Running {
+		resource := &dockertest.Resource{Container: container}
+		return resource, nil
+	}
+
+	if container != nil && !container.State.Running {
+		pool.RemoveContainerByName(defaultContainerName)
+	}
+
+	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+		Name:       defaultContainerName,
+		Repository: "postgres",
+		Tag:        "13-alpine",
+		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + dbName},
+	}, func(c *docker.HostConfig) {
+		c.AutoRemove = true
+		c.RestartPolicy = docker.RestartPolicy{Name: "no"}
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not start resource: %w", err)
+	}
+
+	return resource, nil
+}
+
 func NewDB(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 
+	logger := logrus.New()
+	logger.SetLevel(postgres.LogLevelWarn)
+	log := logger.WithField("environment", "new db integration test")
+
 	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt64(&instances), time.Now().UnixNano())
-	ccConfig := concurrent_conn.Config()
+	cconn := concurrent_conn
 
 	_, err := concurrent_conn.Exec(
 		context.Background(),
@@ -98,8 +130,11 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 	)
 	require.NoError(t, err)
 
-	connString := strings.Replace(ccConfig.ConnString(), ccConfig.ConnConfig.Database, dbName, 1)
-	newPool, err := pgxpool.Connect(context.Background(), connString)
+	orig := cconn.Config().ConnString()
+	dbOrig := cconn.Config().ConnConfig.Database
+
+	connString := strings.Replace(orig, dbOrig, dbName, 1)
+	newPool, err := postgres.ConnectPoolWithMigrations(connString, log, postgres.LogLevelWarn)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {

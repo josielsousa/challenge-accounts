@@ -28,12 +28,12 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
             cpf,
             secret,
             balance,
-            created_at,
-        ) VALUES ($1, $2, $3, $4, $5)
+            created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id, created_at, updated_at
     `
 
-	err := r.db.QueryRow(
+	row := r.db.QueryRow(
 		ctx,
 		query,
 		acc.ID,
@@ -42,7 +42,9 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
 		acc.Secret.String(),
 		acc.Balance,
 		acc.CreatedAt,
-	).Scan(
+	)
+
+	err := row.Scan(
 		&acc.ID,
 		&acc.CreatedAt,
 		&acc.UpdatedAt,

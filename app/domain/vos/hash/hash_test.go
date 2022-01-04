@@ -75,6 +75,13 @@ func TestHash_NewHash(t *testing.T) {
 			},
 			wantErr: nil,
 		},
+		{
+			name: "sucess create a new hash with special chars",
+			args: args{
+				secret: "the#$%PassWoRd",
+			},
+			wantErr: nil,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt // capture range variable
@@ -82,6 +89,46 @@ func TestHash_NewHash(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			_, err := NewHash(tt.args.secret)
+			assert.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestCompareHashedAndSecret(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		hashedSecret string
+		secret       string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name: "should successfully compare hashed string with secret value",
+			args: args{
+				secret:       "teste",
+				hashedSecret: "$2a$10$GUNat4gFNNRKtRZ25DO82.L/XcrcmF8eKpt7/PCGsBvqiAJKx63Au",
+			},
+			wantErr: nil,
+		},
+		{
+			name: "should successfully compare hashed string with secret value",
+			args: args{
+				secret:       "the#$%PassWoRd",
+				hashedSecret: "$2a$10$oUydrP.MQZq7gvLpCvzGaOKBAqwBAoRgzqz7pLks3C0ulIkrpSEQa",
+			},
+			wantErr: nil,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt // capture range variable
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			err := CompareHashedAndSecret(tt.args.hashedSecret, tt.args.secret)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

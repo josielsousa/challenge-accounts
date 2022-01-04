@@ -44,3 +44,12 @@ func (h Hash) CompareHashAndSecret(secret string) error {
 
 	return nil
 }
+
+func CompareHashedAndSecret(hashedSecret, secret string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedSecret), []byte(secret))
+	if err != nil {
+		return ErrInvalidSecret
+	}
+
+	return nil
+}

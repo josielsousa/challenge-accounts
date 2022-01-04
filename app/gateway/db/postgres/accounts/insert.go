@@ -19,7 +19,9 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
 		acc.ID = uuid.NewString()
 	}
 
-	acc.CreatedAt = time.Now().In(time.Local)
+	if acc.CreatedAt.IsZero() {
+		acc.CreatedAt = time.Now().In(time.Local)
+	}
 
 	query := `
         INSERT INTO accounts(

@@ -36,7 +36,7 @@ const (
 	`
 )
 
-func (r *Repository) GetAccountByCPF(ctx context.Context, numCPF string) (accounts.Account, error) {
+func (r *Repository) GetByCPF(ctx context.Context, numCPF string) (accounts.Account, error) {
 	const op = `Repository.Accounts.GetAccountByCPF`
 
 	acc, err := r.getAccount(ctx, numCPF, queryByCPF)
@@ -47,7 +47,7 @@ func (r *Repository) GetAccountByCPF(ctx context.Context, numCPF string) (accoun
 	return acc, nil
 }
 
-func (r *Repository) GetAccountByID(ctx context.Context, id string) (accounts.Account, error) {
+func (r *Repository) GetByID(ctx context.Context, id string) (accounts.Account, error) {
 	const op = `Repository.Accounts.GetAccountByCPF`
 
 	acc, err := r.getAccount(ctx, id, queryByID)

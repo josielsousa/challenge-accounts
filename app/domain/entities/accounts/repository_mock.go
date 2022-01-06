@@ -18,8 +18,8 @@ var _ Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked Repository
 // 		mockedRepository := &RepositoryMock{
-// 			GetAccountByCPFFunc: func(ctx context.Context, cpf string) (Account, error) {
-// 				panic("mock out the GetAccountByCPF method")
+// 			GetByCPFFunc: func(ctx context.Context, cpf string) (Account, error) {
+// 				panic("mock out the GetByCPF method")
 // 			},
 // 			GetByIDFunc: func(ctx context.Context, id string) (Account, error) {
 // 				panic("mock out the GetByID method")
@@ -40,8 +40,8 @@ var _ Repository = &RepositoryMock{}
 //
 // 	}
 type RepositoryMock struct {
-	// GetAccountByCPFFunc mocks the GetAccountByCPF method.
-	GetAccountByCPFFunc func(ctx context.Context, cpf string) (Account, error)
+	// GetByCPFFunc mocks the GetByCPF method.
+	GetByCPFFunc func(ctx context.Context, cpf string) (Account, error)
 
 	// GetByIDFunc mocks the GetByID method.
 	GetByIDFunc func(ctx context.Context, id string) (Account, error)
@@ -57,8 +57,8 @@ type RepositoryMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// GetAccountByCPF holds details about calls to the GetAccountByCPF method.
-		GetAccountByCPF []struct {
+		// GetByCPF holds details about calls to the GetByCPF method.
+		GetByCPF []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Cpf is the cpf argument value.
@@ -91,17 +91,17 @@ type RepositoryMock struct {
 			Account Account
 		}
 	}
-	lockGetAccountByCPF sync.RWMutex
-	lockGetByID         sync.RWMutex
-	lockInsert          sync.RWMutex
-	lockListAccounts    sync.RWMutex
-	lockUpdate          sync.RWMutex
+	lockGetByCPF     sync.RWMutex
+	lockGetByID      sync.RWMutex
+	lockInsert       sync.RWMutex
+	lockListAccounts sync.RWMutex
+	lockUpdate       sync.RWMutex
 }
 
-// GetAccountByCPF calls GetAccountByCPFFunc.
-func (mock *RepositoryMock) GetAccountByCPF(ctx context.Context, cpf string) (Account, error) {
-	if mock.GetAccountByCPFFunc == nil {
-		panic("RepositoryMock.GetAccountByCPFFunc: method is nil but Repository.GetAccountByCPF was just called")
+// GetByCPF calls GetByCPFFunc.
+func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (Account, error) {
+	if mock.GetByCPFFunc == nil {
+		panic("RepositoryMock.GetByCPFFunc: method is nil but Repository.GetByCPF was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
@@ -110,16 +110,16 @@ func (mock *RepositoryMock) GetAccountByCPF(ctx context.Context, cpf string) (Ac
 		Ctx: ctx,
 		Cpf: cpf,
 	}
-	mock.lockGetAccountByCPF.Lock()
-	mock.calls.GetAccountByCPF = append(mock.calls.GetAccountByCPF, callInfo)
-	mock.lockGetAccountByCPF.Unlock()
-	return mock.GetAccountByCPFFunc(ctx, cpf)
+	mock.lockGetByCPF.Lock()
+	mock.calls.GetByCPF = append(mock.calls.GetByCPF, callInfo)
+	mock.lockGetByCPF.Unlock()
+	return mock.GetByCPFFunc(ctx, cpf)
 }
 
-// GetAccountByCPFCalls gets all the calls that were made to GetAccountByCPF.
+// GetByCPFCalls gets all the calls that were made to GetByCPF.
 // Check the length with:
-//     len(mockedRepository.GetAccountByCPFCalls())
-func (mock *RepositoryMock) GetAccountByCPFCalls() []struct {
+//     len(mockedRepository.GetByCPFCalls())
+func (mock *RepositoryMock) GetByCPFCalls() []struct {
 	Ctx context.Context
 	Cpf string
 } {
@@ -127,9 +127,9 @@ func (mock *RepositoryMock) GetAccountByCPFCalls() []struct {
 		Ctx context.Context
 		Cpf string
 	}
-	mock.lockGetAccountByCPF.RLock()
-	calls = mock.calls.GetAccountByCPF
-	mock.lockGetAccountByCPF.RUnlock()
+	mock.lockGetByCPF.RLock()
+	calls = mock.calls.GetByCPF
+	mock.lockGetByCPF.RUnlock()
 	return calls
 }
 

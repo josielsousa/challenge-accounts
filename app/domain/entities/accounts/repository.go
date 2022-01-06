@@ -7,7 +7,7 @@ import "context"
 type Repository interface {
 	ListAccounts(ctx context.Context) ([]Account, error)
 	GetByID(ctx context.Context, id string) (Account, error)
-	GetAccountByCPF(ctx context.Context, cpf string) (Account, error)
+	GetByCPF(ctx context.Context, cpf string) (Account, error)
 	Insert(ctx context.Context, account Account) error
 	Update(ctx context.Context, account Account) error
 }

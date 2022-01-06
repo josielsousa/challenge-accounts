@@ -88,8 +88,11 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, st
 		WHERE id = $1 
     `
 
-	var acc accounts.Account
-	var numCpf, sec string
+	var (
+		numCPF string
+		sec    string
+		acc    accounts.Account
+	)
 
 	row := db.QueryRow(
 		context.Background(),
@@ -100,7 +103,7 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, st
 	err := row.Scan(
 		&acc.ID,
 		&acc.Name,
-		&numCpf,
+		&numCPF,
 		&sec,
 		&acc.Balance,
 		&acc.CreatedAt,
@@ -110,8 +113,8 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, st
 		return accounts.Account{}, "", fmt.Errorf("%s-> %s:%w", op, "on query account", err)
 	}
 
-	if len(numCpf) > 0 {
-		accPF, err := cpf.NewCPF(numCpf)
+	if len(numCPF) > 0 {
+		accPF, err := cpf.NewCPF(numCPF)
 		require.NoError(t, err)
 
 		acc.CPF = accPF

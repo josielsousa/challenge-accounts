@@ -67,8 +67,11 @@ func (r *Repository) getAccount(ctx context.Context, param string, query string)
 		param,
 	)
 
-	var acc accounts.Account
-	var numCPF, sec string
+	var (
+		numCPF string
+		sec    string
+		acc    accounts.Account
+	)
 
 	err := row.Scan(
 		&acc.ID,

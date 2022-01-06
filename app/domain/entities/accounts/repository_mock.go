@@ -18,6 +18,9 @@ var _ Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked Repository
 // 		mockedRepository := &RepositoryMock{
+// 			GetAllFunc: func(ctx context.Context) ([]Account, error) {
+// 				panic("mock out the GetAll method")
+// 			},
 // 			GetByCPFFunc: func(ctx context.Context, cpf string) (Account, error) {
 // 				panic("mock out the GetByCPF method")
 // 			},
@@ -26,9 +29,6 @@ var _ Repository = &RepositoryMock{}
 // 			},
 // 			InsertFunc: func(ctx context.Context, account Account) error {
 // 				panic("mock out the Insert method")
-// 			},
-// 			ListAccountsFunc: func(ctx context.Context) ([]Account, error) {
-// 				panic("mock out the ListAccounts method")
 // 			},
 // 			UpdateFunc: func(ctx context.Context, account Account) error {
 // 				panic("mock out the Update method")
@@ -40,6 +40,9 @@ var _ Repository = &RepositoryMock{}
 //
 // 	}
 type RepositoryMock struct {
+	// GetAllFunc mocks the GetAll method.
+	GetAllFunc func(ctx context.Context) ([]Account, error)
+
 	// GetByCPFFunc mocks the GetByCPF method.
 	GetByCPFFunc func(ctx context.Context, cpf string) (Account, error)
 
@@ -49,14 +52,16 @@ type RepositoryMock struct {
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, account Account) error
 
-	// ListAccountsFunc mocks the ListAccounts method.
-	ListAccountsFunc func(ctx context.Context) ([]Account, error)
-
 	// UpdateFunc mocks the Update method.
 	UpdateFunc func(ctx context.Context, account Account) error
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// GetAll holds details about calls to the GetAll method.
+		GetAll []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
 		// GetByCPF holds details about calls to the GetByCPF method.
 		GetByCPF []struct {
 			// Ctx is the ctx argument value.
@@ -78,11 +83,6 @@ type RepositoryMock struct {
 			// Account is the account argument value.
 			Account Account
 		}
-		// ListAccounts holds details about calls to the ListAccounts method.
-		ListAccounts []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-		}
 		// Update holds details about calls to the Update method.
 		Update []struct {
 			// Ctx is the ctx argument value.
@@ -91,11 +91,42 @@ type RepositoryMock struct {
 			Account Account
 		}
 	}
-	lockGetByCPF     sync.RWMutex
-	lockGetByID      sync.RWMutex
-	lockInsert       sync.RWMutex
-	lockListAccounts sync.RWMutex
-	lockUpdate       sync.RWMutex
+	lockGetAll   sync.RWMutex
+	lockGetByCPF sync.RWMutex
+	lockGetByID  sync.RWMutex
+	lockInsert   sync.RWMutex
+	lockUpdate   sync.RWMutex
+}
+
+// GetAll calls GetAllFunc.
+func (mock *RepositoryMock) GetAll(ctx context.Context) ([]Account, error) {
+	if mock.GetAllFunc == nil {
+		panic("RepositoryMock.GetAllFunc: method is nil but Repository.GetAll was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockGetAll.Lock()
+	mock.calls.GetAll = append(mock.calls.GetAll, callInfo)
+	mock.lockGetAll.Unlock()
+	return mock.GetAllFunc(ctx)
+}
+
+// GetAllCalls gets all the calls that were made to GetAll.
+// Check the length with:
+//     len(mockedRepository.GetAllCalls())
+func (mock *RepositoryMock) GetAllCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockGetAll.RLock()
+	calls = mock.calls.GetAll
+	mock.lockGetAll.RUnlock()
+	return calls
 }
 
 // GetByCPF calls GetByCPFFunc.
@@ -200,37 +231,6 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert
 	mock.lockInsert.RUnlock()
-	return calls
-}
-
-// ListAccounts calls ListAccountsFunc.
-func (mock *RepositoryMock) ListAccounts(ctx context.Context) ([]Account, error) {
-	if mock.ListAccountsFunc == nil {
-		panic("RepositoryMock.ListAccountsFunc: method is nil but Repository.ListAccounts was just called")
-	}
-	callInfo := struct {
-		Ctx context.Context
-	}{
-		Ctx: ctx,
-	}
-	mock.lockListAccounts.Lock()
-	mock.calls.ListAccounts = append(mock.calls.ListAccounts, callInfo)
-	mock.lockListAccounts.Unlock()
-	return mock.ListAccountsFunc(ctx)
-}
-
-// ListAccountsCalls gets all the calls that were made to ListAccounts.
-// Check the length with:
-//     len(mockedRepository.ListAccountsCalls())
-func (mock *RepositoryMock) ListAccountsCalls() []struct {
-	Ctx context.Context
-} {
-	var calls []struct {
-		Ctx context.Context
-	}
-	mock.lockListAccounts.RLock()
-	calls = mock.calls.ListAccounts
-	mock.lockListAccounts.RUnlock()
 	return calls
 }
 

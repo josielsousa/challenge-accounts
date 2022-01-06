@@ -11,7 +11,6 @@ import (
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
-	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
@@ -31,19 +30,19 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should save account with successfully",
 			args: func(t *testing.T) args {
-				secret, err := hash.NewHash("the#$%PassWoRd")
-				require.NoError(t, err)
-
 				newCpf, err := cpf.NewCPF("88350057017")
 				require.NoError(t, err)
 
+				acc := accounts.Account{
+					Name:    "Teste",
+					Balance: 350_00,
+					CPF:     newCpf,
+				}
+
+				acc.SetSecret("the#$%PassWoRd")
+
 				return args{
-					acc: accounts.Account{
-						Name:    "Teste",
-						Balance: 350_00,
-						Secret:  secret,
-						CPF:     newCpf,
-					},
+					acc: acc,
 					ctx: context.Background(),
 				}
 			},
@@ -54,19 +53,19 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should return an postgres error when save new account, because column name is invalid",
 			args: func(t *testing.T) args {
-				secret, err := hash.NewHash("the#$%PassWoRd")
-				require.NoError(t, err)
-
 				newCpf, err := cpf.NewCPF("88350057017")
 				require.NoError(t, err)
 
+				acc := accounts.Account{
+					Name:    "Teste",
+					Balance: 350_00,
+					CPF:     newCpf,
+				}
+
+				acc.SetSecret("the#$%PassWoRd")
+
 				return args{
-					acc: accounts.Account{
-						Name:    "Teste",
-						Balance: 350_00,
-						Secret:  secret,
-						CPF:     newCpf,
-					},
+					acc: acc,
 					ctx: context.Background(),
 				}
 			},
@@ -85,40 +84,37 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should return an error when save a duplicate account",
 			args: func(t *testing.T) args {
-				secret, err := hash.NewHash("the#$%PassWoRd")
-				require.NoError(t, err)
-
 				newCpf, err := cpf.NewCPF("88350057017")
 				require.NoError(t, err)
 
+				acc := accounts.Account{
+					Name:    "Teste",
+					Balance: 350_00,
+					CPF:     newCpf,
+				}
+
+				acc.SetSecret("the#$%PassWoRd")
+
 				return args{
-					acc: accounts.Account{
-						Name:    "Teste",
-						Balance: 350_00,
-						Secret:  secret,
-						CPF:     newCpf,
-					},
+					acc: acc,
 					ctx: context.Background(),
 				}
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
 				{
-					secret, err := hash.NewHash("the#$%PassWoRd")
-					require.NoError(t, err)
-
 					newCpf, err := cpf.NewCPF("88350057017")
 					require.NoError(t, err)
 
 					acc := accounts.Account{
 						Name:    "Teste",
 						Balance: 350_00,
-						Secret:  secret,
 						CPF:     newCpf,
 					}
 
-					err = pgtest.AccountsInsert(db, t, acc)
-					require.NoError(t, err)
+					acc.SetSecret("the#$%PassWoRd")
 
+					err = pgtest.AccountsInsert(t, db, acc)
+					require.NoError(t, err)
 				}
 			},
 			checkErr: func(t *testing.T, err error) {

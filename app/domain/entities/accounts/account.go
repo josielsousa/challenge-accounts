@@ -16,13 +16,14 @@ var (
 
 // Account - Estrutura da entidade `account`
 type Account struct {
-	ID        string
-	Name      string
-	Balance   int
-	Secret    hash.Hash
-	CPF       cpf.CPF
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	secret       string
+	hashedSecret string
+	ID           string
+	Name         string
+	Balance      int
+	CPF          cpf.CPF
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 func (a *Account) Deposit(amount int) error {
@@ -45,4 +46,25 @@ func (a *Account) Withdraw(amount int) error {
 
 	a.Balance -= amount
 	return nil
+}
+
+func (a *Account) SetSecret(secret string) {
+	a.secret = secret
+}
+
+func (a *Account) SetHashedSecret(hashedSecret string) {
+	a.hashedSecret = hashedSecret
+}
+
+func (a *Account) GetSecretHashed() (string, error) {
+	if len(a.hashedSecret) <= 0 {
+		hs, err := hash.GenHash(a.secret)
+		if err != nil {
+			return "", err
+		}
+
+		a.hashedSecret = hs
+	}
+
+	return a.hashedSecret, nil
 }

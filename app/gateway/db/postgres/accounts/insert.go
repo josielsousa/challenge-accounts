@@ -35,18 +35,23 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
         RETURNING id, created_at, updated_at
     `
 
+	sec, err := acc.GetSecretHashed()
+	if err != nil {
+		return fmt.Errorf("%s-> %s:%w", op, "on get hashed secret", err)
+	}
+
 	row := r.db.QueryRow(
 		ctx,
 		query,
 		acc.ID,
 		acc.Name,
 		acc.CPF.String(),
-		acc.Secret.String(),
+		sec,
 		acc.Balance,
 		acc.CreatedAt,
 	)
 
-	err := row.Scan(
+	err = row.Scan(
 		&acc.ID,
 		&acc.CreatedAt,
 		&acc.UpdatedAt,
@@ -54,10 +59,10 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			return fmt.Errorf("%s-> %s:%w", op, "on insert account", accounts.ErrAccountAlreadyExists)
+			return fmt.Errorf("%s-> %s: %w", op, "on insert account", accounts.ErrAccountAlreadyExists)
 		}
 
-		return fmt.Errorf("%s-> %s:%w", op, "on insert account", err)
+		return fmt.Errorf("%s-> %s: %w", op, "on insert account", err)
 	}
 
 	return nil

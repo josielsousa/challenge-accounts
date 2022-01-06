@@ -14,7 +14,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
-func AccountsInsert(db *pgxpool.Pool, t *testing.T, acc accounts.Account) error {
+func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error {
 	t.Helper()
 
 	const op = `Pgtest.AccountsInsert`
@@ -26,6 +26,10 @@ func AccountsInsert(db *pgxpool.Pool, t *testing.T, acc accounts.Account) error 
 		acc.CreatedAt = time.Now().In(time.Local)
 	}
 
+	if acc.UpdatedAt.IsZero() {
+		acc.UpdatedAt = time.Now().In(time.Local)
+	}
+
 	query := `
         INSERT INTO accounts(
             id,
@@ -33,10 +37,14 @@ func AccountsInsert(db *pgxpool.Pool, t *testing.T, acc accounts.Account) error 
             cpf,
             secret,
             balance,
-            created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6)
+            created_at,
+			updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id, created_at, updated_at
     `
+
+	secret, err := acc.GetSecretHashed()
+	require.NoError(t, err)
 
 	row := db.QueryRow(
 		context.Background(),
@@ -44,12 +52,13 @@ func AccountsInsert(db *pgxpool.Pool, t *testing.T, acc accounts.Account) error 
 		acc.ID,
 		acc.Name,
 		acc.CPF.String(),
-		acc.Secret.String(),
+		secret,
 		acc.Balance,
 		acc.CreatedAt,
+		acc.UpdatedAt,
 	)
 
-	err := row.Scan(
+	err = row.Scan(
 		&acc.ID,
 		&acc.CreatedAt,
 		&acc.UpdatedAt,
@@ -61,7 +70,7 @@ func AccountsInsert(db *pgxpool.Pool, t *testing.T, acc accounts.Account) error 
 	return nil
 }
 
-func GetAccount(db *pgxpool.Pool, t *testing.T, id string) (accounts.Account, string, error) {
+func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, string, error) {
 	t.Helper()
 
 	const op = `Pgtest.GetAccount`
@@ -107,6 +116,8 @@ func GetAccount(db *pgxpool.Pool, t *testing.T, id string) (accounts.Account, st
 
 		acc.CPF = accPF
 	}
+
+	acc.SetSecret(sec)
 
 	return acc, sec, nil
 }

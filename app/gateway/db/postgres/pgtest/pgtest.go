@@ -51,23 +51,12 @@ func StartupNewPool() (teardownFn func(), err error) {
 	}
 
 	port := resource.GetPort("5432/tcp")
-	if err = pool.Retry(pingDatabase(port, log)); err != nil {
+	if err = pool.Retry(retryDbHelper(port, dbName, log)); err != nil {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
 
-	dbURL := getPostgresConnString(port, "postgres")
-	defaultPGPool, err := postgres.ConnectPoolWithoutMigrations(dbURL, log, postgres.LogLevelWarn)
-	if err != nil {
-		return nil, err
-	}
-
-	err = createDB(dbName, defaultPGPool)
-	if err != nil {
-		return nil, fmt.Errorf("on create database: %w", err)
-	}
-
 	// create default database
-	dbURL = getPostgresConnString(port, dbName)
+	dbURL := getPgConnURL(port, dbName)
 	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL, log, postgres.LogLevelWarn)
 	if err != nil {
 		return nil, err
@@ -77,10 +66,8 @@ func StartupNewPool() (teardownFn func(), err error) {
 
 	teardownFn = func() {
 		pool.RemoveContainerByName(defaultContainerName)
+		dropDB(dbName, dbPool)
 		dbPool.Close()
-
-		dropDB(dbName, defaultPGPool)
-		defaultPGPool.Close()
 		resource.Close()
 	}
 
@@ -89,19 +76,15 @@ func StartupNewPool() (teardownFn func(), err error) {
 
 func getDockerResource(pool *dockertest.Pool, dbName string) (*dockertest.Resource, error) {
 	container, _ := pool.Client.InspectContainer(defaultContainerName)
-	if container != nil && container.State.Running {
-		resource := &dockertest.Resource{Container: container}
-		return resource, nil
-	}
 
-	if container != nil && !container.State.Running {
+	if container != nil {
 		pool.RemoveContainerByName(defaultContainerName)
 	}
 
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Name:       defaultContainerName,
 		Repository: "postgres",
-		Tag:        "13-alpine",
+		Tag:        "14-alpine",
 		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + dbName},
 	}, func(c *docker.HostConfig) {
 		c.AutoRemove = true
@@ -145,9 +128,9 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 	return newPool
 }
 
-func pingDatabase(port string, log *logrus.Entry) func() error {
+func retryDbHelper(port, dbName string, log *logrus.Entry) func() error {
 	return func() error {
-		dbURL := getPostgresConnString(port, "postgres")
+		dbURL := getPgConnURL(port, dbName)
 		connPool, err := postgres.ConnectPoolWithoutMigrations(dbURL, log, postgres.LogLevelWarn)
 		if err != nil {
 			return err
@@ -158,23 +141,16 @@ func pingDatabase(port string, log *logrus.Entry) func() error {
 	}
 }
 
-func getPostgresConnString(port, dbName string) string {
+func getPgConnURL(port, dbName string) string {
 	return fmt.Sprintf("postgres://postgres:postgres@localhost:%s/%s?sslmode=disable", port, dbName)
 }
 
 func dropDB(dbName string, pool *pgxpool.Pool) error {
-	if _, err := pool.Exec(context.Background(), fmt.Sprintf(`DROP DATABASE IF EXISTS %s;`, dbName)); err != nil {
+	query := fmt.Sprintf(`DROP DATABASE IF EXISTS %s;`, dbName)
+
+	_, err := pool.Exec(context.Background(), query)
+	if err != nil {
 		return fmt.Errorf("on drop database %s: %w", dbName, err)
-	}
-
-	return nil
-}
-
-func createDB(dbName string, pool *pgxpool.Pool) error {
-	_ = dropDB(dbName, pool)
-
-	if _, err := pool.Exec(context.Background(), fmt.Sprintf(`CREATE DATABASE %s;`, dbName)); err != nil {
-		return fmt.Errorf("on create database %s: %w", dbName, err)
 	}
 
 	return nil

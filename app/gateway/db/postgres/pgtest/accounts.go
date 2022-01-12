@@ -51,7 +51,7 @@ func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error 
 		query,
 		acc.ID,
 		acc.Name,
-		acc.CPF.String(),
+		acc.CPF.Value(),
 		secret,
 		acc.Balance,
 		acc.CreatedAt,

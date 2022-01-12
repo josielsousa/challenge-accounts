@@ -83,7 +83,7 @@ func TestCPF_NewCPF(t *testing.T) {
 
 			got, err := NewCPF(tt.args.value)
 			assert.Equal(t, tt.wantErr, err)
-			assert.Equal(t, tt.want, got.String())
+			assert.Equal(t, tt.want, got.Value())
 		})
 	}
 }

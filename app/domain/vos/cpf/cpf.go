@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+
+	"github.com/josielsousa/challenge-accounts/app/common"
 )
 
 const (
@@ -17,10 +19,6 @@ var ErrInvalid = errors.New("invalid cpf number")
 
 type CPF struct {
 	value string
-}
-
-func (c CPF) String() string {
-	return c.value
 }
 
 func NewCPF(cpf string) (CPF, error) {
@@ -103,4 +101,28 @@ func (c CPF) Mask() string {
 	}
 
 	return exp.ReplaceAllString(c.value, "$1.$2.$3-$4")
+}
+
+// Scan implements database/sql/driver Scanner interface
+func (c *CPF) Scan(value interface{}) error {
+	if value == nil {
+		*c = CPF{}
+		return common.ErrScanValueNil
+	}
+
+	if value, ok := value.(string); ok {
+		cpf, err := NewCPF(value)
+		if err != nil {
+			return err
+		}
+
+		*c = cpf
+		return nil
+	}
+
+	return common.ErrScanValueIsNotString
+}
+
+func (c CPF) Value() string {
+	return c.value
 }

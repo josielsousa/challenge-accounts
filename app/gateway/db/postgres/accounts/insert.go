@@ -45,7 +45,7 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
 		query,
 		acc.ID,
 		acc.Name,
-		acc.CPF.String(),
+		acc.CPF.Value(),
 		sec,
 		acc.Balance,
 		acc.CreatedAt,

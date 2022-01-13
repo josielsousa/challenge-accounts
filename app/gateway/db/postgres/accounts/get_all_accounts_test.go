@@ -9,14 +9,17 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
+	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func TestRepository_GetAll(t *testing.T) {
 	t.Parallel()
+
+	secretHash, err := hash.NewHash("the#$%PassWoRd")
+	require.NoError(t, err)
 
 	fakeData := []struct {
 		numCPF string
@@ -55,12 +58,11 @@ func TestRepository_GetAll(t *testing.T) {
 							ID:        fakeData[i].id,
 							Balance:   350_00 * i,
 							CPF:       newCpf,
+							Secret:    secretHash,
 							Name:      fmt.Sprintf("User name %d", i),
 							CreatedAt: time.Date(2022, time.January, 4, i, 0, 0, 0, time.Local),
 							UpdatedAt: time.Date(2022, time.January, 4, i, 0, 0, 0, time.Local),
 						}
-
-						acc.SetSecret(fmt.Sprintf("secret_string_%d", i))
 
 						err = pgtest.AccountsInsert(t, db, acc)
 						require.NoError(t, err)
@@ -72,12 +74,6 @@ func TestRepository_GetAll(t *testing.T) {
 					assert.Len(t, accs, len(fakeData))
 
 					for i, got := range accs {
-						hs, err := got.GetSecretHashed()
-						require.NoError(t, err)
-
-						err = bcrypt.CompareHashAndPassword([]byte(hs), []byte(fmt.Sprintf("secret_string_%d", i)))
-						require.NoError(t, err)
-
 						newCpf, err := cpf.NewCPF(fakeData[i].numCPF)
 						require.NoError(t, err)
 
@@ -85,16 +81,11 @@ func TestRepository_GetAll(t *testing.T) {
 							ID:        fakeData[i].id,
 							Balance:   350_00 * i,
 							CPF:       newCpf,
+							Secret:    secretHash,
 							Name:      fmt.Sprintf("User name %d", i),
 							CreatedAt: time.Date(2022, time.January, 4, i, 0, 0, 0, time.Local),
 							UpdatedAt: time.Date(2022, time.January, 4, i, 0, 0, 0, time.Local),
 						}
-
-						acc.SetSecret("")
-						got.SetSecret("")
-
-						acc.SetHashedSecret("")
-						got.SetHashedSecret("")
 
 						assert.Equal(t, acc, got)
 					}

@@ -26,23 +26,18 @@ func (r *Repository) Update(ctx context.Context, acc accounts.Account) error {
         RETURNING id, created_at, updated_at
     `
 
-	sec, err := acc.GetSecretHashed()
-	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on get hashed secret", err)
-	}
-
 	row := r.db.QueryRow(
 		ctx,
 		query,
 		acc.ID,
 		acc.Name,
 		acc.CPF.Value(),
-		sec,
+		acc.Secret.Value(),
 		acc.Balance,
 		acc.UpdatedAt,
 	)
 
-	err = row.Scan(
+	err := row.Scan(
 		&acc.ID,
 		&acc.CreatedAt,
 		&acc.UpdatedAt,

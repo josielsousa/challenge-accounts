@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/bcrypt"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
@@ -19,7 +18,11 @@ import (
 func TestRepository_Update(t *testing.T) {
 	t.Parallel()
 
-	secPassword := "the#$%PassWoRd"
+	secretHash, err := hash.NewHash("the#$%PassWoRd")
+	require.NoError(t, err)
+
+	newCpf, err := cpf.NewCPF("88350057017")
+	require.NoError(t, err)
 
 	type args struct {
 		ctx context.Context
@@ -35,19 +38,15 @@ func TestRepository_Update(t *testing.T) {
 		{
 			name: "test case name here",
 			args: func(t *testing.T) args {
-				newCpf, err := cpf.NewCPF("88350057017")
-				require.NoError(t, err)
-
 				acc := accounts.Account{
 					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 					Name:      "Teste",
 					Balance:   350_00,
 					CPF:       newCpf,
+					Secret:    secretHash,
 					CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 					UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 				}
-
-				acc.SetSecret(secPassword)
 
 				return args{
 					ctx: context.Background(),
@@ -56,18 +55,14 @@ func TestRepository_Update(t *testing.T) {
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
 				{
-					newCpf, err := cpf.NewCPF("88350057017")
-					require.NoError(t, err)
-
 					acc := accounts.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   350_00,
 						CPF:       newCpf,
+						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 					}
-
-					acc.SetSecret(secPassword)
 
 					err = pgtest.AccountsInsert(t, db, acc)
 					require.NoError(t, err)
@@ -75,10 +70,7 @@ func TestRepository_Update(t *testing.T) {
 			},
 			check: func(t *testing.T, db *pgxpool.Pool) {
 				{
-					got, gotSecret, err := pgtest.GetAccount(t, db, "cdd3e9ed-b33b-4b18-b5a4-31a791969a30")
-					require.NoError(t, err)
-
-					secret, err := hash.GenHash(secPassword)
+					got, err := pgtest.GetAccount(t, db, "cdd3e9ed-b33b-4b18-b5a4-31a791969a30")
 					require.NoError(t, err)
 
 					newCpf, err := cpf.NewCPF("88350057017")
@@ -89,15 +81,10 @@ func TestRepository_Update(t *testing.T) {
 						Name:      "Teste",
 						Balance:   350_00,
 						CPF:       newCpf,
+						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 						UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 					}
-
-					err = bcrypt.CompareHashAndPassword([]byte(gotSecret), []byte(secPassword))
-					require.NoError(t, err)
-
-					got.SetSecret(secret)
-					expected.SetSecret(secret)
 
 					assert.Equal(t, expected, got)
 				}

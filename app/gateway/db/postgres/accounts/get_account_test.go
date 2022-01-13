@@ -8,15 +8,21 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/bcrypt"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
+	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
 func TestRepository_GetAccountByCPF(t *testing.T) {
 	t.Parallel()
+
+	secretHash, err := hash.NewHash("the#$%PassWoRd")
+	require.NoError(t, err)
+
+	newCpf, err := cpf.NewCPF("88350057017")
+	require.NoError(t, err)
 
 	type args struct {
 		ctx    context.Context
@@ -36,47 +42,29 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 				numCPF: "88350057017",
 			},
 			check: func(t *testing.T, got accounts.Account) {
-				newCpf, err := cpf.NewCPF("88350057017")
-				require.NoError(t, err)
-
 				acc := accounts.Account{
 					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 					Name:      "Teste",
 					Balance:   350_00,
 					CPF:       newCpf,
+					Secret:    secretHash,
 					CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 					UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 				}
-
-				hs, err := got.GetSecretHashed()
-				require.NoError(t, err)
-
-				err = bcrypt.CompareHashAndPassword([]byte(hs), []byte("123456"))
-				require.NoError(t, err)
-
-				acc.SetSecret("")
-				got.SetSecret("")
-
-				acc.SetHashedSecret("")
-				got.SetHashedSecret("")
 
 				assert.Equal(t, acc, got)
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
 				{
-					newCpf, err := cpf.NewCPF("88350057017")
-					require.NoError(t, err)
-
 					acc := accounts.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   350_00,
 						CPF:       newCpf,
+						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 						UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 					}
-
-					acc.SetSecret("123456")
 
 					err = pgtest.AccountsInsert(t, db, acc)
 					require.NoError(t, err)
@@ -109,6 +97,12 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 func TestRepository_GetAccountByID(t *testing.T) {
 	t.Parallel()
 
+	secretHash, err := hash.NewHash("the#$%PassWoRd")
+	require.NoError(t, err)
+
+	newCpf, err := cpf.NewCPF("88350057017")
+	require.NoError(t, err)
+
 	type args struct {
 		ctx context.Context
 		id  string
@@ -127,47 +121,29 @@ func TestRepository_GetAccountByID(t *testing.T) {
 				id:  "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 			},
 			check: func(t *testing.T, got accounts.Account) {
-				newCpf, err := cpf.NewCPF("88350057017")
-				require.NoError(t, err)
-
 				acc := accounts.Account{
 					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 					Name:      "Teste",
 					Balance:   350_00,
 					CPF:       newCpf,
+					Secret:    secretHash,
 					CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 					UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 				}
-
-				hs, err := got.GetSecretHashed()
-				require.NoError(t, err)
-
-				err = bcrypt.CompareHashAndPassword([]byte(hs), []byte("123456"))
-				require.NoError(t, err)
-
-				acc.SetSecret("")
-				got.SetSecret("")
-
-				acc.SetHashedSecret("")
-				got.SetHashedSecret("")
 
 				assert.Equal(t, acc, got)
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
 				{
-					newCpf, err := cpf.NewCPF("88350057017")
-					require.NoError(t, err)
-
 					acc := accounts.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   350_00,
 						CPF:       newCpf,
+						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 						UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 					}
-
-					acc.SetSecret("123456")
 
 					err = pgtest.AccountsInsert(t, db, acc)
 					require.NoError(t, err)

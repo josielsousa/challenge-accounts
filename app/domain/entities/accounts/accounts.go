@@ -2,10 +2,10 @@ package accounts
 
 import (
 	"errors"
-	"hash"
 	"time"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
+	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 )
 
 var (

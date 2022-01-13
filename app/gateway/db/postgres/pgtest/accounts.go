@@ -8,10 +8,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/stretchr/testify/require"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
-	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
 func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error {
@@ -43,22 +41,19 @@ func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error 
         RETURNING id, created_at, updated_at
     `
 
-	secret, err := acc.GetSecretHashed()
-	require.NoError(t, err)
-
 	row := db.QueryRow(
 		context.Background(),
 		query,
 		acc.ID,
 		acc.Name,
 		acc.CPF.Value(),
-		secret,
+		acc.Secret.Value(),
 		acc.Balance,
 		acc.CreatedAt,
 		acc.UpdatedAt,
 	)
 
-	err = row.Scan(
+	err := row.Scan(
 		&acc.ID,
 		&acc.CreatedAt,
 		&acc.UpdatedAt,
@@ -70,7 +65,7 @@ func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error 
 	return nil
 }
 
-func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, string, error) {
+func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, error) {
 	t.Helper()
 
 	const op = `Pgtest.GetAccount`
@@ -88,11 +83,7 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, st
 		WHERE id = $1 
     `
 
-	var (
-		numCPF string
-		sec    string
-		acc    accounts.Account
-	)
+	var acc accounts.Account
 
 	row := db.QueryRow(
 		context.Background(),
@@ -103,24 +94,15 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, st
 	err := row.Scan(
 		&acc.ID,
 		&acc.Name,
-		&numCPF,
-		&sec,
+		&acc.CPF,
+		&acc.Secret,
 		&acc.Balance,
 		&acc.CreatedAt,
 		&acc.UpdatedAt,
 	)
 	if err != nil {
-		return accounts.Account{}, "", fmt.Errorf("%s-> %s:%w", op, "on query account", err)
+		return accounts.Account{}, fmt.Errorf("%s-> %s:%w", op, "on query account", err)
 	}
 
-	if len(numCPF) > 0 {
-		accPF, err := cpf.NewCPF(numCPF)
-		require.NoError(t, err)
-
-		acc.CPF = accPF
-	}
-
-	acc.SetSecret(sec)
-
-	return acc, sec, nil
+	return acc, nil
 }

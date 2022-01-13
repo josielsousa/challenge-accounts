@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
-	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
 const (
@@ -38,17 +37,13 @@ func (r *Repository) GetAll(ctx context.Context) ([]accounts.Account, error) {
 	accs := make([]accounts.Account, 0)
 
 	for rows.Next() {
-		var (
-			numCPF string
-			sec    string
-			acc    accounts.Account
-		)
+		var acc accounts.Account
 
 		err := rows.Scan(
 			&acc.ID,
 			&acc.Name,
-			&numCPF,
-			&sec,
+			&acc.CPF,
+			&acc.Secret,
 			&acc.Balance,
 			&acc.CreatedAt,
 			&acc.UpdatedAt,
@@ -57,16 +52,6 @@ func (r *Repository) GetAll(ctx context.Context) ([]accounts.Account, error) {
 			return nil, fmt.Errorf("%s-> %s: %w", op, "on scan get all accounts", err)
 		}
 
-		if len(numCPF) > 0 {
-			accCPF, err := cpf.NewCPF(numCPF)
-			if err != nil {
-				return nil, fmt.Errorf("%s-> %s: %w", op, "on new CPF vos", err)
-			}
-
-			acc.CPF = accCPF
-		}
-
-		acc.SetHashedSecret(sec)
 		accs = append(accs, acc)
 	}
 

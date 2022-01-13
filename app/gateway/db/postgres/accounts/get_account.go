@@ -2,8 +2,10 @@ package accounts
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 
@@ -78,7 +80,13 @@ func (r *Repository) getAccount(ctx context.Context, param string, query string)
 		&acc.UpdatedAt,
 	)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, "on get account by cpf", err)
+		const action = "on get account by cpf"
+
+		if errors.Is(err, pgx.ErrNoRows) {
+			return accounts.Account{}, fmt.Errorf("%s -> %s: %w", op, action, accounts.ErrAccountNotFound)
+		}
+
+		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, action, err)
 	}
 
 	return acc, nil

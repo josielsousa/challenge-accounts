@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrInvalidAmount        = errors.New("invalid amount")
+	ErrAccountNotFound      = errors.New("account not found")
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrInsufficientFunds    = errors.New("insufficient amount")
 )

@@ -72,6 +72,30 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 			},
 			wantErr: nil,
 		},
+		{
+			name: "should return an error when account not found",
+			args: args{
+				ctx:    context.Background(),
+				numCPF: "88350057013",
+			},
+			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				{
+					acc := accounts.Account{
+						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
+						Name:      "Teste",
+						Balance:   350_00,
+						CPF:       newCpf,
+						Secret:    secretHash,
+						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+					}
+
+					err = pgtest.AccountsInsert(t, db, acc)
+					require.NoError(t, err)
+				}
+			},
+			wantErr: accounts.ErrAccountNotFound,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt // capture range variable
@@ -89,7 +113,9 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 			got, err := r.GetByCPF(tt.args.ctx, tt.args.numCPF)
 			assert.ErrorIs(t, err, tt.wantErr)
 
-			tt.check(t, got)
+			if tt.check != nil {
+				tt.check(t, got)
+			}
 		})
 	}
 }
@@ -151,6 +177,30 @@ func TestRepository_GetAccountByID(t *testing.T) {
 			},
 			wantErr: nil,
 		},
+		{
+			name: "should return an error when account not found",
+			args: args{
+				ctx: context.Background(),
+				id:  "d079de7d-b3d2-47fa-b1d6-b5c7d7cf5389",
+			},
+			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				{
+					acc := accounts.Account{
+						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
+						Name:      "Teste",
+						Balance:   350_00,
+						CPF:       newCpf,
+						Secret:    secretHash,
+						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+					}
+
+					err = pgtest.AccountsInsert(t, db, acc)
+					require.NoError(t, err)
+				}
+			},
+			wantErr: accounts.ErrAccountNotFound,
+		},
 	}
 	for _, tt := range tests {
 		tt := tt // capture range variable
@@ -168,7 +218,9 @@ func TestRepository_GetAccountByID(t *testing.T) {
 			got, err := r.GetByID(tt.args.ctx, tt.args.id)
 			assert.ErrorIs(t, err, tt.wantErr)
 
-			tt.check(t, got)
+			if tt.check != nil {
+				tt.check(t, got)
+			}
 		})
 	}
 }

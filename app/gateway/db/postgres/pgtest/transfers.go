@@ -8,7 +8,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/stretchr/testify/require"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
 )
@@ -102,47 +101,4 @@ func GetTransfer(t *testing.T, db *pgxpool.Pool, id string) (transfers.Transfer,
 	}
 
 	return trf, nil
-}
-
-func ListTransfers(t *testing.T, db *pgxpool.Pool, accID string) ([]transfers.Transfer, error) {
-	t.Helper()
-
-	const op = `PgTest.ListTransfers`
-
-	query := `
-        SELECT 
-            id,
-			amount,
-			account_origin_id,
-			account_destination_id,
-			created_at,
-			updated_at
-		FROM transfers 
-		WHERE account_origin_id = $1 
-    `
-
-	trfs := make([]transfers.Transfer, 0)
-
-	rows, err := db.Query(context.Background(), query, accID)
-	require.NoError(t, err)
-
-	for rows.Next() {
-		var trf transfers.Transfer
-		rows.Scan(
-			&trf.ID,
-			&trf.Amount,
-			&trf.AccountOriginID,
-			&trf.AccountDestinationID,
-			&trf.CreatedAt,
-			&trf.UpdatedAt,
-		)
-
-		trfs = append(trfs, trf)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("%s-> %s:%w", op, "on query transfer", err)
-	}
-
-	return trfs, nil
 }

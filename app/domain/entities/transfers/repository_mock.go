@@ -21,7 +21,7 @@ var _ Repository = &RepositoryMock{}
 // 			InsertFunc: func(ctx context.Context, transfer Transfer) error {
 // 				panic("mock out the Insert method")
 // 			},
-// 			ListTransfersFunc: func(ctx context.Context, accountID string) ([]Transfer, error) {
+// 			ListTransfersFunc: func(ctx context.Context, accOriginID string) ([]Transfer, error) {
 // 				panic("mock out the ListTransfers method")
 // 			},
 // 		}
@@ -35,7 +35,7 @@ type RepositoryMock struct {
 	InsertFunc func(ctx context.Context, transfer Transfer) error
 
 	// ListTransfersFunc mocks the ListTransfers method.
-	ListTransfersFunc func(ctx context.Context, accountID string) ([]Transfer, error)
+	ListTransfersFunc func(ctx context.Context, accOriginID string) ([]Transfer, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -50,8 +50,8 @@ type RepositoryMock struct {
 		ListTransfers []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// AccountID is the accountID argument value.
-			AccountID string
+			// AccOriginID is the accOriginID argument value.
+			AccOriginID string
 		}
 	}
 	lockInsert        sync.RWMutex
@@ -94,33 +94,33 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 }
 
 // ListTransfers calls ListTransfersFunc.
-func (mock *RepositoryMock) ListTransfers(ctx context.Context, accountID string) ([]Transfer, error) {
+func (mock *RepositoryMock) ListTransfers(ctx context.Context, accOriginID string) ([]Transfer, error) {
 	if mock.ListTransfersFunc == nil {
 		panic("RepositoryMock.ListTransfersFunc: method is nil but Repository.ListTransfers was just called")
 	}
 	callInfo := struct {
-		Ctx       context.Context
-		AccountID string
+		Ctx         context.Context
+		AccOriginID string
 	}{
-		Ctx:       ctx,
-		AccountID: accountID,
+		Ctx:         ctx,
+		AccOriginID: accOriginID,
 	}
 	mock.lockListTransfers.Lock()
 	mock.calls.ListTransfers = append(mock.calls.ListTransfers, callInfo)
 	mock.lockListTransfers.Unlock()
-	return mock.ListTransfersFunc(ctx, accountID)
+	return mock.ListTransfersFunc(ctx, accOriginID)
 }
 
 // ListTransfersCalls gets all the calls that were made to ListTransfers.
 // Check the length with:
 //     len(mockedRepository.ListTransfersCalls())
 func (mock *RepositoryMock) ListTransfersCalls() []struct {
-	Ctx       context.Context
-	AccountID string
+	Ctx         context.Context
+	AccOriginID string
 } {
 	var calls []struct {
-		Ctx       context.Context
-		AccountID string
+		Ctx         context.Context
+		AccOriginID string
 	}
 	mock.lockListTransfers.RLock()
 	calls = mock.calls.ListTransfers

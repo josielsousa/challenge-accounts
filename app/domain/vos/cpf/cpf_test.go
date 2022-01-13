@@ -3,6 +3,7 @@ package cpf
 import (
 	"testing"
 
+	"github.com/josielsousa/challenge-accounts/app/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -117,6 +118,65 @@ func TestCPF_Mask(t *testing.T) {
 
 			got := c.Mask()
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestCPF_Scan(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		valueToScan interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr error
+	}{
+		{
+			name: "should scan the value with successfully",
+			args: args{
+				valueToScan: "88350057017",
+			},
+			want:    "88350057017",
+			wantErr: nil,
+		},
+		{
+			name: "should return an error when the value not is a string",
+			args: args{
+				valueToScan: 88350057017,
+			},
+			want:    "",
+			wantErr: common.ErrScanValueIsNotString,
+		},
+		{
+			name: "should return an error when the value is nil",
+			args: args{
+				valueToScan: nil,
+			},
+			want:    "",
+			wantErr: common.ErrScanValueNil,
+		},
+		{
+			name: "should return an error when the value is no valid CPF",
+			args: args{
+				valueToScan: "88350057013",
+			},
+			want:    "",
+			wantErr: ErrInvalid,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt // capture range variable
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			c := &CPF{}
+
+			err := c.Scan(tt.args.valueToScan)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, c.Value())
 		})
 	}
 }

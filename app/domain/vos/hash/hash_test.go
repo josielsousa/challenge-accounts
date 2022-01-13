@@ -3,12 +3,13 @@ package hash
 import (
 	"testing"
 
+	"github.com/josielsousa/challenge-accounts/app/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func TestGenHash(t *testing.T) {
+func TestNewHash(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -39,21 +40,20 @@ func TestGenHash(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := GenHash(tt.args.secret)
+			got, err := NewHash(tt.args.secret)
 			assert.ErrorIs(t, err, tt.wantErr)
 
-			err = bcrypt.CompareHashAndPassword([]byte(got), []byte(tt.args.secret))
+			err = bcrypt.CompareHashAndPassword([]byte(got.Value()), []byte(tt.args.secret))
 			require.NoError(t, err)
 		})
 	}
 }
 
-func TestCompareHashedAndSecret(t *testing.T) {
+func TestHash_Compare(t *testing.T) {
 	t.Parallel()
-
 	type args struct {
-		hashedSecret string
-		secret       string
+		secretToCompare string
+		valueToHash     string
 	}
 	tests := []struct {
 		name    string
@@ -61,20 +61,20 @@ func TestCompareHashedAndSecret(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "should successfully compare hashed string with secret value",
+			name: "should compare secrets with success",
 			args: args{
-				secret:       "teste",
-				hashedSecret: "$2a$10$GUNat4gFNNRKtRZ25DO82.L/XcrcmF8eKpt7/PCGsBvqiAJKx63Au",
+				valueToHash:     "teste",
+				secretToCompare: "teste",
 			},
 			wantErr: nil,
 		},
 		{
-			name: "should successfully compare hashed string with secret value",
+			name: "should return an error when compare secret",
 			args: args{
-				secret:       "the#$%PassWoRd",
-				hashedSecret: "$2a$10$oUydrP.MQZq7gvLpCvzGaOKBAqwBAoRgzqz7pLks3C0ulIkrpSEQa",
+				valueToHash:     "teste",
+				secretToCompare: "teste2",
 			},
-			wantErr: nil,
+			wantErr: ErrInvalidSecret,
 		},
 	}
 	for _, tt := range tests {
@@ -82,7 +82,71 @@ func TestCompareHashedAndSecret(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			err := CompareHashedAndSecret(tt.args.hashedSecret, tt.args.secret)
+
+			hash, err := bcrypt.GenerateFromPassword([]byte(tt.args.valueToHash), bcrypt.MinCost)
+			require.NoError(t, err)
+
+			h := Hash{
+				hashedValue: string(hash),
+			}
+
+			err = h.Compare(tt.args.secretToCompare)
+			assert.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestHash_Scan(t *testing.T) {
+	t.Parallel()
+
+	hashedSecret, err := bcrypt.GenerateFromPassword([]byte("th3Secr3T"), 4)
+	require.NoError(t, err)
+
+	type args struct {
+		value interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name: "should scan the value with successfully",
+			args: args{
+				value: string(hashedSecret),
+			},
+			wantErr: nil,
+		},
+		{
+			name: "should return an error when scan value is nil",
+			args: args{
+				value: nil,
+			},
+			wantErr: common.ErrScanValueNil,
+		},
+		{
+			name: "should return an error when scan value not is an string",
+			args: args{
+				value: 123789,
+			},
+			wantErr: common.ErrScanValueIsNotString,
+		},
+		{
+			name: "should return an error when scan value is invalid hash",
+			args: args{
+				value: "th3Secr3T",
+			},
+			wantErr: ErrScanInvalidSecret,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt // capture range variable
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			h := &Hash{}
+
+			err := h.Scan(tt.args.value)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

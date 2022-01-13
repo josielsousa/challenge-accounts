@@ -4,6 +4,7 @@
 package transfers
 
 import (
+	"context"
 	"sync"
 )
 
@@ -17,10 +18,10 @@ var _ Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked Repository
 // 		mockedRepository := &RepositoryMock{
-// 			InsertFunc: func(transfer Transfer) error {
+// 			InsertFunc: func(ctx context.Context, transfer Transfer) error {
 // 				panic("mock out the Insert method")
 // 			},
-// 			ListTransfersFunc: func(accountID string) ([]Transfer, error) {
+// 			ListTransfersFunc: func(ctx context.Context, accountID string) ([]Transfer, error) {
 // 				panic("mock out the ListTransfers method")
 // 			},
 // 		}
@@ -31,20 +32,24 @@ var _ Repository = &RepositoryMock{}
 // 	}
 type RepositoryMock struct {
 	// InsertFunc mocks the Insert method.
-	InsertFunc func(transfer Transfer) error
+	InsertFunc func(ctx context.Context, transfer Transfer) error
 
 	// ListTransfersFunc mocks the ListTransfers method.
-	ListTransfersFunc func(accountID string) ([]Transfer, error)
+	ListTransfersFunc func(ctx context.Context, accountID string) ([]Transfer, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
 		// Insert holds details about calls to the Insert method.
 		Insert []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// Transfer is the transfer argument value.
 			Transfer Transfer
 		}
 		// ListTransfers holds details about calls to the ListTransfers method.
 		ListTransfers []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 			// AccountID is the accountID argument value.
 			AccountID string
 		}
@@ -54,28 +59,32 @@ type RepositoryMock struct {
 }
 
 // Insert calls InsertFunc.
-func (mock *RepositoryMock) Insert(transfer Transfer) error {
+func (mock *RepositoryMock) Insert(ctx context.Context, transfer Transfer) error {
 	if mock.InsertFunc == nil {
 		panic("RepositoryMock.InsertFunc: method is nil but Repository.Insert was just called")
 	}
 	callInfo := struct {
+		Ctx      context.Context
 		Transfer Transfer
 	}{
+		Ctx:      ctx,
 		Transfer: transfer,
 	}
 	mock.lockInsert.Lock()
 	mock.calls.Insert = append(mock.calls.Insert, callInfo)
 	mock.lockInsert.Unlock()
-	return mock.InsertFunc(transfer)
+	return mock.InsertFunc(ctx, transfer)
 }
 
 // InsertCalls gets all the calls that were made to Insert.
 // Check the length with:
 //     len(mockedRepository.InsertCalls())
 func (mock *RepositoryMock) InsertCalls() []struct {
+	Ctx      context.Context
 	Transfer Transfer
 } {
 	var calls []struct {
+		Ctx      context.Context
 		Transfer Transfer
 	}
 	mock.lockInsert.RLock()
@@ -85,28 +94,32 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 }
 
 // ListTransfers calls ListTransfersFunc.
-func (mock *RepositoryMock) ListTransfers(accountID string) ([]Transfer, error) {
+func (mock *RepositoryMock) ListTransfers(ctx context.Context, accountID string) ([]Transfer, error) {
 	if mock.ListTransfersFunc == nil {
 		panic("RepositoryMock.ListTransfersFunc: method is nil but Repository.ListTransfers was just called")
 	}
 	callInfo := struct {
+		Ctx       context.Context
 		AccountID string
 	}{
+		Ctx:       ctx,
 		AccountID: accountID,
 	}
 	mock.lockListTransfers.Lock()
 	mock.calls.ListTransfers = append(mock.calls.ListTransfers, callInfo)
 	mock.lockListTransfers.Unlock()
-	return mock.ListTransfersFunc(accountID)
+	return mock.ListTransfersFunc(ctx, accountID)
 }
 
 // ListTransfersCalls gets all the calls that were made to ListTransfers.
 // Check the length with:
 //     len(mockedRepository.ListTransfersCalls())
 func (mock *RepositoryMock) ListTransfersCalls() []struct {
+	Ctx       context.Context
 	AccountID string
 } {
 	var calls []struct {
+		Ctx       context.Context
 		AccountID string
 	}
 	mock.lockListTransfers.RLock()

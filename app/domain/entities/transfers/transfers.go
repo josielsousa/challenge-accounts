@@ -7,8 +7,7 @@ type Transfer struct {
 	ID                   string
 	AccountOriginID      string
 	AccountDestinationID string
-	Amount               float64
-	CreatedAt            *time.Time
-	UpdatedAt            *time.Time
-	DeletedAt            *time.Time
+	Amount               int
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }

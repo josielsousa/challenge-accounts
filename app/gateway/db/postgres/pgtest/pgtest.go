@@ -23,6 +23,7 @@ var (
 )
 
 const (
+	defaultDbName        = "pg-test-db-name"
 	defaultContainerName = "pg-test-challenge-accounts"
 )
 
@@ -51,11 +52,22 @@ func StartupNewPool() (teardownFn func(), err error) {
 	}
 
 	port := resource.GetPort("5432/tcp")
-	if err = pool.Retry(retryDbHelper(port, dbName, log)); err != nil {
+	if err = pool.Retry(retryDbHelper(port, defaultDbName, log)); err != nil {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
 
-	// create default database
+	dbDefaultURL := getPgConnURL(port, defaultDbName)
+	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(dbDefaultURL, log, postgres.LogLevelWarn)
+	if err != nil {
+		return nil, err
+	}
+
+	// create default database to unit test
+	_, err = dbDefaultPool.Exec(context.Background(), fmt.Sprintf("create database %s", dbName))
+	if err != nil {
+		return nil, err
+	}
+
 	dbURL := getPgConnURL(port, dbName)
 	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL, log, postgres.LogLevelWarn)
 	if err != nil {
@@ -78,14 +90,21 @@ func getDockerResource(pool *dockertest.Pool, dbName string) (*dockertest.Resour
 	container, _ := pool.Client.InspectContainer(defaultContainerName)
 
 	if container != nil {
-		pool.RemoveContainerByName(defaultContainerName)
+		if container.State.Running {
+			resource := &dockertest.Resource{Container: container}
+			return resource, nil
+		}
+
+		if !container.State.Running {
+			pool.RemoveContainerByName(defaultContainerName)
+		}
 	}
 
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Name:       defaultContainerName,
 		Repository: "postgres",
 		Tag:        "14-alpine",
-		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + dbName},
+		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + defaultDbName},
 	}, func(c *docker.HostConfig) {
 		c.AutoRemove = true
 		c.RestartPolicy = docker.RestartPolicy{Name: "no"}
@@ -104,6 +123,7 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 	logger.SetLevel(postgres.LogLevelWarn)
 	log := logger.WithField("environment", "new db integration test")
 
+	atomic.AddInt64(&instances, 1)
 	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt64(&instances), time.Now().UnixNano())
 	cconn := concurrent_conn
 

@@ -72,12 +72,12 @@ func (r *Repository) Insert(ctx context.Context, trf transfers.TransferData) err
 		return fmt.Errorf("%s-> %s: %w", op, "on insert transfer", err)
 	}
 
-	err = r.accRepo.Update(ctx, tx, trf.AccountOrigin)
+	err = r.accRepo.UpdateBalance(ctx, tx, trf.AccountOriginID, trf.AccountOrigin.Balance)
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on update account origin", err)
 	}
 
-	err = r.accRepo.Update(ctx, tx, trf.AccountDestination)
+	err = r.accRepo.UpdateBalance(ctx, tx, trf.AccountDestinationID, trf.AccountDestination.Balance)
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on update account destination", err)
 	}

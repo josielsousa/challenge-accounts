@@ -30,8 +30,8 @@ var _ Repository = &RepositoryMock{}
 // 			InsertFunc: func(ctx context.Context, account Account) error {
 // 				panic("mock out the Insert method")
 // 			},
-// 			UpdateFunc: func(ctx context.Context, account Account) error {
-// 				panic("mock out the Update method")
+// 			UpdateBalanceFunc: func(ctx context.Context, accountID string, balance int) error {
+// 				panic("mock out the UpdateBalance method")
 // 			},
 // 		}
 //
@@ -52,8 +52,8 @@ type RepositoryMock struct {
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, account Account) error
 
-	// UpdateFunc mocks the Update method.
-	UpdateFunc func(ctx context.Context, account Account) error
+	// UpdateBalanceFunc mocks the UpdateBalance method.
+	UpdateBalanceFunc func(ctx context.Context, accountID string, balance int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -83,19 +83,21 @@ type RepositoryMock struct {
 			// Account is the account argument value.
 			Account Account
 		}
-		// Update holds details about calls to the Update method.
-		Update []struct {
+		// UpdateBalance holds details about calls to the UpdateBalance method.
+		UpdateBalance []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// Account is the account argument value.
-			Account Account
+			// AccountID is the accountID argument value.
+			AccountID string
+			// Balance is the balance argument value.
+			Balance int
 		}
 	}
-	lockGetAll   sync.RWMutex
-	lockGetByCPF sync.RWMutex
-	lockGetByID  sync.RWMutex
-	lockInsert   sync.RWMutex
-	lockUpdate   sync.RWMutex
+	lockGetAll        sync.RWMutex
+	lockGetByCPF      sync.RWMutex
+	lockGetByID       sync.RWMutex
+	lockInsert        sync.RWMutex
+	lockUpdateBalance sync.RWMutex
 }
 
 // GetAll calls GetAllFunc.
@@ -234,37 +236,41 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 	return calls
 }
 
-// Update calls UpdateFunc.
-func (mock *RepositoryMock) Update(ctx context.Context, account Account) error {
-	if mock.UpdateFunc == nil {
-		panic("RepositoryMock.UpdateFunc: method is nil but Repository.Update was just called")
+// UpdateBalance calls UpdateBalanceFunc.
+func (mock *RepositoryMock) UpdateBalance(ctx context.Context, accountID string, balance int) error {
+	if mock.UpdateBalanceFunc == nil {
+		panic("RepositoryMock.UpdateBalanceFunc: method is nil but Repository.UpdateBalance was just called")
 	}
 	callInfo := struct {
-		Ctx     context.Context
-		Account Account
+		Ctx       context.Context
+		AccountID string
+		Balance   int
 	}{
-		Ctx:     ctx,
-		Account: account,
+		Ctx:       ctx,
+		AccountID: accountID,
+		Balance:   balance,
 	}
-	mock.lockUpdate.Lock()
-	mock.calls.Update = append(mock.calls.Update, callInfo)
-	mock.lockUpdate.Unlock()
-	return mock.UpdateFunc(ctx, account)
+	mock.lockUpdateBalance.Lock()
+	mock.calls.UpdateBalance = append(mock.calls.UpdateBalance, callInfo)
+	mock.lockUpdateBalance.Unlock()
+	return mock.UpdateBalanceFunc(ctx, accountID, balance)
 }
 
-// UpdateCalls gets all the calls that were made to Update.
+// UpdateBalanceCalls gets all the calls that were made to UpdateBalance.
 // Check the length with:
-//     len(mockedRepository.UpdateCalls())
-func (mock *RepositoryMock) UpdateCalls() []struct {
-	Ctx     context.Context
-	Account Account
+//     len(mockedRepository.UpdateBalanceCalls())
+func (mock *RepositoryMock) UpdateBalanceCalls() []struct {
+	Ctx       context.Context
+	AccountID string
+	Balance   int
 } {
 	var calls []struct {
-		Ctx     context.Context
-		Account Account
+		Ctx       context.Context
+		AccountID string
+		Balance   int
 	}
-	mock.lockUpdate.RLock()
-	calls = mock.calls.Update
-	mock.lockUpdate.RUnlock()
+	mock.lockUpdateBalance.RLock()
+	calls = mock.calls.UpdateBalance
+	mock.lockUpdateBalance.RUnlock()
 	return calls
 }

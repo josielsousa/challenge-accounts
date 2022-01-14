@@ -15,7 +15,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
-func TestRepository_Update(t *testing.T) {
+func TestRepository_UpdateBalance(t *testing.T) {
 	t.Parallel()
 
 	secretHash, err := hash.NewHash("the#$%PassWoRd")
@@ -39,13 +39,8 @@ func TestRepository_Update(t *testing.T) {
 			name: "test case name here",
 			args: func(t *testing.T) args {
 				acc := accounts.Account{
-					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
-					Name:      "Teste",
-					Balance:   350_00,
-					CPF:       newCpf,
-					Secret:    secretHash,
-					CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
-					UpdatedAt: time.Date(2022, time.January, 5, 1, 0, 0, 0, time.Local),
+					ID:      "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
+					Balance: 250_00,
 				}
 
 				return args{
@@ -79,12 +74,15 @@ func TestRepository_Update(t *testing.T) {
 					expected := accounts.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
-						Balance:   350_00,
+						Balance:   250_00,
 						CPF:       newCpf,
 						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
-						UpdatedAt: time.Date(2022, time.January, 5, 1, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 15, 1, 0, 0, 0, time.Local),
 					}
+
+					got.UpdatedAt = time.Time{}
+					expected.UpdatedAt = time.Time{}
 
 					assert.Equal(t, expected, got)
 				}
@@ -109,15 +107,15 @@ func TestRepository_Update(t *testing.T) {
 			tx, err := pgPool.Begin(args.ctx)
 			require.NoError(t, err)
 
-			err = r.Update(args.ctx, tx, args.acc)
+			err = r.UpdateBalance(args.ctx, tx, args.acc.ID, args.acc.Balance)
 			assert.ErrorIs(t, err, tt.wantErr)
+
+			err = tx.Commit(args.ctx)
+			require.NoError(t, err)
 
 			if tt.check != nil {
 				tt.check(t, pgPool)
 			}
-
-			err = tx.Commit(args.ctx)
-			require.NoError(t, err)
 		})
 	}
 }

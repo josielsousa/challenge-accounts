@@ -11,7 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
+	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
@@ -21,6 +24,15 @@ func TestRepository_Insert(t *testing.T) {
 	trfID := uuid.NewString()
 	accOriginID := uuid.NewString()
 	accDestinationID := uuid.NewString()
+
+	secretHash, err := hash.NewHash("the#$%PassWoRd")
+	require.NoError(t, err)
+
+	newCpf, err := cpf.NewCPF("88350057017")
+	require.NoError(t, err)
+
+	newCpf02, err := cpf.NewCPF("71970232030")
+	require.NoError(t, err)
 
 	type args struct {
 		ctx context.Context
@@ -42,11 +54,58 @@ func TestRepository_Insert(t *testing.T) {
 						ID:                   trfID,
 						AccountOriginID:      accOriginID,
 						AccountDestinationID: accDestinationID,
-						Amount:               30,
+						Amount:               50,
 						CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 						UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 					},
+					AccountOrigin: accounts.Account{
+						ID:        accOriginID,
+						Name:      "Teste 01",
+						Balance:   350_00,
+						CPF:       newCpf,
+						Secret:    secretHash,
+						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+					},
+					AccountDestination: accounts.Account{
+						ID:        accDestinationID,
+						Name:      "Teste 02",
+						Balance:   50_00,
+						CPF:       newCpf02,
+						Secret:    secretHash,
+						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+					},
 				},
+			},
+			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				{
+					accs := []accounts.Account{
+						{
+							ID:        accOriginID,
+							Name:      "Teste 01",
+							Balance:   350_00,
+							CPF:       newCpf,
+							Secret:    secretHash,
+							CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+							UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						},
+						{
+							ID:        accDestinationID,
+							Name:      "Teste 02",
+							Balance:   50_00,
+							CPF:       newCpf02,
+							Secret:    secretHash,
+							CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+							UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						},
+					}
+
+					for _, acc := range accs {
+						err = pgtest.AccountsInsert(t, db, acc)
+						require.NoError(t, err)
+					}
+				}
 			},
 			check: func(t *testing.T, pgPool *pgxpool.Pool) {
 				{
@@ -57,12 +116,50 @@ func TestRepository_Insert(t *testing.T) {
 						ID:                   trfID,
 						AccountOriginID:      accOriginID,
 						AccountDestinationID: accDestinationID,
-						Amount:               30,
+						Amount:               50,
 						CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 						UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 					}
 
 					assert.Equal(t, expected, got)
+				}
+				{
+					got01, err := pgtest.GetAccount(t, pgPool, accOriginID)
+					require.NoError(t, err)
+
+					expected01 := accounts.Account{
+						ID:        accOriginID,
+						Name:      "Teste 01",
+						Balance:   350_00,
+						CPF:       newCpf,
+						Secret:    secretHash,
+						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+					}
+
+					got01.UpdatedAt = time.Time{}
+					expected01.UpdatedAt = time.Time{}
+
+					assert.Equal(t, expected01, got01)
+				}
+				{
+					got02, err := pgtest.GetAccount(t, pgPool, accDestinationID)
+					require.NoError(t, err)
+
+					expected02 := accounts.Account{
+						ID:        accDestinationID,
+						Name:      "Teste 02",
+						Balance:   50_00,
+						CPF:       newCpf02,
+						Secret:    secretHash,
+						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+					}
+
+					got02.UpdatedAt = time.Time{}
+					expected02.UpdatedAt = time.Time{}
+
+					assert.Equal(t, expected02, got02)
 				}
 			},
 			checkErr: func(t *testing.T, err error) {

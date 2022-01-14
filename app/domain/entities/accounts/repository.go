@@ -9,5 +9,5 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (Account, error)
 	GetByCPF(ctx context.Context, cpf string) (Account, error)
 	Insert(ctx context.Context, account Account) error
-	Update(ctx context.Context, account Account) error
+	UpdateBalance(ctx context.Context, accountID string, balance int) error
 }

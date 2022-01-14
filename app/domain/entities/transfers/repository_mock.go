@@ -18,7 +18,7 @@ var _ Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked Repository
 // 		mockedRepository := &RepositoryMock{
-// 			InsertFunc: func(ctx context.Context, transfer Transfer) error {
+// 			InsertFunc: func(ctx context.Context, transfer TransferData) error {
 // 				panic("mock out the Insert method")
 // 			},
 // 			ListTransfersFunc: func(ctx context.Context, accOriginID string) ([]Transfer, error) {
@@ -32,7 +32,7 @@ var _ Repository = &RepositoryMock{}
 // 	}
 type RepositoryMock struct {
 	// InsertFunc mocks the Insert method.
-	InsertFunc func(ctx context.Context, transfer Transfer) error
+	InsertFunc func(ctx context.Context, transfer TransferData) error
 
 	// ListTransfersFunc mocks the ListTransfers method.
 	ListTransfersFunc func(ctx context.Context, accOriginID string) ([]Transfer, error)
@@ -44,7 +44,7 @@ type RepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Transfer is the transfer argument value.
-			Transfer Transfer
+			Transfer TransferData
 		}
 		// ListTransfers holds details about calls to the ListTransfers method.
 		ListTransfers []struct {
@@ -59,13 +59,13 @@ type RepositoryMock struct {
 }
 
 // Insert calls InsertFunc.
-func (mock *RepositoryMock) Insert(ctx context.Context, transfer Transfer) error {
+func (mock *RepositoryMock) Insert(ctx context.Context, transfer TransferData) error {
 	if mock.InsertFunc == nil {
 		panic("RepositoryMock.InsertFunc: method is nil but Repository.Insert was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
-		Transfer Transfer
+		Transfer TransferData
 	}{
 		Ctx:      ctx,
 		Transfer: transfer,
@@ -81,11 +81,11 @@ func (mock *RepositoryMock) Insert(ctx context.Context, transfer Transfer) error
 //     len(mockedRepository.InsertCalls())
 func (mock *RepositoryMock) InsertCalls() []struct {
 	Ctx      context.Context
-	Transfer Transfer
+	Transfer TransferData
 } {
 	var calls []struct {
 		Ctx      context.Context
-		Transfer Transfer
+		Transfer TransferData
 	}
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert

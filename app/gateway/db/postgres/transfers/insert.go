@@ -1,4 +1,4 @@
-package accounts
+package transfers
 
 import (
 	"context"
@@ -14,8 +14,15 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
 )
 
-func (r *Repository) Insert(ctx context.Context, trf transfers.Transfer) error {
+func (r *Repository) Insert(ctx context.Context, trf transfers.TransferData) error {
 	const op = `Repository.Transfers.Insert`
+
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s-> %s: %w", op, "on open transaction", err)
+	}
+	defer tx.Rollback(ctx)
+
 	if len(trf.ID) <= 0 {
 		trf.ID = uuid.NewString()
 	}
@@ -40,7 +47,7 @@ func (r *Repository) Insert(ctx context.Context, trf transfers.Transfer) error {
         RETURNING id, created_at, updated_at
     `
 
-	row := r.db.QueryRow(
+	row := tx.QueryRow(
 		ctx,
 		query,
 		trf.ID,
@@ -51,7 +58,7 @@ func (r *Repository) Insert(ctx context.Context, trf transfers.Transfer) error {
 		trf.UpdatedAt,
 	)
 
-	err := row.Scan(
+	err = row.Scan(
 		&trf.ID,
 		&trf.CreatedAt,
 		&trf.UpdatedAt,
@@ -63,6 +70,21 @@ func (r *Repository) Insert(ctx context.Context, trf transfers.Transfer) error {
 		}
 
 		return fmt.Errorf("%s-> %s: %w", op, "on insert transfer", err)
+	}
+
+	err = r.accRepo.Update(ctx, tx, trf.AccountOrigin)
+	if err != nil {
+		return fmt.Errorf("%s-> %s: %w", op, "on update account origin", err)
+	}
+
+	err = r.accRepo.Update(ctx, tx, trf.AccountDestination)
+	if err != nil {
+		return fmt.Errorf("%s-> %s: %w", op, "on update account destination", err)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("%s-> %s: %w", op, "on commit transaction", err)
 	}
 
 	return nil

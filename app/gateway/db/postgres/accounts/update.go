@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 
-func (r *Repository) Update(ctx context.Context, acc accounts.Account) error {
+func (*Repository) Update(ctx context.Context, tx pgx.Tx, acc accounts.Account) error {
 	const op = `Repository.Accounts.Update`
 
 	if acc.UpdatedAt.IsZero() {
@@ -23,10 +24,9 @@ func (r *Repository) Update(ctx context.Context, acc accounts.Account) error {
 			balance = $5,
 			updated_at = $6
 		WHERE id = $1
-        RETURNING id, created_at, updated_at
     `
 
-	row := r.db.QueryRow(
+	cmTag, err := tx.Exec(
 		ctx,
 		query,
 		acc.ID,
@@ -36,14 +36,12 @@ func (r *Repository) Update(ctx context.Context, acc accounts.Account) error {
 		acc.Balance,
 		acc.UpdatedAt,
 	)
-
-	err := row.Scan(
-		&acc.ID,
-		&acc.CreatedAt,
-		&acc.UpdatedAt,
-	)
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on update account", err)
+	}
+
+	if cmTag.RowsAffected() != 1 {
+		return fmt.Errorf("%s-> %s: %w", op, "on check rows affected", accounts.ErrUpdateAccountNotPerformed)
 	}
 
 	return nil

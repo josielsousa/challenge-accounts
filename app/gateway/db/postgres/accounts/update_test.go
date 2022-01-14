@@ -45,7 +45,7 @@ func TestRepository_Update(t *testing.T) {
 					CPF:       newCpf,
 					Secret:    secretHash,
 					CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
-					UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+					UpdatedAt: time.Date(2022, time.January, 5, 1, 0, 0, 0, time.Local),
 				}
 
 				return args{
@@ -83,7 +83,7 @@ func TestRepository_Update(t *testing.T) {
 						CPF:       newCpf,
 						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
-						UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+						UpdatedAt: time.Date(2022, time.January, 5, 1, 0, 0, 0, time.Local),
 					}
 
 					assert.Equal(t, expected, got)
@@ -106,12 +106,18 @@ func TestRepository_Update(t *testing.T) {
 				tt.beforeRun(t, pgPool)
 			}
 
-			err := r.Update(args.ctx, args.acc)
+			tx, err := pgPool.Begin(args.ctx)
+			require.NoError(t, err)
+
+			err = r.Update(args.ctx, tx, args.acc)
 			assert.ErrorIs(t, err, tt.wantErr)
 
 			if tt.check != nil {
 				tt.check(t, pgPool)
 			}
+
+			err = tx.Commit(args.ctx)
+			require.NoError(t, err)
 		})
 	}
 }

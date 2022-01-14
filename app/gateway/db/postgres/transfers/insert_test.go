@@ -1,4 +1,4 @@
-package accounts
+package transfers
 
 import (
 	"context"
@@ -24,7 +24,7 @@ func TestRepository_Insert(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		trf transfers.Transfer
+		trf transfers.TransferData
 	}
 	tests := []struct {
 		name      string
@@ -37,13 +37,15 @@ func TestRepository_Insert(t *testing.T) {
 			name: "should insert a transfer with successfully",
 			args: args{
 				ctx: context.Background(),
-				trf: transfers.Transfer{
-					ID:                   trfID,
-					AccountOriginID:      accOriginID,
-					AccountDestinationID: accDestinationID,
-					Amount:               30,
-					CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
-					UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+				trf: transfers.TransferData{
+					Transfer: transfers.Transfer{
+						ID:                   trfID,
+						AccountOriginID:      accOriginID,
+						AccountDestinationID: accDestinationID,
+						Amount:               30,
+						CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+					},
 				},
 			},
 			check: func(t *testing.T, pgPool *pgxpool.Pool) {
@@ -71,13 +73,15 @@ func TestRepository_Insert(t *testing.T) {
 			name: "should return an error when insert a transfer",
 			args: args{
 				ctx: context.Background(),
-				trf: transfers.Transfer{
-					ID:                   trfID,
-					AccountOriginID:      accOriginID,
-					AccountDestinationID: accDestinationID,
-					Amount:               30,
-					CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
-					UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+				trf: transfers.TransferData{
+					Transfer: transfers.Transfer{
+						ID:                   trfID,
+						AccountOriginID:      accOriginID,
+						AccountDestinationID: accDestinationID,
+						Amount:               30,
+						CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
+					},
 				},
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {

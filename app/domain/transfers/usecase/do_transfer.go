@@ -32,6 +32,16 @@ func (t Transfer) DoTransfer(ctx context.Context, input trfUC.TransferInput) err
 		return accounts.ErrAccountDestinationNotFound
 	}
 
+	err = accOri.Withdraw(input.Amount)
+	if err != nil {
+		return fmt.Errorf("%s-> %s: %w", op, "on withdraw", err)
+	}
+
+	err = accDest.Deposit(input.Amount)
+	if err != nil {
+		return fmt.Errorf("%s-> %s: %w", op, "on deposit", err)
+	}
+
 	err = t.repo.Insert(ctx, transfers.TransferData{
 		Transfer: transfers.Transfer{
 			ID:                   uuid.NewString(),
@@ -40,8 +50,14 @@ func (t Transfer) DoTransfer(ctx context.Context, input trfUC.TransferInput) err
 			AccountOriginID:      accOri.ID,
 			AccountDestinationID: accDest.ID,
 		},
-		AccountDestination: accDest,
-		AccountOrigin:      accOri,
+		AccountDestination: transfers.AccountData{
+			ID:      accDest.ID,
+			Balance: accDest.Balance,
+		},
+		AccountOrigin: transfers.AccountData{
+			ID:      accOri.ID,
+			Balance: accOri.Balance,
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on do transfer", err)

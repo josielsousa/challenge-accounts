@@ -2,8 +2,6 @@ package transfers
 
 import (
 	"time"
-
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 
 // Transfer - Estrutura da entidade `transfer`
@@ -16,8 +14,13 @@ type Transfer struct {
 	UpdatedAt            time.Time
 }
 
+type AccountData struct {
+	ID      string
+	Balance int
+}
+
 type TransferData struct {
 	Transfer
-	AccountOrigin      accounts.Account
-	AccountDestination accounts.Account
+	AccountOrigin      AccountData
+	AccountDestination AccountData
 }

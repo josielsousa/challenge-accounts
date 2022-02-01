@@ -16,6 +16,12 @@ type PostgresConfig struct {
 }
 
 func (p PostgresConfig) URL() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+	connString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		p.User, p.Password, p.Host, p.Port, p.DatabaseName)
+
+	if p.Hostname != "" {
+		connString = fmt.Sprintf("%s application_name=%s", connString, p.Hostname)
+	}
+
+	return connString
 }

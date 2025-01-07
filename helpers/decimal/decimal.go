@@ -11,6 +11,7 @@ func Add(balance, amount float64) float64 {
 
 	subtotal := balanceDecimal.Add(amountDecimal)
 	total, _ := subtotal.Float64()
+
 	return total
 }
 
@@ -21,5 +22,6 @@ func Sub(amount, balance float64) float64 {
 
 	subtotal := balanceDecimal.Sub(amountDecimal)
 	total, _ := subtotal.Float64()
+
 	return total
 }

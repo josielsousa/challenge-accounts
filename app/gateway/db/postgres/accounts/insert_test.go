@@ -3,6 +3,7 @@ package accounts
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -25,9 +26,9 @@ func TestRepository_Insert(t *testing.T) {
 	require.NoError(t, err)
 
 	type args struct {
-		ctx context.Context
 		acc accounts.Account
 	}
+
 	tests := []struct {
 		name      string
 		args      func(t *testing.T) args
@@ -37,90 +38,112 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should save account with successfully",
 			args: func(t *testing.T) args {
+				t.Helper()
+
 				acc := accounts.Account{
-					Name:    "Teste",
-					Balance: 350_00,
-					CPF:     newCpf,
-					Secret:  secretHash,
+					ID:        "",
+					Name:      "Teste",
+					Balance:   350_00,
+					CPF:       newCpf,
+					Secret:    secretHash,
+					CreatedAt: time.Time{},
+					UpdatedAt: time.Time{},
 				}
 
 				return args{
 					acc: acc,
-					ctx: context.Background(),
 				}
 			},
+			beforeRun: nil,
 			checkErr: func(t *testing.T, err error) {
-				assert.NoError(t, err)
+				t.Helper()
+
+				require.NoError(t, err)
 			},
 		},
 		{
 			name: "should return an postgres error when save new account, because column name is invalid",
 			args: func(t *testing.T) args {
+				t.Helper()
+
 				acc := accounts.Account{
-					Name:    "Teste",
-					Balance: 350_00,
-					CPF:     newCpf,
-					Secret:  secretHash,
+					ID:        "",
+					Name:      "Teste",
+					Balance:   350_00,
+					CPF:       newCpf,
+					Secret:    secretHash,
+					CreatedAt: time.Time{},
+					UpdatedAt: time.Time{},
 				}
 
 				return args{
 					acc: acc,
-					ctx: context.Background(),
 				}
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
-				{
-					_, err := db.Exec(context.Background(), "ALTER TABLE accounts RENAME COLUMN name TO username")
-					require.NoError(t, err)
-				}
+				t.Helper()
+
+				_, err := db.Exec(context.Background(), "ALTER TABLE accounts RENAME COLUMN name TO username")
+				require.NoError(t, err)
 			},
 			checkErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				var pgErr *pgconn.PgError
-				assert.ErrorAs(t, err, &pgErr)
+				require.ErrorAs(t, err, &pgErr)
 				assert.Equal(t, `column "name" of relation "accounts" does not exist`, pgErr.Message)
 			},
 		},
 		{
 			name: "should return an error when save a duplicate account",
 			args: func(t *testing.T) args {
+				t.Helper()
+
 				acc := accounts.Account{
-					Name:    "Teste",
-					Balance: 350_00,
-					CPF:     newCpf,
-					Secret:  secretHash,
+					ID:        "",
+					Name:      "Teste",
+					Balance:   350_00,
+					CPF:       newCpf,
+					Secret:    secretHash,
+					CreatedAt: time.Time{},
+					UpdatedAt: time.Time{},
 				}
 
 				return args{
 					acc: acc,
-					ctx: context.Background(),
 				}
 			},
-			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+			beforeRun: func(t *testing.T, dbTest *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					acc := accounts.Account{
-						Name:    "Teste",
-						Balance: 350_00,
-						CPF:     newCpf,
-						Secret:  secretHash,
+						ID:        "",
+						Name:      "Teste",
+						Balance:   350_00,
+						CPF:       newCpf,
+						Secret:    secretHash,
+						CreatedAt: time.Time{},
+						UpdatedAt: time.Time{},
 					}
 
-					err = pgtest.AccountsInsert(t, db, acc)
+					err = pgtest.AccountsInsert(t, dbTest, acc)
 					require.NoError(t, err)
 				}
 			},
 			checkErr: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, accounts.ErrAccountAlreadyExists)
+				t.Helper()
+
+				require.ErrorIs(t, err, accounts.ErrAccountAlreadyExists)
 			},
 		},
 	}
 	for _, tt := range tests {
-		tt := tt // capture range variable
-
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			pgPool := pgtest.NewDB(t)
-			r := NewRepository(pgPool)
+			repo := NewRepository(pgPool)
 
 			if tt.beforeRun != nil {
 				tt.beforeRun(t, pgPool)
@@ -128,7 +151,7 @@ func TestRepository_Insert(t *testing.T) {
 
 			args := tt.args(t)
 
-			err := r.Insert(args.ctx, args.acc)
+			err := repo.Insert(context.Background(), args.acc)
 			tt.checkErr(t, err)
 		})
 	}

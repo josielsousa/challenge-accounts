@@ -25,9 +25,9 @@ func TestRepository_UpdateBalance(t *testing.T) {
 	require.NoError(t, err)
 
 	type args struct {
-		ctx context.Context
 		acc accounts.Account
 	}
+
 	tests := []struct {
 		name      string
 		args      func(t *testing.T) args
@@ -38,17 +38,25 @@ func TestRepository_UpdateBalance(t *testing.T) {
 		{
 			name: "test case name here",
 			args: func(t *testing.T) args {
+				t.Helper()
+
 				acc := accounts.Account{
-					ID:      "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
-					Balance: 250_00,
+					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
+					Name:      "",
+					Balance:   250_00,
+					CPF:       cpf.CPF{},
+					Secret:    hash.Hash{},
+					CreatedAt: time.Time{},
+					UpdatedAt: time.Time{},
 				}
 
 				return args{
-					ctx: context.Background(),
 					acc: acc,
 				}
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					acc := accounts.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
@@ -57,6 +65,7 @@ func TestRepository_UpdateBalance(t *testing.T) {
 						CPF:       newCpf,
 						Secret:    secretHash,
 						CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
+						UpdatedAt: time.Time{},
 					}
 
 					err = pgtest.AccountsInsert(t, db, acc)
@@ -64,6 +73,8 @@ func TestRepository_UpdateBalance(t *testing.T) {
 				}
 			},
 			check: func(t *testing.T, db *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					got, err := pgtest.GetAccount(t, db, "cdd3e9ed-b33b-4b18-b5a4-31a791969a30")
 					require.NoError(t, err)
@@ -90,13 +101,12 @@ func TestRepository_UpdateBalance(t *testing.T) {
 			wantErr: nil,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			pgPool := pgtest.NewDB(t)
-			r := NewRepository(pgPool)
+			repo := NewRepository(pgPool)
 
 			args := tt.args(t)
 
@@ -104,13 +114,15 @@ func TestRepository_UpdateBalance(t *testing.T) {
 				tt.beforeRun(t, pgPool)
 			}
 
-			tx, err := pgPool.Begin(args.ctx)
+			ctx := context.Background()
+
+			tx, err := pgPool.Begin(ctx)
 			require.NoError(t, err)
 
-			err = r.UpdateBalance(args.ctx, tx, args.acc.ID, args.acc.Balance)
-			assert.ErrorIs(t, err, tt.wantErr)
+			err = repo.UpdateBalance(ctx, tx, args.acc.ID, args.acc.Balance)
+			require.ErrorIs(t, err, tt.wantErr)
 
-			err = tx.Commit(args.ctx)
+			err = tx.Commit(ctx)
 			require.NoError(t, err)
 
 			if tt.check != nil {

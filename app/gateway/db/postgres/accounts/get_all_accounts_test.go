@@ -49,9 +49,11 @@ func TestRepository_GetAll(t *testing.T) {
 		{
 			name:    "should got a accounts list with successfully",
 			wantErr: nil,
-			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+			beforeRun: func(t *testing.T, dbTest *pgxpool.Pool) {
+				t.Helper()
+
 				{
-					for i := 0; i < len(fakeData); i++ {
+					for i := range fakeData {
 						newCpf, err := cpf.NewCPF(fakeData[i].numCPF)
 						require.NoError(t, err)
 
@@ -65,12 +67,14 @@ func TestRepository_GetAll(t *testing.T) {
 							UpdatedAt: time.Date(2022, time.January, 4, i, 0, 0, 0, time.Local),
 						}
 
-						err = pgtest.AccountsInsert(t, db, acc)
+						err = pgtest.AccountsInsert(t, dbTest, acc)
 						require.NoError(t, err)
 					}
 				}
 			},
 			check: func(t *testing.T, accs []accounts.Account) {
+				t.Helper()
+
 				{
 					assert.Len(t, accs, len(fakeData))
 
@@ -94,9 +98,8 @@ func TestRepository_GetAll(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -106,7 +109,7 @@ func TestRepository_GetAll(t *testing.T) {
 
 			r := NewRepository(pgPool)
 			got, err := r.GetAll(context.Background())
-			assert.ErrorIs(t, err, tt.wantErr)
+			require.ErrorIs(t, err, tt.wantErr)
 
 			tt.check(t, got)
 		})

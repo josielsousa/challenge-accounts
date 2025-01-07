@@ -10,7 +10,7 @@ import (
 )
 
 func (*Repository) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID string, balance int) error {
-	const op = `Repository.Accounts.UpdateBalance`
+	const operation = `Repository.Accounts.UpdateBalance`
 
 	query := `
         UPDATE accounts SET
@@ -26,11 +26,11 @@ func (*Repository) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID strin
 		balance,
 	)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on update balance account", err)
+		return fmt.Errorf("%s-> %s: %w", operation, "on update balance account", err)
 	}
 
 	if cmTag.RowsAffected() != 1 {
-		return fmt.Errorf("%s-> %s: %w", op, "on check rows affected", accounts.ErrUpdateAccountNotPerformed)
+		return fmt.Errorf("%s-> %s: %w", operation, "on check rows affected", accounts.ErrUpdateAccountNotPerformed)
 	}
 
 	return nil

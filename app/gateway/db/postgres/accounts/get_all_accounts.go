@@ -9,7 +9,7 @@ import (
 
 const (
 	queryGetAllAccs = `
-		SELECT 
+		SELECT
 			id,
 			name,
 			cpf,
@@ -17,19 +17,19 @@ const (
 			balance,
 			created_at,
 			updated_at
-		FROM accounts 
+		FROM accounts
 	`
 )
 
 func (r *Repository) GetAll(ctx context.Context) ([]accounts.Account, error) {
-	const op = `Repository.Accounts.GetAll`
+	const operation = `Repository.Accounts.GetAll`
 
 	rows, err := r.db.Query(
 		ctx,
 		queryGetAllAccs,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s -> %s: %w", op, "on get all accounts", err)
+		return nil, fmt.Errorf("%s -> %s: %w", operation, "on get all accounts", err)
 	}
 
 	defer rows.Close()
@@ -49,7 +49,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]accounts.Account, error) {
 			&acc.UpdatedAt,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("%s-> %s: %w", op, "on scan get all accounts", err)
+			return nil, fmt.Errorf("%s-> %s: %w", operation, "on scan get all accounts", err)
 		}
 
 		accs = append(accs, acc)

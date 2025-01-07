@@ -14,13 +14,14 @@ import (
 )
 
 func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
-	const op = `Repository.Accounts.Insert`
-	if len(acc.ID) <= 0 {
+	const operation = `Repository.Accounts.Insert`
+
+	if len(acc.ID) == 0 {
 		acc.ID = uuid.NewString()
 	}
 
 	if acc.CreatedAt.IsZero() {
-		acc.CreatedAt = time.Now().In(time.Local)
+		acc.CreatedAt = time.Now().In(time.UTC)
 	}
 
 	query := `
@@ -54,10 +55,10 @@ func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			return fmt.Errorf("%s-> %s: %w", op, "on insert account", accounts.ErrAccountAlreadyExists)
+			return fmt.Errorf("%s-> %s: %w", operation, "on insert account", accounts.ErrAccountAlreadyExists)
 		}
 
-		return fmt.Errorf("%s-> %s: %w", op, "on insert account", err)
+		return fmt.Errorf("%s-> %s: %w", operation, "on insert account", err)
 	}
 
 	return nil

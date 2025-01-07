@@ -1,6 +1,10 @@
 package auth
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 // Helper - Define a struct para o helper Auth.
 type Helper struct{}
@@ -12,10 +16,19 @@ func NewHelper() *Helper {
 
 // Hash - gera um novo hash para o secret da account.
 func (h *Helper) Hash(secret string) ([]byte, error) {
-	return bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("generating hash: %w", err)
+	}
+
+	return hash, nil
 }
 
 // VerifySecret - verifica se a senha informada é a mesma salva na account.
 func (h *Helper) VerifySecret(hashedSecret, secret string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedSecret), []byte(secret))
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedSecret), []byte(secret)); err != nil {
+		return fmt.Errorf("comparing hash and secret: %w", err)
+	}
+
+	return nil
 }

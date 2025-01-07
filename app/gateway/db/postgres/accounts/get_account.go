@@ -12,7 +12,7 @@ import (
 
 const (
 	queryByCPF = `
-		SELECT 
+		SELECT
 			id,
 			name,
 			cpf,
@@ -20,12 +20,12 @@ const (
 			balance,
 			created_at,
 			updated_at
-		FROM accounts 
-		WHERE cpf = $1 
+		FROM accounts
+		WHERE cpf = $1
 	`
 
 	queryByID = `
-		SELECT 
+		SELECT
 			id,
 			name,
 			cpf,
@@ -33,35 +33,35 @@ const (
 			balance,
 			created_at,
 			updated_at
-		FROM accounts 
-		WHERE id = $1 
+		FROM accounts
+		WHERE id = $1
 	`
 )
 
 func (r *Repository) GetByCPF(ctx context.Context, numCPF string) (accounts.Account, error) {
-	const op = `Repository.Accounts.GetAccountByCPF`
+	const operation = `Repository.Accounts.GetAccountByCPF`
 
 	acc, err := r.getAccount(ctx, numCPF, queryByCPF)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, "on query by CPF", err)
+		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", operation, "on query by CPF", err)
 	}
 
 	return acc, nil
 }
 
 func (r *Repository) GetByID(ctx context.Context, id string) (accounts.Account, error) {
-	const op = `Repository.Accounts.GetAccountByCPF`
+	const operation = `Repository.Accounts.GetAccountByCPF`
 
 	acc, err := r.getAccount(ctx, id, queryByID)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, "on query by id", err)
+		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", operation, "on query by id", err)
 	}
 
 	return acc, nil
 }
 
 func (r *Repository) getAccount(ctx context.Context, param, query string) (accounts.Account, error) {
-	const op = `Repository.Accounts.getAccount`
+	const operation = `Repository.Accounts.getAccount`
 
 	row := r.db.QueryRow(
 		ctx,
@@ -84,10 +84,10 @@ func (r *Repository) getAccount(ctx context.Context, param, query string) (accou
 		const action = "on get account by cpf"
 
 		if errors.Is(err, pgx.ErrNoRows) {
-			return accounts.Account{}, fmt.Errorf("%s -> %s: %w", op, action, accounts.ErrAccountNotFound)
+			return accounts.Account{}, fmt.Errorf("%s -> %s: %w", operation, action, accounts.ErrAccountNotFound)
 		}
 
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, action, err)
+		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", operation, action, err)
 	}
 
 	return acc, nil

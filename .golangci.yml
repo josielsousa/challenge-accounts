@@ -49,6 +49,8 @@ linters-settings:
       - wg
       - to
       - v1
+      - tx
+      - db
     ignore-type-assert-ok: true
   wrapcheck:
     ignorePackageGlobs:

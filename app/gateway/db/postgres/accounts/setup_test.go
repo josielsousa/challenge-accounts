@@ -2,7 +2,6 @@ package accounts
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
@@ -13,7 +12,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(fmt.Errorf("on startup pgtest container: %w", err))
 	}
+
 	defer teardown()
 
-	os.Exit(m.Run())
+	m.Run()
 }

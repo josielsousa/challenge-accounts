@@ -18,16 +18,16 @@ import (
 )
 
 var (
-	instances       int64
-	concurrent_conn *pgxpool.Pool
+	instances      int64
+	concurrentConn *pgxpool.Pool
 )
 
 const (
-	defaultDbName        = "pg-test-db-name"
+	defaultDBName        = "pg-test-db-name"
 	defaultContainerName = "pg-test-challenge-accounts"
 )
 
-func StartupNewPool() (teardownFn func(), err error) {
+func StartupNewPool() (func(), error) {
 	logger := logrus.New()
 	logger.SetLevel(postgres.LogLevelWarn)
 
@@ -46,38 +46,43 @@ func StartupNewPool() (teardownFn func(), err error) {
 	ttName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt64(&instances), time.Now().UnixNano())
 	dbName := strings.ToLower(ttName)
 
-	resource, err := getDockerResource(pool, dbName)
+	resource, err := getDockerResource(pool)
 	if err != nil {
 		return nil, fmt.Errorf("on docker resource: %w", err)
 	}
 
 	port := resource.GetPort("5432/tcp")
-	if err = pool.Retry(retryDbHelper(port, defaultDbName, log)); err != nil {
+	if err = pool.Retry(retryDBHelper(port, defaultDBName, log)); err != nil {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
 
-	dbDefaultURL := getPgConnURL(port, defaultDbName)
+	dbDefaultURL := getPgConnURL(port, defaultDBName)
+
 	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(dbDefaultURL, log, postgres.LogLevelWarn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("on connect pool: %w", err)
 	}
 
 	// create default database to unit test
-	_, err = dbDefaultPool.Exec(context.Background(), fmt.Sprintf("create database %s", dbName))
+	_, err = dbDefaultPool.Exec(context.Background(), "create database "+dbName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("on create database %s: %w", dbName, err)
 	}
 
 	dbURL := getPgConnURL(port, dbName)
+
 	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL, log, postgres.LogLevelWarn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("on connect pool with migrations: %w", err)
 	}
 
-	concurrent_conn = dbPool
+	concurrentConn = dbPool
 
-	teardownFn = func() {
-		pool.RemoveContainerByName(defaultContainerName)
+	teardownFn := func() {
+		if err := pool.RemoveContainerByName(defaultContainerName); err != nil {
+			panic(fmt.Errorf("could not remove container: %w", err))
+		}
+
 		dropDB(dbName, dbPool)
 		dbPool.Close()
 		resource.Close()
@@ -86,25 +91,29 @@ func StartupNewPool() (teardownFn func(), err error) {
 	return teardownFn, nil
 }
 
-func getDockerResource(pool *dockertest.Pool, dbName string) (*dockertest.Resource, error) {
+func getDockerResource(pool *dockertest.Pool) (*dockertest.Resource, error) {
 	container, _ := pool.Client.InspectContainer(defaultContainerName)
 
 	if container != nil {
 		if container.State.Running {
 			resource := &dockertest.Resource{Container: container}
+
 			return resource, nil
 		}
 
 		if !container.State.Running {
-			pool.RemoveContainerByName(defaultContainerName)
+			if err := pool.RemoveContainerByName(defaultContainerName); err != nil {
+				return nil, fmt.Errorf("could not remove container: %w", err)
+			}
 		}
 	}
 
+	//nolint:exhaustruct
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Name:       defaultContainerName,
 		Repository: "postgres",
 		Tag:        "14-alpine",
-		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + defaultDbName},
+		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + defaultDBName},
 	}, func(c *docker.HostConfig) {
 		c.AutoRemove = true
 		c.RestartPolicy = docker.RestartPolicy{Name: "no"}
@@ -125,11 +134,11 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 
 	atomic.AddInt64(&instances, 1)
 	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt64(&instances), time.Now().UnixNano())
-	cconn := concurrent_conn
+	cconn := concurrentConn
 
-	_, err := concurrent_conn.Exec(
+	_, err := concurrentConn.Exec(
 		context.Background(),
-		fmt.Sprintf("create database %s", dbName),
+		"create database "+dbName,
 	)
 	require.NoError(t, err)
 
@@ -142,19 +151,23 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 
 	t.Cleanup(func() {
 		newPool.Close()
-		concurrent_conn.Exec(context.Background(), fmt.Sprintf("drop database %s", dbName))
+
+		_, err := concurrentConn.Exec(context.Background(), "drop database "+dbName)
+		require.NoError(t, err)
 	})
 
 	return newPool
 }
 
-func retryDbHelper(port, dbName string, log *logrus.Entry) func() error {
+func retryDBHelper(port, dbName string, log *logrus.Entry) func() error {
 	return func() error {
 		dbURL := getPgConnURL(port, dbName)
+
 		connPool, err := postgres.ConnectPoolWithoutMigrations(dbURL, log, postgres.LogLevelWarn)
 		if err != nil {
-			return err
+			return fmt.Errorf("on connect pool: %w", err)
 		}
+
 		defer connPool.Close()
 
 		return connPool.Ping(context.Background())
@@ -165,13 +178,10 @@ func getPgConnURL(port, dbName string) string {
 	return fmt.Sprintf("postgres://postgres:postgres@localhost:%s/%s?sslmode=disable", port, dbName)
 }
 
-func dropDB(dbName string, pool *pgxpool.Pool) error {
+func dropDB(dbName string, pool *pgxpool.Pool) {
 	query := fmt.Sprintf(`DROP DATABASE IF EXISTS %s;`, dbName)
 
-	_, err := pool.Exec(context.Background(), query)
-	if err != nil {
-		return fmt.Errorf("on drop database %s: %w", dbName, err)
+	if _, err := pool.Exec(context.Background(), query); err != nil {
+		panic(fmt.Errorf("on drop database %s: %w", dbName, err))
 	}
-
-	return nil
 }

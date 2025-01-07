@@ -21,18 +21,20 @@ func (r *Repository) Insert(ctx context.Context, trf transfers.TransferData) err
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on open transaction", err)
 	}
+
+	//nolint:errcheck
 	defer tx.Rollback(ctx)
 
-	if len(trf.ID) <= 0 {
+	if len(trf.ID) == 0 {
 		trf.ID = uuid.NewString()
 	}
 
 	if trf.CreatedAt.IsZero() {
-		trf.CreatedAt = time.Now().In(time.Local)
+		trf.CreatedAt = time.Now().In(time.UTC)
 	}
 
 	if trf.UpdatedAt.IsZero() {
-		trf.UpdatedAt = time.Now().In(time.Local)
+		trf.UpdatedAt = time.Now().In(time.UTC)
 	}
 
 	query := `

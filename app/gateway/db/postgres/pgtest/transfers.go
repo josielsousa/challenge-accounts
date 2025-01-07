@@ -16,16 +16,17 @@ func TransfersInsert(t *testing.T, db *pgxpool.Pool, trf transfers.Transfer) err
 	t.Helper()
 
 	const op = `PgTest.TransfersInsert`
-	if len(trf.ID) <= 0 {
+
+	if len(trf.ID) == 0 {
 		trf.ID = uuid.NewString()
 	}
 
 	if trf.CreatedAt.IsZero() {
-		trf.CreatedAt = time.Now().In(time.Local)
+		trf.CreatedAt = time.Now().In(time.UTC)
 	}
 
 	if trf.UpdatedAt.IsZero() {
-		trf.UpdatedAt = time.Now().In(time.Local)
+		trf.UpdatedAt = time.Now().In(time.UTC)
 	}
 
 	query := `
@@ -69,15 +70,15 @@ func GetTransfer(t *testing.T, db *pgxpool.Pool, id string) (transfers.Transfer,
 	const op = `PgTest.GetTransfer`
 
 	query := `
-        SELECT 
+        SELECT
             id,
 			amount,
 			account_origin_id,
 			account_destination_id,
 			created_at,
 			updated_at
-		FROM transfers 
-		WHERE id = $1 
+		FROM transfers
+		WHERE id = $1
     `
 
 	var trf transfers.Transfer

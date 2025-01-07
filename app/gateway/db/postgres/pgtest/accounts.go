@@ -16,16 +16,17 @@ func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error 
 	t.Helper()
 
 	const op = `Pgtest.AccountsInsert`
-	if len(acc.ID) <= 0 {
+
+	if len(acc.ID) == 0 {
 		acc.ID = uuid.NewString()
 	}
 
 	if acc.CreatedAt.IsZero() {
-		acc.CreatedAt = time.Now().In(time.Local)
+		acc.CreatedAt = time.Now().In(time.UTC)
 	}
 
 	if acc.UpdatedAt.IsZero() {
-		acc.UpdatedAt = time.Now().In(time.Local)
+		acc.UpdatedAt = time.Now().In(time.UTC)
 	}
 
 	query := `
@@ -71,7 +72,7 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, er
 	const op = `Pgtest.GetAccount`
 
 	query := `
-        SELECT 
+        SELECT
             id,
             name,
             cpf,
@@ -79,8 +80,8 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, er
             balance,
             created_at,
 			updated_at
-		FROM  accounts 
-		WHERE id = $1 
+		FROM  accounts
+		WHERE id = $1
     `
 
 	var acc accounts.Account

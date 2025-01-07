@@ -51,6 +51,7 @@ linters-settings:
       - v1
       - tx
       - db
+      - op
     ignore-type-assert-ok: true
   wrapcheck:
     ignorePackageGlobs:

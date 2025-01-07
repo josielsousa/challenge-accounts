@@ -3,8 +3,9 @@ package hash
 import (
 	"errors"
 
-	"github.com/josielsousa/challenge-accounts/app/common"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/josielsousa/challenge-accounts/app/common"
 )
 
 var (
@@ -42,7 +43,7 @@ func (h Hash) Value() string {
 	return h.hashedValue
 }
 
-// Scan implements the database/sql/driver Scanner interface
+// Scan implements the database/sql/driver Scanner interface.
 func (h *Hash) Scan(value interface{}) error {
 	if value == nil {
 		*h = Hash{}

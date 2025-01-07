@@ -111,7 +111,7 @@ func TestAuthServiceLogin(t *testing.T) {
 	})
 }
 
-// Gera um novo token
+// Gera um novo token.
 func generateToken(duration time.Duration, t *testing.T) *types.Auth {
 	// Tempo de expiração do token
 	jwtKey := []byte("api-challenge-accounts")

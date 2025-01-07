@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 

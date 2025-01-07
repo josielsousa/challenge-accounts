@@ -167,7 +167,7 @@ func (h *Helper) removeSpecialChars(value *string) string {
 	return normalized
 }
 
-// allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11
+// allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11.
 func (h *Helper) allEquals(value string) bool {
 	base := value[0]
 	for i := 1; i < len(value); i++ {
@@ -180,8 +180,10 @@ func (h *Helper) allEquals(value string) bool {
 }
 
 // calculateDigit - Calcula o digito verificador do documento informado conforme seu tipo.
+//
 //	position - representa o peso para a regra de cálculo do digito verificador.
-// CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2
+//
+// CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2.
 func calculateDigit(value string, position int) string {
 	var sum int
 	for _, r := range value {

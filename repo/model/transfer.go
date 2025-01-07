@@ -7,7 +7,7 @@ const (
 	TransferTablename = "transfers"
 )
 
-// Transfer - Estrutura da entidade `transfer`
+// Transfer - Estrutura da entidade `transfer`.
 type Transfer struct {
 	ID                   string     `json:"id,omitempty"`
 	AccountOriginID      string     `json:"account_origin_id"`

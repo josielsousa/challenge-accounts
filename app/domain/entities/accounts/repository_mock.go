@@ -14,31 +14,31 @@ var _ Repository = &RepositoryMock{}
 
 // RepositoryMock is a mock implementation of Repository.
 //
-// 	func TestSomethingThatUsesRepository(t *testing.T) {
+//	func TestSomethingThatUsesRepository(t *testing.T) {
 //
-// 		// make and configure a mocked Repository
-// 		mockedRepository := &RepositoryMock{
-// 			GetAllFunc: func(ctx context.Context) ([]Account, error) {
-// 				panic("mock out the GetAll method")
-// 			},
-// 			GetByCPFFunc: func(ctx context.Context, cpf string) (Account, error) {
-// 				panic("mock out the GetByCPF method")
-// 			},
-// 			GetByIDFunc: func(ctx context.Context, id string) (Account, error) {
-// 				panic("mock out the GetByID method")
-// 			},
-// 			InsertFunc: func(ctx context.Context, account Account) error {
-// 				panic("mock out the Insert method")
-// 			},
-// 			UpdateBalanceFunc: func(ctx context.Context, accountID string, balance int) error {
-// 				panic("mock out the UpdateBalance method")
-// 			},
-// 		}
+//		// make and configure a mocked Repository
+//		mockedRepository := &RepositoryMock{
+//			GetAllFunc: func(ctx context.Context) ([]Account, error) {
+//				panic("mock out the GetAll method")
+//			},
+//			GetByCPFFunc: func(ctx context.Context, cpf string) (Account, error) {
+//				panic("mock out the GetByCPF method")
+//			},
+//			GetByIDFunc: func(ctx context.Context, id string) (Account, error) {
+//				panic("mock out the GetByID method")
+//			},
+//			InsertFunc: func(ctx context.Context, account Account) error {
+//				panic("mock out the Insert method")
+//			},
+//			UpdateBalanceFunc: func(ctx context.Context, accountID string, balance int) error {
+//				panic("mock out the UpdateBalance method")
+//			},
+//		}
 //
-// 		// use mockedRepository in code that requires Repository
-// 		// and then make assertions.
+//		// use mockedRepository in code that requires Repository
+//		// and then make assertions.
 //
-// 	}
+//	}
 type RepositoryMock struct {
 	// GetAllFunc mocks the GetAll method.
 	GetAllFunc func(ctx context.Context) ([]Account, error)
@@ -118,7 +118,8 @@ func (mock *RepositoryMock) GetAll(ctx context.Context) ([]Account, error) {
 
 // GetAllCalls gets all the calls that were made to GetAll.
 // Check the length with:
-//     len(mockedRepository.GetAllCalls())
+//
+//	len(mockedRepository.GetAllCalls())
 func (mock *RepositoryMock) GetAllCalls() []struct {
 	Ctx context.Context
 } {
@@ -151,7 +152,8 @@ func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (Account, 
 
 // GetByCPFCalls gets all the calls that were made to GetByCPF.
 // Check the length with:
-//     len(mockedRepository.GetByCPFCalls())
+//
+//	len(mockedRepository.GetByCPFCalls())
 func (mock *RepositoryMock) GetByCPFCalls() []struct {
 	Ctx context.Context
 	Cpf string
@@ -186,7 +188,8 @@ func (mock *RepositoryMock) GetByID(ctx context.Context, id string) (Account, er
 
 // GetByIDCalls gets all the calls that were made to GetByID.
 // Check the length with:
-//     len(mockedRepository.GetByIDCalls())
+//
+//	len(mockedRepository.GetByIDCalls())
 func (mock *RepositoryMock) GetByIDCalls() []struct {
 	Ctx context.Context
 	ID  string
@@ -221,7 +224,8 @@ func (mock *RepositoryMock) Insert(ctx context.Context, account Account) error {
 
 // InsertCalls gets all the calls that were made to Insert.
 // Check the length with:
-//     len(mockedRepository.InsertCalls())
+//
+//	len(mockedRepository.InsertCalls())
 func (mock *RepositoryMock) InsertCalls() []struct {
 	Ctx     context.Context
 	Account Account
@@ -258,7 +262,8 @@ func (mock *RepositoryMock) UpdateBalance(ctx context.Context, accountID string,
 
 // UpdateBalanceCalls gets all the calls that were made to UpdateBalance.
 // Check the length with:
-//     len(mockedRepository.UpdateBalanceCalls())
+//
+//	len(mockedRepository.UpdateBalanceCalls())
 func (mock *RepositoryMock) UpdateBalanceCalls() []struct {
 	Ctx       context.Context
 	AccountID string

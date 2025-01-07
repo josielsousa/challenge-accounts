@@ -7,10 +7,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
-	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
 func TestRepository_ListTransfers(t *testing.T) {

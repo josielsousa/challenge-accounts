@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Transfer - Estrutura da entidade `transfer`
+// Transfer - Estrutura da entidade `transfer`.
 type Transfer struct {
 	ID                   string
 	AccountOriginID      string

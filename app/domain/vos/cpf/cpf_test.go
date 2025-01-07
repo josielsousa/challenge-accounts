@@ -3,9 +3,10 @@ package cpf
 import (
 	"testing"
 
-	"github.com/josielsousa/challenge-accounts/app/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/josielsousa/challenge-accounts/app/common"
 )
 
 func TestCPF_NewCPF(t *testing.T) {

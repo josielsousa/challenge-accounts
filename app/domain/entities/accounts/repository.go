@@ -3,6 +3,7 @@ package accounts
 import "context"
 
 // Repository - Interface que define as assinaturas para o repository de accounts.
+//
 //go:generate moq -fmt goimports -out repository_mock.go . Repository
 type Repository interface {
 	GetAll(ctx context.Context) ([]Account, error)

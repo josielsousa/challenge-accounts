@@ -44,6 +44,7 @@ func NewAccountService(stgAccount model.AccountStorage, log types.APILogProvider
 }
 
 // InsertAccount - Realiza a inserção de uma account conforme os dados do `body` da requisição
+//
 //	200: Sucesso na inserção
 //	422: Erro - Os dados de entrada são válidos porém existe uma `account` para o CPF informado.
 //	500: Erro inesperado durante o processamento da requisição
@@ -90,6 +91,7 @@ func (s *AccountService) InsertAccount(w http.ResponseWriter, req *http.Request)
 }
 
 // GetAllAccounts - Retorna as informações de todas as contas se não existir retorna []
+//
 //	200: Quando existir accounts para serem retornadas
 //	204: Quando não encontrar accounts.
 //	500: Erro inesperado durante o processamento da requisição
@@ -110,6 +112,7 @@ func (s *AccountService) GetAllAccounts(w http.ResponseWriter, req *http.Request
 }
 
 // GetAccountBalance - Retorna as informações da account, conforme o id informado.
+//
 //	200: Quando existir account para ser retornada
 //	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição

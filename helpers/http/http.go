@@ -17,7 +17,7 @@ func NewHelper() *Helper {
 	return &Helper{}
 }
 
-// GetParams - Encapsula a recuperação de paramêtros
+// GetParams - Encapsula a recuperação de paramêtros.
 func (h *Helper) GetParams(req *http.Request) map[string]string {
 	return mux.Vars(req)
 }

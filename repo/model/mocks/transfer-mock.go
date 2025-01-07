@@ -2,7 +2,7 @@ package mocks
 
 import "github.com/josielsousa/challenge-accounts/repo/model"
 
-// MockTransferStorage - Mock transfer storage
+// MockTransferStorage - Mock transfer storage.
 type MockTransferStorage struct {
 	OnGetAllTransfers func(accountID string) ([]model.Transfer, error)
 	OnInsert          func(transfer model.Transfer) (*model.Transfer, error)

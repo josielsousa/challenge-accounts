@@ -50,6 +50,7 @@ func NewAuthService(stgAccount model.AccountStorage, log types.APILogProvider) *
 }
 
 // Login - Realiza a autenticação do usuário na API.
+//
 //	200: Quando a autenticação for bem sucedida.
 //	401: Quando o `secret` fornecido for diferente do secret armazenado.
 //	404: Quando não encontrar a account.
@@ -113,6 +114,7 @@ func (s *AuthService) GetToken(acc *model.Account, jwtKey []byte, expirationTime
 }
 
 // ValidateToken - Realiza a validação do token enviado.
+//
 //	Quando a validação for bem sucedida, executa a próxima rota informada.
 //	401: Quando o `token` fornecido for inválido.
 //	400: Quando o token estiver vazio / nulo

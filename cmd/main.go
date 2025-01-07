@@ -7,7 +7,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
 )
 
-//import (
+// import (
 // "github.com/josielsousa/challenge-accounts/providers/http"
 // "github.com/josielsousa/challenge-accounts/providers/log"
 // "github.com/josielsousa/challenge-accounts/repo/db"
@@ -54,5 +54,5 @@ func main() {
 	}
 
 	defer dbPool.Close()
-	logger.Info("api avaiable...")
+	logger.Info("api available...")
 }

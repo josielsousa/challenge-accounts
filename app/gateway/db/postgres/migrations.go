@@ -5,8 +5,9 @@ import (
 	"net/http"
 
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/httpfs"
+
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 )
 
 //go:embed migrations

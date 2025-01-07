@@ -43,7 +43,7 @@ func removeSpecialChars(value string) string {
 	return exp.ReplaceAllString(value, "")
 }
 
-// allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11
+// allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11.
 func (c CPF) allEquals() bool {
 	base := c.value[0]
 	for i := 1; i < len(c.value); i++ {
@@ -56,8 +56,10 @@ func (c CPF) allEquals() bool {
 }
 
 // calculateDigit - Calcula o digito verificador do documento informado conforme seu tipo.
+//
 //	position - representa o peso para a regra de cálculo do digito verificador.
-// CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2
+//
+// CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2.
 func (c CPF) calculateDigit(position int) string {
 	var sum int
 	data := c.value[:position-1]
@@ -103,7 +105,7 @@ func (c CPF) Mask() string {
 	return exp.ReplaceAllString(c.value, "$1.$2.$3-$4")
 }
 
-// Scan implements database/sql/driver Scanner interface
+// Scan implements database/sql/driver Scanner interface.
 func (c *CPF) Scan(value interface{}) error {
 	if value == nil {
 		*c = CPF{}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 
@@ -59,7 +60,7 @@ func (r *Repository) GetByID(ctx context.Context, id string) (accounts.Account, 
 	return acc, nil
 }
 
-func (r *Repository) getAccount(ctx context.Context, param string, query string) (accounts.Account, error) {
+func (r *Repository) getAccount(ctx context.Context, param, query string) (accounts.Account, error) {
 	const op = `Repository.Accounts.getAccount`
 
 	row := r.db.QueryRow(

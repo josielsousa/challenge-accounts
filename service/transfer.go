@@ -39,6 +39,7 @@ func NewTransferService(stg *db.Service, log types.APILogProvider) *TransferServ
 }
 
 // DoTransfer - Realiza a transferência entre as `accounts` conforme os dados enviados na requisição.
+//
 //	200: Sucesso na inserção
 //	400: Quando o `token` estiver vazio / nulo
 //	401: Quando o `token` fornecido for inválido.
@@ -123,6 +124,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 }
 
 // GetAllTransfers - Retorna as informações de todas as contas se não existir retorna []
+//
 //	200: Quando existir transfers para serem retornadas
 //	204: Quando não encontrar transfers.
 //	400: Quando o token estiver vazio / nulo

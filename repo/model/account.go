@@ -7,7 +7,7 @@ const (
 	AccountsTablename = "accounts"
 )
 
-// Account - Estrutura da entidade `account`
+// Account - Estrutura da entidade `account`.
 type Account struct {
 	ID        string     `json:"id"`
 	Cpf       string     `json:"cpf"`
@@ -19,7 +19,7 @@ type Account struct {
 	DeletedAt *time.Time `json:"-"`
 }
 
-// AccountBalance - Estrutura utilizada para serializar o balance da entidade `account`
+// AccountBalance - Estrutura utilizada para serializar o balance da entidade `account`.
 type AccountBalance struct {
 	Balance float64 `json:"balance"`
 }

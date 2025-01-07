@@ -3,12 +3,12 @@ package db_test
 import (
 	"testing"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-
 	"github.com/josielsousa/challenge-accounts/repo/db"
+
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-// Constante de mensagens
+// Constante de mensagens.
 const (
 	DatabaseType                             = "nope"
 	ErrorOpenTransaction                     = "Error on open transaction"

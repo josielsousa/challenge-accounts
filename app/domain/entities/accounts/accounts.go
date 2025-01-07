@@ -18,7 +18,7 @@ var (
 	ErrInsufficientFunds          = errors.New("insufficient amount")
 )
 
-// Account - Estrutura da entidade `account`
+// Account - Estrutura da entidade `account`.
 type Account struct {
 	ID        string
 	Name      string

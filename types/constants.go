@@ -1,6 +1,6 @@
 package types
 
-// Constantes de mensagens
+// Constantes de mensagens.
 const (
 	ErrorUnexpected     = "Erro Inesperado"
 	ErrorUnauthorized   = "Não autenticado"

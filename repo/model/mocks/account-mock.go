@@ -2,7 +2,7 @@ package mocks
 
 import "github.com/josielsousa/challenge-accounts/repo/model"
 
-// MockAccountStorage - Mock account storage
+// MockAccountStorage - Mock account storage.
 type MockAccountStorage struct {
 	OnGetAllAccounts  func() ([]model.Account, error)
 	OnGetAccount      func(id string) (*model.Account, error)

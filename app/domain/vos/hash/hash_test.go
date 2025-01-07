@@ -3,10 +3,11 @@ package hash
 import (
 	"testing"
 
-	"github.com/josielsousa/challenge-accounts/app/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/josielsousa/challenge-accounts/app/common"
 )
 
 func TestNewHash(t *testing.T) {
@@ -21,14 +22,14 @@ func TestNewHash(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "sucess create a new hash",
+			name: "success create a new hash",
 			args: args{
 				secret: "teste",
 			},
 			wantErr: nil,
 		},
 		{
-			name: "sucess create a new hash with special chars",
+			name: "success create a new hash with special chars",
 			args: args{
 				secret: "the#$%PassWoRdok",
 			},

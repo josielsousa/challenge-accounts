@@ -9,13 +9,14 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/josielsousa/challenge-accounts/repo/db"
 	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/repo/model/mocks"
 	srv "github.com/josielsousa/challenge-accounts/service"
 	"github.com/josielsousa/challenge-accounts/types"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (

@@ -23,5 +23,5 @@ func LoadConfig() (*Config, error) {
 type APIConfig struct {
 	Port    string `envconfig:"API_PORT" default:"3000"`
 	Host    string `envconfig:"API_HOST" default:"0.0.0.0"`
-	AppName string `envconfig:"APP_NAME" default:"challange_accounts"`
+	AppName string `envconfig:"APP_NAME" default:"challenge_accounts"`
 }

@@ -5,8 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 
 func TestAccount_GetAccountBalance(t *testing.T) {

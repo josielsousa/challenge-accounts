@@ -1,150 +1,72 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 5m
+  tests: true
+
+output:
+  sort-results: true
+  sort-order:
+    - linter
+    - file
 
 linters-settings:
-  dupl:
-    threshold: 200
+  exhaustive:
+    default-signifies-exhaustive: true
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/josielsousa)
+      - prefix(github.com/josielsousa/challange-accounts)
+      - blank
+      - dot
   goimports:
-    local-prefixes: github.com/josielsousa/challenge-accounts
-  gofumpt:
-    lang-version: "1.17"
-    extra-rules: true
-  gosimple:
-    go: "1.17"
-  govet:
-    check-shadowing: true
-    enable-all: true
-  lll:
-    line-length: 120
-  staticcheck:
-    go: "1.17"
-  stylecheck:
-    go: "1.17"
-  tagliatelle:
-    case:
-      rules:
-        json: snake
-  unparam:
-    check-exported: true
-  unused:
-    go: "1.17"
-  revive:
-    ignore-generated-header: true
-    rules:
-      - name: atomic
-      - name: blank-imports
-      - name: bool-literal-in-expr
-      - name: constant-logical-expr
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: defer
-      - name: dot-imports
-      - name: early-return
-      - name: empty-block
-      - name: error-naming
-      - name: error-return
-      - name: error-strings
-      - name: errorf
-      - name: exported
-      - name: if-return
-      - name: import-shadowing
-      - name: increment-decrement
-      - name: indent-error-flow
-      - name: flag-parameter
-      - name: modifies-parameter
-      - name: package-comments
-      - name: range
-      - name: range-val-address
-      - name: range-val-in-closure
-      - name: receiver-naming
-      - name: redefines-builtin-id
-      - name: struct-tag
-      - name: superfluous-else
-      - name: time-naming
-      - name: unexported-return
-      - name: unnecessary-stmt
-      - name: unreachable-code
-      - name: unused-parameter
-      - name: unused-receiver
-      - name: useless-break
-      - name: var-declaration
-      - name: var-naming
-      - name: waitgroup-by-value
-
-issues:
-  exclude-rules:
-    # Exclude some linters from running on tests files.
-    - path: _test\.go
-      linters:
-        - dogsled
-        - dupl
-        - errcheck
-        - gocognit
-        - goconst
-        - gocyclo
-        - gosec
+    local-prefixes: github.com/josielsousa/challange-accounts
+  gomoddirectives:
+    replace-allow-list:
+      - github.com/imdario/mergo
+  misspell:
+    ignore-words:
+      - essencial
+  tagalign:
+    order:
+      - required
+      - envconfig
+      - json
+      - extensions
+      - validate
+      - example
+    sort: true
+  varnamelen:
+    ignore-decls:
+      - i int
+      - rw http.ResponseWriter
+    ignore-names:
+      - id
+      - ok
+      - tc
+      - tt
+      - wg
+      - to
+      - v1
+    ignore-type-assert-ok: true
+  wrapcheck:
+    ignorePackageGlobs:
+      - "github.com/go-ozzo/ozzo-validation/*"
 
 linters:
-  enable:
-    - asciicheck
-    - bodyclose
-    - deadcode
+  enable-all: true
+  disable:
+    - cyclop
     - depguard
-    - dogsled
     - dupl
-    - durationcheck
-    - errcheck
-    - errname
-    - errorlint
-    - exhaustive
-    - exportloopref
-    - forcetypeassert
-    - gci
-    - gochecknoinits
+    - err113
+    - funlen
     - gochecknoglobals
-    - gocognit
-    - goconst
-    - gocritic
-    - gocyclo
-    - goerr113
-    - gofmt
-    - gofumpt
-    - goimports
-    - gomnd
-    - gomoddirectives
-    - gomodguard
-    - goprintffuncname
-    - gosec
-    - gosimple
-    - govet
-    - ifshort
-    - importas
-    - ineffassign
+    - godox
+    - ireturn
     - lll
-    - makezero
-    - misspell
-    - nakedret
-    - nestif
-    - nilerr
-    - nlreturn
-    - noctx
-    - nolintlint
-    - paralleltest
-    - prealloc
-    - predeclared
-    - revive
-    - rowserrcheck
-    - sqlclosecheck
-    - staticcheck
-    - structcheck
-    - stylecheck
+    - maintidx
     - tagliatelle
-    - tparallel
-    - typecheck
-    - unconvert
-    - unused
-    - varcheck
-    - wastedassign
-    - whitespace
-    - wrapcheck
+    - testpackage
+    - exportloopref

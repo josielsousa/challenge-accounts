@@ -13,6 +13,11 @@ GIT_COMMIT=$(shell git rev-parse HEAD)
 GIT_BUILD_TIME=$(shell date '+%Y-%m-%d__%I:%M:%S%p')
 VCS_REF = $(if $(GITHUB_SHA),$(GITHUB_SHA),$(shell git rev-parse HEAD))
 
+GOLANGCI_LINT_PATH=$$(go env GOPATH)/bin/golangci-lint
+GOLANGCI_LINT_VERSION=1.62.2
+
+SWAG_CMD_VERSION=$(shell grep "github.com/swaggo/swag" go.mod | awk -F' v' '{print $$NF}')
+
 define goBuild
 	@echo "==> Go Building $2"
 	@env GOOS=${OS} GOARCH=amd64 go build -v -o  build/$1 \
@@ -66,21 +71,43 @@ docker-build: compile
 	@echo "==> Compiling docker images"
 	docker image build --label "challange.accounts.vcs-ref=$(VCS_REF)" -t josielsousa/${APP_NAME}:${ENVIRONMENT_STAGE} build -f api.dockerfile
 
-.PHONY: metalint
-metalint:
-ifeq (, $(shell which $$(go env GOPATH)/bin/golangci-lint))
-	@echo "==> installing golangci-lint"
-	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin
-	go install ./...
-endif
-	$$(go env GOPATH)/bin/golangci-lint run --fix --allow-parallel-runners -c ./.golangci.yml ./...
+## Execute 'codelint'
+lint: codelint
 
-.PHONY: gofmt
+## Lint code using golangci-lint
+codelint:
+	@echo "==> Installing golangci-lint"
+ifeq (,$(findstring $(GOLANGCI_LINT_VERSION),$(shell which $(GOLANGCI_LINT_PATH) && eval $(GOLANGCI_LINT_PATH) version)))
+	@echo "installing golangci-lint v$(GOLANGCI_LINT_VERSION)"
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v$(GOLANGCI_LINT_VERSION)
+else
+	@echo "already installed: $(shell eval $(GOLANGCI_LINT_PATH) version)"
+endif
+	@echo "==> Running golangci-lint"
+	@$(GOLANGCI_LINT_PATH) run -c ./.golangci.yml --fix
+
+
+## Execute 'mocks' + 'docs' + 'lint'
+format: mocks gofmt lint
+
 gofmt:
-	@echo "==> Formating code"
-	go mod tidy
-	go install github.com/daixiang0/gci@latest
-	gci -local ${PROJECT_PATH} -w .
-	go install mvdan.cc/gofumpt@latest
-	gofumpt -w -extra .
-	go fmt ./...
+	@echo "==> Tidy modules"
+	@go mod tidy
+	@echo "==> GCI ${PROJECT_PATH}"
+	@gci write --skip-generated -s standard -s default -s "prefix(github.com/dlpco)" -s "prefix(${PROJECT_PATH})" -s blank -s dot .
+	@echo "==> gofmt+"
+	@gofumpt -w -extra .
+	@go fmt ./...
+
+## Generate mocks files
+mocks:
+	@echo "==> Generating mocks files"
+	@git submodule update --init --remote
+	@go generate ./...
+
+## Check for vuln. using govulncheck
+vuln:
+	@echo "==> Installing go vuln check"
+	@go install golang.org/x/vuln/cmd/govulncheck@latest
+	@echo "==> Running go vuln check"
+	@govulncheck ./...

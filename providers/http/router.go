@@ -30,7 +30,7 @@ func NewRouter(srvAuth *service.AuthService, srvAccount *service.AccountService,
 	}
 }
 
-// Init - Inicializa as rotas da API
+// Init - Inicializa as rotas da API.
 func (rp *RouterProvider) ServeHTTP() {
 	rp.mux.HandleFunc("/", homeHandler).Methods("GET")
 
@@ -50,7 +50,7 @@ func (rp *RouterProvider) ServeHTTP() {
 	log.Fatal(http.ListenAndServe(":3000", rp.mux))
 }
 
-// homeHandler - Função utilizada para a rota principal da API `/`
+// homeHandler - Função utilizada para a rota principal da API `/`.
 func homeHandler(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte("Desafio técnico accounts."))
 }

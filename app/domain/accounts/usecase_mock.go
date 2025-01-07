@@ -14,25 +14,25 @@ var _ Usecase = &UsecaseMock{}
 
 // UsecaseMock is a mock implementation of Usecase.
 //
-// 	func TestSomethingThatUsesUsecase(t *testing.T) {
+//	func TestSomethingThatUsesUsecase(t *testing.T) {
 //
-// 		// make and configure a mocked Usecase
-// 		mockedUsecase := &UsecaseMock{
-// 			CreateFunc: func(ctx context.Context, acc AccountInput) error {
-// 				panic("mock out the Create method")
-// 			},
-// 			GetAccountBalanceFunc: func(ctx context.Context, accountID string) (int, error) {
-// 				panic("mock out the GetAccountBalance method")
-// 			},
-// 			GetAllAccountsFunc: func(ctx context.Context) ([]AccountOutput, error) {
-// 				panic("mock out the GetAllAccounts method")
-// 			},
-// 		}
+//		// make and configure a mocked Usecase
+//		mockedUsecase := &UsecaseMock{
+//			CreateFunc: func(ctx context.Context, acc AccountInput) error {
+//				panic("mock out the Create method")
+//			},
+//			GetAccountBalanceFunc: func(ctx context.Context, accountID string) (int, error) {
+//				panic("mock out the GetAccountBalance method")
+//			},
+//			GetAllAccountsFunc: func(ctx context.Context) ([]AccountOutput, error) {
+//				panic("mock out the GetAllAccounts method")
+//			},
+//		}
 //
-// 		// use mockedUsecase in code that requires Usecase
-// 		// and then make assertions.
+//		// use mockedUsecase in code that requires Usecase
+//		// and then make assertions.
 //
-// 	}
+//	}
 type UsecaseMock struct {
 	// CreateFunc mocks the Create method.
 	CreateFunc func(ctx context.Context, acc AccountInput) error
@@ -90,7 +90,8 @@ func (mock *UsecaseMock) Create(ctx context.Context, acc AccountInput) error {
 
 // CreateCalls gets all the calls that were made to Create.
 // Check the length with:
-//     len(mockedUsecase.CreateCalls())
+//
+//	len(mockedUsecase.CreateCalls())
 func (mock *UsecaseMock) CreateCalls() []struct {
 	Ctx context.Context
 	Acc AccountInput
@@ -125,7 +126,8 @@ func (mock *UsecaseMock) GetAccountBalance(ctx context.Context, accountID string
 
 // GetAccountBalanceCalls gets all the calls that were made to GetAccountBalance.
 // Check the length with:
-//     len(mockedUsecase.GetAccountBalanceCalls())
+//
+//	len(mockedUsecase.GetAccountBalanceCalls())
 func (mock *UsecaseMock) GetAccountBalanceCalls() []struct {
 	Ctx       context.Context
 	AccountID string
@@ -158,7 +160,8 @@ func (mock *UsecaseMock) GetAllAccounts(ctx context.Context) ([]AccountOutput, e
 
 // GetAllAccountsCalls gets all the calls that were made to GetAllAccounts.
 // Check the length with:
-//     len(mockedUsecase.GetAllAccountsCalls())
+//
+//	len(mockedUsecase.GetAllAccountsCalls())
 func (mock *UsecaseMock) GetAllAccountsCalls() []struct {
 	Ctx context.Context
 } {

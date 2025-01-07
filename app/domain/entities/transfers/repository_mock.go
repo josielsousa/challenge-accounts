@@ -14,22 +14,22 @@ var _ Repository = &RepositoryMock{}
 
 // RepositoryMock is a mock implementation of Repository.
 //
-// 	func TestSomethingThatUsesRepository(t *testing.T) {
+//	func TestSomethingThatUsesRepository(t *testing.T) {
 //
-// 		// make and configure a mocked Repository
-// 		mockedRepository := &RepositoryMock{
-// 			InsertFunc: func(ctx context.Context, transfer TransferData) error {
-// 				panic("mock out the Insert method")
-// 			},
-// 			ListTransfersFunc: func(ctx context.Context, accOriginID string) ([]Transfer, error) {
-// 				panic("mock out the ListTransfers method")
-// 			},
-// 		}
+//		// make and configure a mocked Repository
+//		mockedRepository := &RepositoryMock{
+//			InsertFunc: func(ctx context.Context, transfer TransferData) error {
+//				panic("mock out the Insert method")
+//			},
+//			ListTransfersFunc: func(ctx context.Context, accOriginID string) ([]Transfer, error) {
+//				panic("mock out the ListTransfers method")
+//			},
+//		}
 //
-// 		// use mockedRepository in code that requires Repository
-// 		// and then make assertions.
+//		// use mockedRepository in code that requires Repository
+//		// and then make assertions.
 //
-// 	}
+//	}
 type RepositoryMock struct {
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, transfer TransferData) error
@@ -78,7 +78,8 @@ func (mock *RepositoryMock) Insert(ctx context.Context, transfer TransferData) e
 
 // InsertCalls gets all the calls that were made to Insert.
 // Check the length with:
-//     len(mockedRepository.InsertCalls())
+//
+//	len(mockedRepository.InsertCalls())
 func (mock *RepositoryMock) InsertCalls() []struct {
 	Ctx      context.Context
 	Transfer TransferData
@@ -113,7 +114,8 @@ func (mock *RepositoryMock) ListTransfers(ctx context.Context, accOriginID strin
 
 // ListTransfersCalls gets all the calls that were made to ListTransfers.
 // Check the length with:
-//     len(mockedRepository.ListTransfersCalls())
+//
+//	len(mockedRepository.ListTransfersCalls())
 func (mock *RepositoryMock) ListTransfersCalls() []struct {
 	Ctx         context.Context
 	AccOriginID string

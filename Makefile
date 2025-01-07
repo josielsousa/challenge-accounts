@@ -22,11 +22,10 @@ endef
 
 default: test-coverage
 
-.PHONY: install-dependencies
-install-dependencies:
+.PHONY: tools
+tools:
 	@echo "Installing dependencies"
 	go mod tidy
-
 
 .PHONY: clean
 clean:
@@ -77,7 +76,7 @@ endif
 	$$(go env GOPATH)/bin/golangci-lint run --fix --allow-parallel-runners -c ./.golangci.yml ./...
 
 .PHONY: gofmt
-gofmt: 
+gofmt:
 	@echo "==> Formating code"
 	go mod tidy
 	go install github.com/daixiang0/gci@latest

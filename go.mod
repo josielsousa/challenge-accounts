@@ -1,6 +1,6 @@
 module github.com/josielsousa/challenge-accounts
 
-go 1.17
+go 1.23
 
 require (
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1

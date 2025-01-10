@@ -16,6 +16,7 @@ func TestNewHash(t *testing.T) {
 	type args struct {
 		secret string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -37,12 +38,11 @@ func TestNewHash(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt // capture range variable
-
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got, err := NewHash(tt.args.secret)
-			assert.ErrorIs(t, err, tt.wantErr)
+			require.ErrorIs(t, err, tt.wantErr)
 
 			err = bcrypt.CompareHashAndPassword([]byte(got.Value()), []byte(tt.args.secret))
 			require.NoError(t, err)
@@ -52,10 +52,12 @@ func TestNewHash(t *testing.T) {
 
 func TestHash_Compare(t *testing.T) {
 	t.Parallel()
+
 	type args struct {
 		secretToCompare string
 		valueToHash     string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -78,9 +80,8 @@ func TestHash_Compare(t *testing.T) {
 			wantErr: ErrInvalidSecret,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -106,6 +107,7 @@ func TestHash_Scan(t *testing.T) {
 	type args struct {
 		value interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -140,12 +142,14 @@ func TestHash_Scan(t *testing.T) {
 			wantErr: ErrScanInvalidSecret,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			h := &Hash{}
+
+			h := &Hash{
+				hashedValue: "",
+			}
 
 			err := h.Scan(tt.args.value)
 			assert.ErrorIs(t, err, tt.wantErr)

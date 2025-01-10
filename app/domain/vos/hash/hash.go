@@ -19,18 +19,22 @@ type Hash struct {
 }
 
 func NewHash(secret string) (Hash, error) {
-	h := Hash{}
+	hash := Hash{
+		hashedValue: "",
+	}
+
 	hs, err := bcrypt.GenerateFromPassword([]byte(secret), bcrypt.MinCost)
 	if err != nil {
 		return Hash{}, ErrGenerateHash
 	}
 
-	h.hashedValue = string(hs)
-	return h, nil
+	hash.hashedValue = string(hs)
+
+	return hash, nil
 }
 
 // Compare - verifica se a senha informada é a mesma salva na account.
-func (h Hash) Compare(secret string) error {
+func (h *Hash) Compare(secret string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(h.hashedValue), []byte(secret))
 	if err != nil {
 		return ErrInvalidSecret
@@ -39,14 +43,17 @@ func (h Hash) Compare(secret string) error {
 	return nil
 }
 
-func (h Hash) Value() string {
+func (h *Hash) Value() string {
 	return h.hashedValue
 }
 
 // Scan implements the database/sql/driver Scanner interface.
 func (h *Hash) Scan(value interface{}) error {
 	if value == nil {
-		*h = Hash{}
+		*h = Hash{
+			hashedValue: "",
+		}
+
 		return common.ErrScanValueNil
 	}
 
@@ -56,6 +63,7 @@ func (h *Hash) Scan(value interface{}) error {
 		}
 
 		*h = Hash{hashedValue: value}
+
 		return nil
 	}
 

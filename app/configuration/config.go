@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"fmt"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -11,12 +13,14 @@ type Config struct {
 
 func LoadConfig() (*Config, error) {
 	var config Config
+
 	noPrefix := ""
 
 	err := envconfig.Process(noPrefix, &config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("on loading config: %w", err)
 	}
+
 	return &config, nil
 }
 

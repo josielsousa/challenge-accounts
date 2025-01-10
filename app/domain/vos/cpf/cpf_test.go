@@ -15,6 +15,7 @@ func TestCPF_NewCPF(t *testing.T) {
 	type args struct {
 		value string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -78,8 +79,8 @@ func TestCPF_NewCPF(t *testing.T) {
 			wantErr: ErrInvalid,
 		},
 	}
+
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -96,6 +97,7 @@ func TestCPF_Mask(t *testing.T) {
 	type args struct {
 		value string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -109,8 +111,8 @@ func TestCPF_Mask(t *testing.T) {
 			want: "883.500.570-17",
 		},
 	}
+
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -129,6 +131,7 @@ func TestCPF_Scan(t *testing.T) {
 	type args struct {
 		valueToScan interface{}
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -168,16 +171,18 @@ func TestCPF_Scan(t *testing.T) {
 			wantErr: ErrInvalid,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			c := &CPF{}
 
-			err := c.Scan(tt.args.valueToScan)
-			assert.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, c.Value())
+			cpf := &CPF{
+				value: "",
+			}
+
+			err := cpf.Scan(tt.args.valueToScan)
+			require.ErrorIs(t, err, tt.wantErr)
+			require.Equal(t, tt.want, cpf.Value())
 		})
 	}
 }

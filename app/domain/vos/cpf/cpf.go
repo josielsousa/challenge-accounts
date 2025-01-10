@@ -10,43 +10,45 @@ import (
 )
 
 const (
-	firstOneDigitPosition   = 10
-	regexPatternOnlyNumbers = `[^0-9]+`
-	regexPatternCPFMasked   = `^(\d{3})(\d{3})(\d{3})(\d{2})$`
+	firstOneDigitPosition = 10
+	maxCPFLen             = 11
+
+	weigthPosition = 2
+	dividend       = 2
 )
 
-var ErrInvalid = errors.New("invalid cpf number")
+var (
+	ErrInvalid = errors.New("invalid cpf number")
+
+	regexPatternOnlyNumbers = regexp.MustCompile(`[^0-9]+`)
+	regexPatternCPFMasked   = regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})$`)
+)
 
 type CPF struct {
 	value string
 }
 
-func NewCPF(cpf string) (CPF, error) {
-	c := CPF{
-		value: removeSpecialChars(cpf),
+func NewCPF(numCPF string) (CPF, error) {
+	cpf := CPF{
+		value: removeSpecialChars(numCPF),
 	}
 
-	if ok := c.isValid(); !ok {
+	if ok := cpf.isValid(); !ok {
 		return CPF{}, ErrInvalid
 	}
 
-	return c, nil
+	return cpf, nil
 }
 
 // removeSpecialChars - Remove os caracteres não númericos.
 func removeSpecialChars(value string) string {
-	exp, err := regexp.Compile(regexPatternOnlyNumbers)
-	if err != nil {
-		return ""
-	}
-
-	return exp.ReplaceAllString(value, "")
+	return regexPatternOnlyNumbers.ReplaceAllString(value, "")
 }
 
 // allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11.
-func (c CPF) allEquals() bool {
+func (c *CPF) allEquals() bool {
 	base := c.value[0]
-	for i := 1; i < len(c.value); i++ {
+	for i := range len(c.value) {
 		if base != c.value[i] {
 			return false
 		}
@@ -60,30 +62,31 @@ func (c CPF) allEquals() bool {
 //	position - representa o peso para a regra de cálculo do digito verificador.
 //
 // CPF pesos: 10, 9, 8, 7, 6, 5, 4, 3, 2.
-func (c CPF) calculateDigit(position int) string {
+func (c *CPF) calculateDigit(position int) string {
 	var sum int
+
 	data := c.value[:position-1]
 
 	for _, digit := range data {
 		sum += int(digit-'0') * position
 		position--
 
-		if position < 2 {
+		if position < weigthPosition {
 			position = 9
 		}
 	}
 
-	sum %= 11
-	if sum < 2 {
+	sum %= maxCPFLen
+	if sum < dividend {
 		return "0"
 	}
 
-	return strconv.Itoa(11 - sum)
+	return strconv.Itoa(maxCPFLen - sum)
 }
 
 // IsValid - Verifica se o CPF informado é válido, calculando os dígitos verificadores.
-func (c CPF) isValid() bool {
-	if len(c.value) != 11 || c.allEquals() {
+func (c *CPF) isValid() bool {
+	if len(c.value) != maxCPFLen || c.allEquals() {
 		return false
 	}
 
@@ -92,23 +95,22 @@ func (c CPF) isValid() bool {
 	secondOne := c.calculateDigit(firstOneDigitPosition + 1)
 
 	doc = fmt.Sprintf("%s%s%s", doc, firstOne, secondOne)
+
 	return c.value == doc
 }
 
 // mask retorna o CPF informado no padrão (000.000.000-00).
-func (c CPF) Mask() string {
-	exp, err := regexp.Compile(regexPatternCPFMasked)
-	if err != nil {
-		return ""
-	}
-
-	return exp.ReplaceAllString(c.value, "$1.$2.$3-$4")
+func (c *CPF) Mask() string {
+	return regexPatternCPFMasked.ReplaceAllString(c.value, "$1.$2.$3-$4")
 }
 
 // Scan implements database/sql/driver Scanner interface.
 func (c *CPF) Scan(value interface{}) error {
 	if value == nil {
-		*c = CPF{}
+		*c = CPF{
+			value: "",
+		}
+
 		return common.ErrScanValueNil
 	}
 
@@ -119,12 +121,13 @@ func (c *CPF) Scan(value interface{}) error {
 		}
 
 		*c = cpf
+
 		return nil
 	}
 
 	return common.ErrScanValueIsNotString
 }
 
-func (c CPF) Value() string {
+func (c *CPF) Value() string {
 	return c.value
 }

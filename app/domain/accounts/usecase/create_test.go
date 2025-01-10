@@ -18,19 +18,18 @@ func TestAccount_Create(t *testing.T) {
 	errUnexpected := errors.New("unexpected error")
 
 	type args struct {
-		ctx   context.Context
 		input accUC.AccountInput
 	}
+
 	tests := []struct {
 		name    string
 		args    args
 		wantErr error
-		setupUC func(t *testing.T) *Account
+		setupUC func() *Account
 	}{
 		{
 			name: "should create a new account from values",
 			args: args{
-				ctx: context.Background(),
 				input: accUC.AccountInput{
 					Name:    "username test",
 					Balance: 50,
@@ -38,7 +37,9 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func(_ *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accounts.Account) error {
 						return nil
@@ -52,7 +53,6 @@ func TestAccount_Create(t *testing.T) {
 		{
 			name: "should return an error when create a new account, account already exists",
 			args: args{
-				ctx: context.Background(),
 				input: accUC.AccountInput{
 					Name:    "username test",
 					Balance: 0,
@@ -60,7 +60,9 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func(_ *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accounts.Account) error {
 						return accounts.ErrAccountAlreadyExists
@@ -74,7 +76,6 @@ func TestAccount_Create(t *testing.T) {
 		{
 			name: "should return an error when create a new account, invalid cpf number",
 			args: args{
-				ctx: context.Background(),
 				input: accUC.AccountInput{
 					Name:    "username test",
 					Balance: 0,
@@ -82,7 +83,9 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func(_ *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accounts.Account) error {
 						return accounts.ErrAccountAlreadyExists
@@ -96,7 +99,6 @@ func TestAccount_Create(t *testing.T) {
 		{
 			name: "should return an error when create a new account, unexpected error",
 			args: args{
-				ctx: context.Background(),
 				input: accUC.AccountInput{
 					Name:    "username test",
 					Balance: 0,
@@ -104,7 +106,9 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func(_ *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accounts.Account) error {
 						return errUnexpected
@@ -116,14 +120,14 @@ func TestAccount_Create(t *testing.T) {
 			wantErr: errUnexpected,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			a := tt.setupUC(t)
 
-			err := a.Create(tt.args.ctx, tt.args.input)
+			a := tt.setupUC()
+
+			err := a.Create(context.Background(), tt.args.input)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

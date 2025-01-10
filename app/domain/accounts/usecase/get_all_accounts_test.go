@@ -25,26 +25,21 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 
 	errUnexpected := errors.New("unexpected error")
 
-	type args struct {
-		ctx context.Context
-	}
 	tests := []struct {
 		name    string
-		args    args
 		want    []accUC.AccountOutput
 		wantErr error
-		setupUC func(t *testing.T) *Account
+		setupUC func() *Account
 	}{
 		{
-			name: "should return an empty list when db is empty",
-			args: args{
-				ctx: context.Background(),
-			},
+			name:    "should return an empty list when db is empty",
 			wantErr: nil,
 			want:    []accUC.AccountOutput{},
-			setupUC: func(t *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
-					GetAllFunc: func(ctx context.Context) ([]accounts.Account, error) {
+					GetAllFunc: func(_ context.Context) ([]accounts.Account, error) {
 						return nil, nil
 					},
 				}
@@ -53,10 +48,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			},
 		},
 		{
-			name: "should return a list with all accounts",
-			args: args{
-				ctx: context.Background(),
-			},
+			name:    "should return a list with all accounts",
 			wantErr: nil,
 			want: []accUC.AccountOutput{
 				{
@@ -76,9 +68,11 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 					UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 				},
 			},
-			setupUC: func(t *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
-					GetAllFunc: func(ctx context.Context) ([]accounts.Account, error) {
+					GetAllFunc: func(_ context.Context) ([]accounts.Account, error) {
 						return []accounts.Account{
 							{
 								ID:        "acc-id-01",
@@ -104,15 +98,14 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			},
 		},
 		{
-			name: "should return an unexpected error",
-			args: args{
-				ctx: context.Background(),
-			},
+			name:    "should return an unexpected error",
 			wantErr: errUnexpected,
 			want:    nil,
-			setupUC: func(t *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
-					GetAllFunc: func(ctx context.Context) ([]accounts.Account, error) {
+					GetAllFunc: func(_ context.Context) ([]accounts.Account, error) {
 						return nil, errUnexpected
 					},
 				}
@@ -121,15 +114,15 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			a := tt.setupUC(t)
 
-			got, err := a.GetAllAccounts(tt.args.ctx)
-			assert.ErrorIs(t, err, tt.wantErr)
+			a := tt.setupUC()
+
+			got, err := a.GetAllAccounts(context.Background())
+			require.ErrorIs(t, err, tt.wantErr)
 
 			assert.Equal(t, tt.want, got)
 		})

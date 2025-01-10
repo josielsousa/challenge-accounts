@@ -6,7 +6,7 @@ import (
 )
 
 func (a Account) GetAccountBalance(ctx context.Context, accountID string) (int, error) {
-	const op = `Usecase.Account.GetAccountBalance`
+	const op = `accounts.GetAccountBalance`
 
 	acc, err := a.accRepo.GetByID(ctx, accountID)
 	if err != nil {

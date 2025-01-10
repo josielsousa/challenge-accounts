@@ -14,7 +14,7 @@ import (
 )
 
 func (a Account) Create(ctx context.Context, input accUC.AccountInput) error {
-	const op = `Usecase.Account.Create`
+	const op = `accounts.Create`
 
 	cpf, err := cpf.NewCPF(input.CPF)
 	if err != nil {
@@ -29,10 +29,11 @@ func (a Account) Create(ctx context.Context, input accUC.AccountInput) error {
 	acc := accounts.Account{
 		ID:        uuid.NewString(),
 		Name:      input.Name,
+		Balance:   input.Balance,
 		CPF:       cpf,
 		Secret:    secret,
-		Balance:   input.Balance,
-		CreatedAt: time.Now().Local(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	err = a.accRepo.Insert(ctx, acc)

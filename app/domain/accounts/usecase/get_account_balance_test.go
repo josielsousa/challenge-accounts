@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
@@ -16,27 +17,28 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 	errUnexpected := errors.New("unexpected error")
 
 	type args struct {
-		ctx       context.Context
 		accountID string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
 		want    int
 		wantErr error
-		setupUC func(t *testing.T) *Account
+		setupUC func() *Account
 	}{
 		{
 			name: "should return balance by account id",
 			args: args{
-				ctx:       context.Background(),
 				accountID: "d079de7d-b3d2-47fa-b1d6-b5c7d7cf5389",
 			},
 			wantErr: nil,
 			want:    50,
-			setupUC: func(t *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
-					GetByIDFunc: func(ctx context.Context, id string) (accounts.Account, error) {
+					GetByIDFunc: func(_ context.Context, _ string) (accounts.Account, error) {
 						return accounts.Account{
 							Balance: 50,
 						}, nil
@@ -49,13 +51,14 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 		{
 			name: "should return an error when account not found",
 			args: args{
-				ctx:       context.Background(),
 				accountID: "d079de7d-b3d2-47fa-b1d6-b5c7d7cf5389",
 			},
 			want: 0,
-			setupUC: func(t *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
-					GetByIDFunc: func(ctx context.Context, id string) (accounts.Account, error) {
+					GetByIDFunc: func(_ context.Context, _ string) (accounts.Account, error) {
 						return accounts.Account{}, accounts.ErrAccountNotFound
 					},
 				}
@@ -67,13 +70,14 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 		{
 			name: "should return an unexpected error",
 			args: args{
-				ctx:       context.Background(),
 				accountID: "d079de7d-b3d2-47fa-b1d6-b5c7d7cf5389",
 			},
 			want: 0,
-			setupUC: func(t *testing.T) *Account {
+			setupUC: func() *Account {
+				t.Helper()
+
 				mockAccRepo := &accounts.RepositoryMock{
-					GetByIDFunc: func(ctx context.Context, id string) (accounts.Account, error) {
+					GetByIDFunc: func(_ context.Context, _ string) (accounts.Account, error) {
 						return accounts.Account{}, errUnexpected
 					},
 				}
@@ -83,15 +87,15 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			wantErr: errUnexpected,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			a := tt.setupUC(t)
 
-			got, err := a.GetAccountBalance(tt.args.ctx, tt.args.accountID)
-			assert.ErrorIs(t, err, tt.wantErr)
+			a := tt.setupUC()
+
+			got, err := a.GetAccountBalance(context.Background(), tt.args.accountID)
+			require.ErrorIs(t, err, tt.wantErr)
 
 			assert.Equal(t, tt.want, got)
 		})

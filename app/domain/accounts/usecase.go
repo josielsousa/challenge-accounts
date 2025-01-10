@@ -7,7 +7,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
-//go:generate moq -fmt goimports -out usecase_mock.go . Usecase
+// go :generate moq -fmt goimports -out usecase_mock.go . Usecase
 type Usecase interface {
 	Create(ctx context.Context, acc AccountInput) error
 	GetAllAccounts(ctx context.Context) ([]AccountOutput, error)

@@ -74,3 +74,5 @@ linters:
     - testpackage
     - exportloopref
     - nosprintfhostport
+    - exhaustruct
+    - godot

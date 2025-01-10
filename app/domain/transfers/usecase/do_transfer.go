@@ -13,7 +13,7 @@ import (
 )
 
 func (t Transfer) DoTransfer(ctx context.Context, input trfUC.TransferInput) error {
-	const op = `Usecase.Transfer.DoTransfer`
+	const op = `transfers.DoTransfer`
 
 	if input.Amount <= 0 {
 		return accounts.ErrInvalidAmount
@@ -47,7 +47,7 @@ func (t Transfer) DoTransfer(ctx context.Context, input trfUC.TransferInput) err
 		Transfer: transfers.Transfer{
 			ID:                   uuid.NewString(),
 			Amount:               input.Amount,
-			CreatedAt:            time.Now().Local(),
+			CreatedAt:            time.Now(),
 			AccountOriginID:      accOri.ID,
 			AccountDestinationID: accDest.ID,
 		},

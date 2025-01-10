@@ -10,10 +10,10 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 
+	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validator"
-	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -101,11 +101,11 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 }
 
 // GetToken - Gera um novo token.
-func (s *AuthService) GetToken(acc *model.Account, jwtKey []byte, expirationTime time.Time) (*types.Auth, error) {
+func (s *AuthService) GetToken(acc accounts.Account, jwtKey []byte, expirationTime time.Time) (*types.Auth, error) {
 	// JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
 	claims := &types.Claims{
 		AccountID: acc.ID,
-		Username:  acc.Cpf,
+		Username:  acc.CPF.Value(),
 		ExpiresAt: expirationTime.Unix(),
 	}
 

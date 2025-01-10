@@ -10,8 +10,9 @@ import (
 
 	"github.com/thedevsaddam/govalidator"
 
+	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/repo/model"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -71,8 +72,8 @@ func InitCustomRule() {
 }
 
 // ValidateDataAccount - Realiza a validação dos dados enviados para as request de `account`.
-func (h *Helper) ValidateDataAccount(w http.ResponseWriter, req *http.Request) *model.Account {
-	var account model.Account
+func (h *Helper) ValidateDataAccount(w http.ResponseWriter, req *http.Request) *accounts.Account {
+	var account accounts.Account
 	opts := govalidator.Options{
 		Request:         req,
 		RequiredDefault: true,
@@ -91,8 +92,8 @@ func (h *Helper) ValidateDataAccount(w http.ResponseWriter, req *http.Request) *
 }
 
 // ValidateDataTransfer - Realiza a validação dos dados enviados para as request de `transfer`.
-func (h *Helper) ValidateDataTransfer(w http.ResponseWriter, req *http.Request) *model.Transfer {
-	var transfer model.Transfer
+func (h *Helper) ValidateDataTransfer(w http.ResponseWriter, req *http.Request) *transfers.Transfer {
+	var transfer transfers.Transfer
 	opts := govalidator.Options{
 		Request:         req,
 		RequiredDefault: true,

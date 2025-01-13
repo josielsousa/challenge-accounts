@@ -1,7 +1,6 @@
 package http_test
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,12 +17,17 @@ const (
 )
 
 func TestHelperGetParams(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Teste Get Params com sucesso", func(t *testing.T) {
+		t.Parallel()
+
 		id := "35"
 		vars := map[string]string{"id": id}
 
 		// Criando nova fake request para teste
-		url := fmt.Sprintf("http://localhost:3000/accounts/%s", vars["id"])
+		url := "http://localhost:3000/accounts/" + vars["id"]
+
 		mockReq := httptest.NewRequest(http.MethodGet, url, nil)
 		mockReq = mux.SetURLVars(mockReq, vars)
 
@@ -31,35 +35,49 @@ func TestHelperGetParams(t *testing.T) {
 		params := hlp.GetParams(mockReq)
 
 		if id != params["id"] {
-			t.Error(fmt.Sprintf(ErrorGetParams, params["id"], id))
+			t.Errorf(ErrorGetParams, params["id"], id)
 		}
 	})
 }
 
 func TestHelperThrowError(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Teste Throw Error", func(t *testing.T) {
+		t.Parallel()
+
 		// Criando nova fake request e mockRps para teste
-		mockRps := httptest.NewRecorder()
+		rec := httptest.NewRecorder()
 
 		hlp := httpHelper.NewHelper()
-		hlp.ThrowError(mockRps, http.StatusInternalServerError, "Error")
+		hlp.ThrowError(rec, http.StatusInternalServerError, "Error")
 
-		if mockRps.Result().StatusCode != http.StatusInternalServerError {
-			t.Errorf(ErrorOnThrowError, mockRps.Result().StatusCode)
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusInternalServerError {
+			t.Errorf(ErrorOnThrowError, res.StatusCode)
 		}
 	})
 }
 
 func TestHelperThrowSuccess(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Teste Throw Success", func(t *testing.T) {
-		// Criando nova fake request e mockRps para teste
-		mockRps := httptest.NewRecorder()
+		t.Parallel()
+
+		// Criando nova fake request e rec para teste
+		rec := httptest.NewRecorder()
 
 		hlp := httpHelper.NewHelper()
-		hlp.ThrowSuccess(mockRps, http.StatusOK, "Success")
+		hlp.ThrowSuccess(rec, http.StatusOK, "Success")
 
-		if mockRps.Result().StatusCode != http.StatusOK {
-			t.Errorf(ErrorOnThrowSuccess, mockRps.Result().StatusCode)
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			t.Errorf(ErrorOnThrowSuccess, res.StatusCode)
 		}
 	})
 }

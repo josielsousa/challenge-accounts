@@ -10,7 +10,6 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/helpers/validator"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -33,9 +32,9 @@ var jwtKey = []byte("api-challenge-accounts")
 // AuthService - Implementação do service para autenticação.
 type AuthService struct {
 	// authHlp      *auth.Helper
-	httpHlp      *httpHelper.Helper
-	validatorHlp *validator.Helper
-	logger       types.APILogProvider
+	httpHlp *httpHelper.Helper
+	// validatorHlp *validator.Helper
+	logger types.APILogProvider
 	// stgAccount   model.AccountStorage
 }
 

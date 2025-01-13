@@ -4,11 +4,6 @@ import (
 	"github.com/thedevsaddam/govalidator"
 )
 
-// Mensagens utilizadas no contexto de validação.
-const (
-	ErrorFieldNotString = "The %s should be a string"
-)
-
 // Define as regras para validação dos campos de `account`.
 var validateRulesAccount = map[string][]string{
 	"cpf":    {"required", "cpf"},

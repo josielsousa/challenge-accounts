@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -23,15 +24,15 @@ func (h *Helper) GetParams(req *http.Request) map[string]string {
 }
 
 // ThrowError - Retorna um Erro de acordo com o formato passado e com o statusCode informado.
-func (h *Helper) ThrowError(w http.ResponseWriter, code int, Error interface{}) {
+func (h *Helper) ThrowError(w http.ResponseWriter, code int, err interface{}) {
 	h.StatusCode(w, code)
-	h.JSONEncoder(w, types.ErrorResponse{Error: Error})
+	h.JSONEncoder(w, types.ErrorResponse{Error: err})
 }
 
 // ThrowSuccess - Retorna Sucesso com o Data informado.
-func (h *Helper) ThrowSuccess(w http.ResponseWriter, code int, Data interface{}) {
+func (h *Helper) ThrowSuccess(w http.ResponseWriter, code int, data interface{}) {
 	h.StatusCode(w, code)
-	h.JSONEncoder(w, Data)
+	h.JSONEncoder(w, data)
 }
 
 // StatusCode - Seta o statusCode no response.
@@ -42,5 +43,7 @@ func (h *Helper) StatusCode(w http.ResponseWriter, code int) {
 
 // JSONEncoder - Seta um Novo Encoder no Writer.
 func (h *Helper) JSONEncoder(w http.ResponseWriter, data interface{}) {
-	json.NewEncoder(w).Encode(data)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		slog.Error("on encode response", slog.Any("err", err))
+	}
 }

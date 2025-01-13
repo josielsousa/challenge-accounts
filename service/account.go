@@ -3,7 +3,6 @@ package service
 import (
 	"net/http"
 
-	"github.com/josielsousa/challenge-accounts/helpers/auth"
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/helpers/validator"
 	"github.com/josielsousa/challenge-accounts/types"
@@ -21,7 +20,7 @@ func init() {
 
 // AccountService - Implementação do service para as accounts.
 type AccountService struct {
-	authHlp      *auth.Helper
+	// authHlp      *auth.Helper
 	httpHlp      *httpHelper.Helper
 	validatorHlp *validator.Helper
 	// stgAccount   model.AccountStorage

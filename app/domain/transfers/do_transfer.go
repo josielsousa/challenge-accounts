@@ -1,4 +1,4 @@
-package usecase
+package transfers
 
 import (
 	"context"
@@ -7,30 +7,29 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
-	trfUC "github.com/josielsousa/challenge-accounts/app/domain/transfers"
+	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
 )
 
-func (t Transfer) DoTransfer(ctx context.Context, input trfUC.TransferInput) error {
+func (u Usecase) DoTransfer(ctx context.Context, input TransferInput) error {
 	const op = `transfers.DoTransfer`
 
 	if input.Amount <= 0 {
-		return accounts.ErrInvalidAmount
+		return accE.ErrInvalidAmount
 	}
 
-	accOri, err := t.accRepo.GetByID(ctx, input.AccountOriginID)
+	accOri, err := u.AR.GetByID(ctx, input.AccountOriginID)
 	if err != nil {
-		return accounts.ErrAccountOriginNotFound
+		return accE.ErrAccountOriginNotFound
 	}
 
 	if accOri.Balance < input.Amount {
-		return accounts.ErrInsufficientFunds
+		return accE.ErrInsufficientFunds
 	}
 
-	accDest, err := t.accRepo.GetByID(ctx, input.AccountDestinationID)
+	accDest, err := u.AR.GetByID(ctx, input.AccountDestinationID)
 	if err != nil {
-		return accounts.ErrAccountDestinationNotFound
+		return accE.ErrAccountDestinationNotFound
 	}
 
 	err = accOri.Withdraw(input.Amount)
@@ -43,19 +42,19 @@ func (t Transfer) DoTransfer(ctx context.Context, input trfUC.TransferInput) err
 		return fmt.Errorf("%s-> %s: %w", op, "on deposit", err)
 	}
 
-	err = t.repo.Insert(ctx, transfers.TransferData{
-		Transfer: transfers.Transfer{
+	err = u.R.Insert(ctx, trfE.TransferData{
+		Transfer: trfE.Transfer{
 			ID:                   uuid.NewString(),
 			Amount:               input.Amount,
 			CreatedAt:            time.Now(),
 			AccountOriginID:      accOri.ID,
 			AccountDestinationID: accDest.ID,
 		},
-		AccountDestination: transfers.AccountData{
+		AccountDestination: trfE.AccountData{
 			ID:      accDest.ID,
 			Balance: accDest.Balance,
 		},
-		AccountOrigin: transfers.AccountData{
+		AccountOrigin: trfE.AccountData{
 			ID:      accOri.ID,
 			Balance: accOri.Balance,
 		},

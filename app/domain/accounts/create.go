@@ -1,4 +1,4 @@
-package usecase
+package accounts
 
 import (
 	"context"
@@ -7,13 +7,12 @@ import (
 
 	"github.com/google/uuid"
 
-	accUC "github.com/josielsousa/challenge-accounts/app/domain/accounts"
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 )
 
-func (a Account) Create(ctx context.Context, input accUC.AccountInput) error {
+func (a Account) Create(ctx context.Context, input AccountInput) error {
 	const op = `accounts.Create`
 
 	cpf, err := cpf.NewCPF(input.CPF)
@@ -26,7 +25,7 @@ func (a Account) Create(ctx context.Context, input accUC.AccountInput) error {
 		return fmt.Errorf("%s -> %s: %w", op, "on new hashed secret from input", err)
 	}
 
-	acc := accounts.Account{
+	acc := accE.Account{
 		ID:        uuid.NewString(),
 		Name:      input.Name,
 		Balance:   input.Balance,

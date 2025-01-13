@@ -1,13 +1,11 @@
-package usecase
+package accounts
 
 import (
 	"context"
 	"fmt"
-
-	accUC "github.com/josielsousa/challenge-accounts/app/domain/accounts"
 )
 
-func (a Account) GetAllAccounts(ctx context.Context) ([]accUC.AccountOutput, error) {
+func (a Account) GetAllAccounts(ctx context.Context) ([]AccountOutput, error) {
 	const op = `accounts.GetAllAccounts`
 
 	accs, err := a.accRepo.GetAll(ctx)
@@ -15,9 +13,10 @@ func (a Account) GetAllAccounts(ctx context.Context) ([]accUC.AccountOutput, err
 		return nil, fmt.Errorf("%s -> %s: %w", op, "on get all accounts", err)
 	}
 
-	out := make([]accUC.AccountOutput, 0, len(accs))
+	out := make([]AccountOutput, 0, len(accs))
+
 	for _, acc := range accs {
-		out = append(out, accUC.AccountOutput{
+		out = append(out, AccountOutput{
 			ID:        acc.ID,
 			Name:      acc.Name,
 			Balance:   acc.Balance,

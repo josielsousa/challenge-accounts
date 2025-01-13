@@ -1,4 +1,4 @@
-package usecase
+package accounts
 
 import (
 	"context"
@@ -9,8 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	accUC "github.com/josielsousa/challenge-accounts/app/domain/accounts"
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
@@ -27,19 +26,19 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		want    []accUC.AccountOutput
+		want    []AccountOutput
 		wantErr error
 		setupUC func() *Account
 	}{
 		{
 			name:    "should return an empty list when db is empty",
 			wantErr: nil,
-			want:    []accUC.AccountOutput{},
+			want:    []AccountOutput{},
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accounts.RepositoryMock{
-					GetAllFunc: func(_ context.Context) ([]accounts.Account, error) {
+				mockAccRepo := &accE.RepositoryMock{
+					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
 						return nil, nil
 					},
 				}
@@ -50,7 +49,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 		{
 			name:    "should return a list with all accounts",
 			wantErr: nil,
-			want: []accUC.AccountOutput{
+			want: []AccountOutput{
 				{
 					ID:        "acc-id-01",
 					Name:      "name test account 01",
@@ -71,9 +70,9 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accounts.RepositoryMock{
-					GetAllFunc: func(_ context.Context) ([]accounts.Account, error) {
-						return []accounts.Account{
+				mockAccRepo := &accE.RepositoryMock{
+					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
+						return []accE.Account{
 							{
 								ID:        "acc-id-01",
 								Name:      "name test account 01",
@@ -104,8 +103,8 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accounts.RepositoryMock{
-					GetAllFunc: func(_ context.Context) ([]accounts.Account, error) {
+				mockAccRepo := &accE.RepositoryMock{
+					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
 						return nil, errUnexpected
 					},
 				}

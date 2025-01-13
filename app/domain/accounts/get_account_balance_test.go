@@ -1,4 +1,4 @@
-package usecase
+package accounts
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 )
 
 func TestAccount_GetAccountBalance(t *testing.T) {
@@ -37,9 +37,9 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accounts.RepositoryMock{
-					GetByIDFunc: func(_ context.Context, _ string) (accounts.Account, error) {
-						return accounts.Account{
+				mockAccRepo := &accE.RepositoryMock{
+					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
+						return accE.Account{
 							Balance: 50,
 						}, nil
 					},
@@ -57,15 +57,15 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accounts.RepositoryMock{
-					GetByIDFunc: func(_ context.Context, _ string) (accounts.Account, error) {
-						return accounts.Account{}, accounts.ErrAccountNotFound
+				mockAccRepo := &accE.RepositoryMock{
+					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
+						return accE.Account{}, accE.ErrAccountNotFound
 					},
 				}
 
 				return NewUsecase(mockAccRepo)
 			},
-			wantErr: accounts.ErrAccountNotFound,
+			wantErr: accE.ErrAccountNotFound,
 		},
 		{
 			name: "should return an unexpected error",
@@ -76,9 +76,9 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accounts.RepositoryMock{
-					GetByIDFunc: func(_ context.Context, _ string) (accounts.Account, error) {
-						return accounts.Account{}, errUnexpected
+				mockAccRepo := &accE.RepositoryMock{
+					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
+						return accE.Account{}, errUnexpected
 					},
 				}
 

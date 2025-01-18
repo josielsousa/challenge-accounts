@@ -3,14 +3,12 @@ package pgtest
 import (
 	"context"
 	"fmt"
-	"io/fs"
 	"log/slog"
 	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
@@ -29,21 +27,11 @@ const (
 	defaultContainerName = "pg-test-challenge-accounts"
 )
 
-type Migrations struct {
-	Folder string
-
-	FS fs.FS
-
-	// Logger is a custom logger. If nil, the std lib log with verbose=true will be used
-	Logger migrate.Logger
-}
-
 type DockerContainerConfig struct {
-	DBName     string
-	Migrations *Migrations
+	DBName string
 }
 
-func StartupNewPool(cfg DockerContainerConfig) (func(), error) {
+func StartupNewPool() (func(), error) {
 	dockerPool, err := dockertest.NewPool("")
 	if err != nil {
 		return nil, fmt.Errorf(`could not connect to docker: %w`, err)
@@ -53,10 +41,8 @@ func StartupNewPool(cfg DockerContainerConfig) (func(), error) {
 		return nil, fmt.Errorf(`could not connect to docker: %w`, err)
 	}
 
-	if cfg.DBName == "" {
-		atomic.AddInt32(&instances, 1)
-		cfg.DBName = fmt.Sprintf("db_%d_%d", time.Now().UnixNano(), atomic.LoadInt32(&instances))
-	}
+	atomic.AddInt32(&instances, 1)
+	dbName := fmt.Sprintf("db_%d_%d", time.Now().UnixNano(), atomic.LoadInt32(&instances))
 
 	dockerResource, err := getDockerResource(dockerPool)
 	if err != nil {
@@ -77,12 +63,12 @@ func StartupNewPool(cfg DockerContainerConfig) (func(), error) {
 	}
 
 	// create default database to unit test
-	_, err = dbDefaultPool.Exec(context.Background(), "create database "+cfg.DBName)
+	_, err = dbDefaultPool.Exec(context.Background(), "create database "+dbName)
 	if err != nil {
-		return nil, fmt.Errorf("on create database %s: %w", cfg.DBName, err)
+		return nil, fmt.Errorf("on create database %s: %w", dbName, err)
 	}
 
-	dbURL := getPgConnURL(dbPort, cfg.DBName)
+	dbURL := getPgConnURL(dbPort, dbName)
 
 	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL)
 	if err != nil {
@@ -94,7 +80,7 @@ func StartupNewPool(cfg DockerContainerConfig) (func(), error) {
 	teardownFn := func() {
 		dbPool.Close()
 
-		dropDB(cfg.DBName, dbDefaultPool)
+		dropDB(dbName, dbDefaultPool)
 
 		dbDefaultPool.Close()
 	}

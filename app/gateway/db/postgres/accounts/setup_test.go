@@ -5,17 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
 func TestMain(m *testing.M) {
-	teardown, err := pgtest.StartupNewPool(pgtest.DockerContainerConfig{
-		Migrations: &pgtest.Migrations{
-			Folder: "migrations",
-			FS:     postgres.MigrationsFS,
-		},
-	})
+	teardown, err := pgtest.StartupNewPool()
 	if err != nil {
 		panic(fmt.Errorf("on startup pgtest container: %w", err))
 	}

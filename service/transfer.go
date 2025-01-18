@@ -42,8 +42,11 @@ func NewTransferService(stg any, log types.APILogProvider) *TransferService {
 //	404: Quando a `account` destino não for encontrada
 //	422: Quando não houver saldo disponível
 //	500: Erro inesperado durante o processamento da requisição
-func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
+func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request) {
+	//  claims *types.Claims claims *types.Claims get from context or from path
+
 	// transfer := s.validatorHlp.ValidateDataTransfer(w, req)
+
 	// if transfer == nil {
 	// 	return
 	// }
@@ -125,18 +128,22 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request, c
 //	400: Quando o token estiver vazio / nulo
 //	401: Quando o `token` fornecido for inválido.
 //	500: Erro inesperado durante o processamento da requisição
-func (s *TransferService) GetAllTransfers(w http.ResponseWriter, req *http.Request, claims *types.Claims) {
+func (s *TransferService) GetAllTransfers(w http.ResponseWriter, req *http.Request) {
+	// claims *types.Claims get from context or from request path
+	//
 	// transfers, err := s.stg.Transfer.GetAllTransfers(claims.AccountID)
-	// if err != nil {
-	// 	s.logger.Error("Error on get all transfers: ", err)
-	// 	s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
-	// 	return
-	// }
+	//
+	//	if err != nil {
+	//		s.logger.Error("Error on get all transfers: ", err)
+	//		s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+	//		return
+	//	}
 	//
 	// statusCode := http.StatusOK
-	// if len(transfers) <= 0 {
-	// 	statusCode = http.StatusNoContent
-	// }
+	//
+	//	if len(transfers) <= 0 {
+	//		statusCode = http.StatusNoContent
+	//	}
 	//
 	// s.httpHlp.ThrowSuccess(w, statusCode, types.SuccessResponse{Success: true, Data: transfers})
 }

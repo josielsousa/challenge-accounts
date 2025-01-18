@@ -1,13 +1,7 @@
 package service
 
 import (
-	"errors"
 	"net/http"
-	"regexp"
-	"strings"
-	"time"
-
-	"github.com/dgrijalva/jwt-go/v4"
 
 	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
 	"github.com/josielsousa/challenge-accounts/types"
@@ -76,57 +70,57 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 // TODO: moves this method to a middleware package.
 //
 //nolint:varnamelen
-func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request, *types.Claims)) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, req *http.Request) {
-		tokenHeader := req.Header.Get("Access-Token")
-		claims := &types.Claims{}
-
-		getJwtKey := func(_ *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
-		}
-
-		if len(strings.Trim(tokenHeader, " ")) == 0 || tokenHeader == "null" {
-			s.logger.Info("Error on parser token claims ")
-			s.httpHlp.ThrowError(w, http.StatusBadRequest, InfoTokenEmpty)
-
-			return
-		}
-
-		jwtToken, err := jwt.ParseWithClaims(tokenHeader, claims, getJwtKey)
-		if err != nil {
-			tokenMalFormed, _ := regexp.MatchString(ErrorTokenMalformed, err.Error())
-
-			tokenSignatureInvalid, _ := regexp.MatchString(ErrorTokenSignatureInvalid, err.Error())
-			if errors.Is(err, jwt.ErrSignatureInvalid) || tokenSignatureInvalid || tokenMalFormed {
-				s.logger.Error("Error on parser token claims: ", err)
-				s.httpHlp.ThrowError(w, http.StatusUnauthorized, ErrorSignatureKeyInvalid)
-
-				return
-			}
-
-			s.logger.Error("Error unexpected on parser token claims: ", err)
-			s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
-
-			return
-		}
-
-		if !jwtToken.Valid {
-			s.logger.Error("Error on parser token claims: ", err)
-			s.httpHlp.ThrowError(w, http.StatusUnauthorized, ErrorTokenInvalid)
-
-			return
-		}
-
-		minutesElapsedLastAuth := time.Until(time.Unix(claims.ExpiresAt, 0))
-
-		if minutesElapsedLastAuth <= 0 {
-			s.logger.Info("Token expired")
-			s.httpHlp.ThrowError(w, http.StatusUnauthorized, InfoTokenExpired)
-
-			return
-		}
-
-		// Invoca a próxima requisição.
-		next(w, req, claims)
-	}
-}
+// func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request, *types.Claims)) func(http.ResponseWriter, *http.Request) {
+// 	return func(w http.ResponseWriter, req *http.Request) {
+// 		tokenHeader := req.Header.Get("Access-Token")
+// 		claims := &types.Claims{}
+//
+// 		getJwtKey := func(_ *jwt.Token) (interface{}, error) {
+// 			return jwtKey, nil
+// 		}
+//
+// 		if len(strings.Trim(tokenHeader, " ")) == 0 || tokenHeader == "null" {
+// 			s.logger.Info("Error on parser token claims ")
+// 			s.httpHlp.ThrowError(w, http.StatusBadRequest, InfoTokenEmpty)
+//
+// 			return
+// 		}
+//
+// 		jwtToken, err := jwt.ParseWithClaims(tokenHeader, claims, getJwtKey)
+// 		if err != nil {
+// 			tokenMalFormed, _ := regexp.MatchString(ErrorTokenMalformed, err.Error())
+//
+// 			tokenSignatureInvalid, _ := regexp.MatchString(ErrorTokenSignatureInvalid, err.Error())
+// 			if errors.Is(err, jwt.ErrSignatureInvalid) || tokenSignatureInvalid || tokenMalFormed {
+// 				s.logger.Error("Error on parser token claims: ", err)
+// 				s.httpHlp.ThrowError(w, http.StatusUnauthorized, ErrorSignatureKeyInvalid)
+//
+// 				return
+// 			}
+//
+// 			s.logger.Error("Error unexpected on parser token claims: ", err)
+// 			s.httpHlp.ThrowError(w, http.StatusInternalServerError, types.ErrorUnexpected)
+//
+// 			return
+// 		}
+//
+// 		if !jwtToken.Valid {
+// 			s.logger.Error("Error on parser token claims: ", err)
+// 			s.httpHlp.ThrowError(w, http.StatusUnauthorized, ErrorTokenInvalid)
+//
+// 			return
+// 		}
+//
+// 		minutesElapsedLastAuth := time.Until(time.Unix(claims.ExpiresAt, 0))
+//
+// 		if minutesElapsedLastAuth <= 0 {
+// 			s.logger.Info("Token expired")
+// 			s.httpHlp.ThrowError(w, http.StatusUnauthorized, InfoTokenExpired)
+//
+// 			return
+// 		}
+//
+// 		// Invoca a próxima requisição.
+// 		next(w, req, claims)
+// 	}
+// }

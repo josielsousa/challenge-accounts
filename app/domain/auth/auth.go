@@ -15,8 +15,8 @@ import (
 // TODO: resolve no linters annotations.
 //
 //nolint:stylecheck
-func (u Usecase) Auth(ctx context.Context, credential types.Credentials) (types.Auth, error) {
-	const op = `auth.Auth`
+func (u Usecase) Signin(ctx context.Context, credential types.Credentials) (types.Auth, error) {
+	const op = `auth.Signin`
 
 	acc, err := u.R.GetByCPF(ctx, credential.Cpf)
 	if err != nil {
@@ -34,9 +34,7 @@ func (u Usecase) Auth(ctx context.Context, credential types.Credentials) (types.
 	}
 
 	// Tempo de expiração do token
-	expirationTime := time.Now().Add(MaxTimeToExpiration * time.Minute)
-
-	authToken, err := u.GetToken(acc, jwtKey, expirationTime)
+	authToken, err := u.SignToken(acc)
 	if err != nil {
 		return types.Auth{}, errors.New(types.ErrorUnexpected)
 	}
@@ -44,22 +42,18 @@ func (u Usecase) Auth(ctx context.Context, credential types.Credentials) (types.
 	return authToken, nil
 }
 
-func (u Usecase) GetToken(acc accE.Account, jwtKey []byte, expirationTime time.Time) (types.Auth, error) {
+func (u Usecase) SignToken(acc accE.Account) (types.Auth, error) {
 	// JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
-	claims := &types.Claims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &types.Claims{
 		AccountID: acc.ID,
 		Username:  acc.CPF.Value(),
-		ExpiresAt: expirationTime.Unix(),
-	}
+		ExpiresAt: time.Now().Add(TTLToken).Unix(),
+	})
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(u.appKey)
 	if err != nil {
 		return types.Auth{}, fmt.Errorf("on signed token: %w", err)
 	}
 
-	authToken := types.Auth{Token: tokenString}
-
-	return authToken, nil
+	return types.Auth{Token: tokenString}, nil
 }

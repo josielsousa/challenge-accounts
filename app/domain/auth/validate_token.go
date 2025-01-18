@@ -9,11 +9,11 @@ import (
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
-func (u *Usecase) getAppKey(_ *jwt.Token) (interface{}, error) {
+func (u Usecase) getAppKey(_ *jwt.Token) (interface{}, error) {
 	return u.appKey, nil
 }
 
-func (u *Usecase) Authorize(token string) (types.Claims, error) {
+func (u Usecase) Authorize(token string) (types.Claims, error) {
 	claims := &types.Claims{}
 
 	if len(strings.TrimSpace(token)) == 0 || token == "null" {

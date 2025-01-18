@@ -25,9 +25,9 @@ func TestRepository_ListTransfers(t *testing.T) {
 	accDestinationID2 := uuid.NewString()
 
 	type args struct {
-		ctx         context.Context
 		accOriginID string
 	}
+
 	tests := []struct {
 		name      string
 		args      args
@@ -38,7 +38,6 @@ func TestRepository_ListTransfers(t *testing.T) {
 		{
 			name: "should return an empty slice when db is empty",
 			args: args{
-				ctx:         context.Background(),
 				accOriginID: accOriginID,
 			},
 			want:    []transfers.Transfer{},
@@ -47,7 +46,6 @@ func TestRepository_ListTransfers(t *testing.T) {
 		{
 			name: "should return an empty slice when db is empty",
 			args: args{
-				ctx:         context.Background(),
 				accOriginID: accOriginID,
 			},
 			want: []transfers.Transfer{
@@ -70,6 +68,8 @@ func TestRepository_ListTransfers(t *testing.T) {
 			},
 			wantErr: nil,
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					trfs := []transfers.Transfer{
 						{
@@ -98,22 +98,21 @@ func TestRepository_ListTransfers(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			pgPool := pgtest.NewDB(t)
 
-			r := NewRepository(pgPool)
+			repo := NewRepository(pgPool)
 
 			if tt.beforeRun != nil {
 				tt.beforeRun(t, pgPool)
 			}
 
-			got, err := r.ListTransfers(tt.args.ctx, tt.args.accOriginID)
-			assert.ErrorIs(t, err, tt.wantErr)
+			got, err := repo.ListTransfers(context.Background(), tt.args.accOriginID)
+			require.ErrorIs(t, err, tt.wantErr)
 
 			assert.Equal(t, tt.want, got)
 		})

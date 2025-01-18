@@ -9,15 +9,15 @@ import (
 
 const (
 	queryGetAllTransfersByAccOriginID = `
-	SELECT 
+	SELECT
 		id,
 		amount,
 		account_origin_id,
 		account_destination_id,
 		created_at,
 		updated_at
-	FROM transfers 
-	WHERE account_origin_id = $1 
+	FROM transfers
+	WHERE account_origin_id = $1
 	`
 )
 
@@ -26,7 +26,7 @@ func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]t
 
 	trfs := make([]transfers.Transfer, 0)
 
-	rows, err := r.db.Query(context.Background(), queryGetAllTransfersByAccOriginID, accOriginID)
+	rows, err := r.db.Query(ctx, queryGetAllTransfersByAccOriginID, accOriginID)
 	if err != nil {
 		return nil, fmt.Errorf("%s -> %s: %w", op, "on get all transfers by account origin", err)
 	}
@@ -34,7 +34,8 @@ func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]t
 
 	for rows.Next() {
 		var trf transfers.Transfer
-		rows.Scan(
+
+		err := rows.Scan(
 			&trf.ID,
 			&trf.Amount,
 			&trf.AccountOriginID,
@@ -42,6 +43,9 @@ func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]t
 			&trf.CreatedAt,
 			&trf.UpdatedAt,
 		)
+		if err != nil {
+			return nil, fmt.Errorf("%s -> %s: %w", op, "on scan row", err)
+		}
 
 		trfs = append(trfs, trf)
 	}

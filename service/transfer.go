@@ -2,10 +2,6 @@ package service
 
 import (
 	"net/http"
-
-	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/helpers/validator"
-	"github.com/josielsousa/challenge-accounts/types"
 )
 
 // Mensagens domínio de transferencias.
@@ -16,21 +12,11 @@ const (
 )
 
 // TransferService - Implementação do service para as transfers.
-type TransferService struct {
-	stg          any
-	logger       types.APILogProvider
-	httpHlp      *httpHelper.Helper
-	validatorHlp *validator.Helper
-}
+type TransferService struct{}
 
 // NewTransferService - Instância o service com a dependência `log` inicializada.
-func NewTransferService(stg any, log types.APILogProvider) *TransferService {
-	return &TransferService{
-		stg:          stg,
-		logger:       log,
-		httpHlp:      httpHelper.NewHelper(),
-		validatorHlp: validator.NewHelper(),
-	}
+func NewTransferService() *TransferService {
+	return &TransferService{}
 }
 
 // DoTransfer - Realiza a transferência entre as `accounts` conforme os dados enviados na requisição.
@@ -42,7 +28,7 @@ func NewTransferService(stg any, log types.APILogProvider) *TransferService {
 //	404: Quando a `account` destino não for encontrada
 //	422: Quando não houver saldo disponível
 //	500: Erro inesperado durante o processamento da requisição
-func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request) {
+func (s *TransferService) DoTransfer(_ http.ResponseWriter, _ *http.Request) {
 	//  claims *types.Claims claims *types.Claims get from context or from path
 
 	// transfer := s.validatorHlp.ValidateDataTransfer(w, req)
@@ -128,7 +114,7 @@ func (s *TransferService) DoTransfer(w http.ResponseWriter, req *http.Request) {
 //	400: Quando o token estiver vazio / nulo
 //	401: Quando o `token` fornecido for inválido.
 //	500: Erro inesperado durante o processamento da requisição
-func (s *TransferService) GetAllTransfers(w http.ResponseWriter, req *http.Request) {
+func (s *TransferService) GetAllTransfers(_ http.ResponseWriter, _ *http.Request) {
 	// claims *types.Claims get from context or from request path
 	//
 	// transfers, err := s.stg.Transfer.GetAllTransfers(claims.AccountID)

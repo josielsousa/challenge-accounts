@@ -2,29 +2,12 @@ package service
 
 import (
 	"net/http"
-
-	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/helpers/validator"
-	"github.com/josielsousa/challenge-accounts/types"
 )
-
-// Mesnagens de validação para `accounts`.
-const (
-	ErrorAccountExist = "Já existe uma conta criada com o CPF informado."
-)
-
-// Inicializa as regras customizadas.
-func init() {
-	validator.InitCustomRule()
-}
 
 // AccountService - Implementação do service para as accounts.
 type AccountService struct {
 	// authHlp      *auth.Helper
-	httpHlp      *httpHelper.Helper
-	validatorHlp *validator.Helper
 	// stgAccount   model.AccountStorage
-	logger types.APILogProvider
 }
 
 // NewAccountService - Instância o service com a dependência `log` inicializada.

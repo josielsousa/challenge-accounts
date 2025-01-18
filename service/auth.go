@@ -2,46 +2,17 @@ package service
 
 import (
 	"net/http"
-
-	httpHelper "github.com/josielsousa/challenge-accounts/helpers/http"
-	"github.com/josielsousa/challenge-accounts/types"
 )
-
-// Constantes utilizadas no serviço de autenticação.
-//
-//nolint:gosec
-const (
-	MaxTimeToExpiration        = 5
-	InfoTokenEmpty             = "Token vazio."
-	InfoTokenExpired           = "Token expirado."
-	ErrorTokenInvalid          = "Token inválido."
-	ErrorTokenMalformed        = "token is malformed"
-	ErrorTokenSignatureInvalid = "token signature is invalid"
-	ErrorSignatureKeyInvalid   = "A chave de assinatura do token é inválida."
-)
-
-// JWT string chave utilizada para geração do token.
-var jwtKey = []byte("api-challenge-accounts")
 
 // AuthService - Implementação do service para autenticação.
 type AuthService struct {
 	// authHlp      *auth.Helper
-	httpHlp *httpHelper.Helper
 	// validatorHlp *validator.Helper
-	logger types.APILogProvider
 	// stgAccount   model.AccountStorage
 }
 
 // NewAuthService - Instância o service.
 func NewAuthService() *AuthService {
-	// return &AuthService{
-	// 	logger:       log,
-	// 	stgAccount:   stgAccount,
-	// 	authHlp:      auth.NewHelper(),
-	// 	httpHlp:      httpHelper.NewHelper(),
-	// 	validatorHlp: validator.NewHelper(),
-	// }
-
 	return nil
 }
 
@@ -51,7 +22,7 @@ func NewAuthService() *AuthService {
 //	401: Quando o `secret` fornecido for diferente do secret armazenado.
 //	404: Quando não encontrar a account.
 //	500: Erro inesperado durante o processamento da requisição
-func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
+func (s *AuthService) Login(_ http.ResponseWriter, _ *http.Request) {
 	// credential := s.validatorHlp.ValidateDataLogin(w, req)
 	// if credential == nil {
 	// 	return
@@ -69,7 +40,6 @@ func (s *AuthService) Login(w http.ResponseWriter, req *http.Request) {
 //
 // TODO: moves this method to a middleware package.
 //
-//nolint:varnamelen
 // func (s *AuthService) ValidateToken(next func(http.ResponseWriter, *http.Request, *types.Claims)) func(http.ResponseWriter, *http.Request) {
 // 	return func(w http.ResponseWriter, req *http.Request) {
 // 		tokenHeader := req.Header.Get("Access-Token")

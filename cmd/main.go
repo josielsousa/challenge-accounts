@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
+	"log/slog"
+	"os"
 
 	"github.com/josielsousa/challenge-accounts/app/configuration"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
@@ -38,19 +39,17 @@ import (
 // }
 
 func main() {
-	logger := logrus.New()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	logger.Info("api inicializando...")
 
 	cfg, err := configuration.LoadConfig()
 	if err != nil {
-		logger.WithError(err).Error("on loading configuration")
+		logger.Error("on loading configuration", slog.Any("error", err))
 	}
 
-	log := logger.WithField("app", cfg.API.AppName)
-
-	dbPool, err := postgres.ConnectPoolWithMigrations(cfg.Postgres.URL(), log, postgres.LogLevelError)
+	dbPool, err := postgres.ConnectPoolWithMigrations(cfg.Postgres.URL())
 	if err != nil {
-		logger.WithError(err).Error("on connect with database")
+		logger.Error("on connect to pool", slog.Any("error", err))
 	}
 
 	defer dbPool.Close()

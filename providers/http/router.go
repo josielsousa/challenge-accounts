@@ -1,28 +1,29 @@
 package http
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/gorilla/mux"
 
 	"github.com/josielsousa/challenge-accounts/service"
-	"github.com/josielsousa/challenge-accounts/types"
 )
 
 // RouterProvider - Implementação do provider de rotas.
 type RouterProvider struct {
 	mux         *mux.Router
-	logger      types.APILogProvider
 	srvAuth     *service.AuthService
 	srvAccount  *service.AccountService
 	srvTransfer *service.TransferService
 }
 
 // NewRouter - Instância o novo provider com as dependências `mux, log` inicializadas.
-func NewRouter(srvAuth *service.AuthService, srvAccount *service.AccountService, srvTransfer *service.TransferService, log types.APILogProvider) *RouterProvider {
+func NewRouter(
+	srvAuth *service.AuthService,
+	srvAccount *service.AccountService,
+	srvTransfer *service.TransferService,
+) *RouterProvider {
 	return &RouterProvider{
-		logger:      log,
 		mux:         mux.NewRouter(),
 		srvAuth:     srvAuth,
 		srvAccount:  srvAccount,
@@ -31,6 +32,8 @@ func NewRouter(srvAuth *service.AuthService, srvAccount *service.AccountService,
 }
 
 // Init - Inicializa as rotas da API.
+//
+// TODO: use chi as router
 func (rp *RouterProvider) ServeHTTP() {
 	rp.mux.HandleFunc("/", homeHandler).Methods("GET")
 
@@ -46,11 +49,17 @@ func (rp *RouterProvider) ServeHTTP() {
 	rp.mux.HandleFunc("/transfers", rp.srvTransfer.GetAllTransfers).Methods("GET")
 	rp.mux.HandleFunc("/transfers", rp.srvTransfer.DoTransfer).Methods("POST")
 
-	rp.logger.Info("API disponibilizada na porta 3000")
-	log.Fatal(http.ListenAndServe(":3000", rp.mux))
+	slog.Info("API disponibilizada na porta 3000")
+
+	//nolint:gosec
+	if err := http.ListenAndServe(":3000", rp.mux); err != nil {
+		slog.Error("on start server: ", slog.Any("error", err))
+	}
 }
 
 // homeHandler - Função utilizada para a rota principal da API `/`.
-func homeHandler(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte("Desafio técnico accounts."))
+func homeHandler(w http.ResponseWriter, _ *http.Request) {
+	if _, err := w.Write([]byte("Desafio técnico accounts.")); err != nil {
+		slog.Error("on write response: ", slog.Any("error", err))
+	}
 }

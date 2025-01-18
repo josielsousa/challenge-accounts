@@ -9,5 +9,5 @@ import (
 
 type Pool interface {
 	pgxtype.Querier
-	Begin(context.Context) (pgx.Tx, error)
+	Begin(ctx context.Context) (pgx.Tx, error)
 }

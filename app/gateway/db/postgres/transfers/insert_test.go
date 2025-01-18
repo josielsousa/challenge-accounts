@@ -35,9 +35,9 @@ func TestRepository_Insert(t *testing.T) {
 	require.NoError(t, err)
 
 	type args struct {
-		ctx context.Context
 		trf transfers.TransferData
 	}
+
 	tests := []struct {
 		name      string
 		args      args
@@ -48,7 +48,6 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should insert a transfer with successfully",
 			args: args{
-				ctx: context.Background(),
 				trf: transfers.TransferData{
 					Transfer: transfers.Transfer{
 						ID:                   trfID,
@@ -69,6 +68,8 @@ func TestRepository_Insert(t *testing.T) {
 				},
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					accs := []accounts.Account{
 						{
@@ -98,6 +99,8 @@ func TestRepository_Insert(t *testing.T) {
 				}
 			},
 			check: func(t *testing.T, pgPool *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					got, err := pgtest.GetTransfer(t, pgPool, trfID)
 					require.NoError(t, err)
@@ -153,13 +156,14 @@ func TestRepository_Insert(t *testing.T) {
 				}
 			},
 			checkErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				require.NoError(t, err)
 			},
 		},
 		{
 			name: "should return an error when insert a transfer",
 			args: args{
-				ctx: context.Background(),
 				trf: transfers.TransferData{
 					Transfer: transfers.Transfer{
 						ID:                   trfID,
@@ -172,32 +176,35 @@ func TestRepository_Insert(t *testing.T) {
 				},
 			},
 			beforeRun: func(t *testing.T, db *pgxpool.Pool) {
+				t.Helper()
+
 				{
 					_, err := db.Exec(context.Background(), "ALTER TABLE transfers RENAME COLUMN amount TO wrong_amount")
 					require.NoError(t, err)
 				}
 			},
 			checkErr: func(t *testing.T, err error) {
+				t.Helper()
+
 				var pgErr *pgconn.PgError
-				assert.ErrorAs(t, err, &pgErr)
+				require.ErrorAs(t, err, &pgErr)
 				assert.Equal(t, `column "amount" of relation "transfers" does not exist`, pgErr.Message)
 			},
 		},
 	}
-	for _, tt := range tests {
-		tt := tt // capture range variable
 
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			pgPool := pgtest.NewDB(t)
 
-			r := NewRepository(pgPool)
+			repo := NewRepository(pgPool)
 
 			if tt.beforeRun != nil {
 				tt.beforeRun(t, pgPool)
 			}
 
-			err := r.Insert(tt.args.ctx, tt.args.trf)
+			err := repo.Insert(context.Background(), tt.args.trf)
 			tt.checkErr(t, err)
 
 			if tt.check != nil {

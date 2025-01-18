@@ -1,8 +1,9 @@
 version: "3.7"
 
 volumes:
-  pg_data: 
+  pg_data:
     driver: local
+
 services:
   chl_acc_redis:
     container_name: chl_acc_redis
@@ -11,7 +12,7 @@ services:
       - "6379:6379"
   chl_acc_postgres:
     container_name: chl_acc_postgres
-    image: postgres:14.1-alpine
+    image: postgres:16-alpine
     restart: always
     ports:
       - "5432:5432"

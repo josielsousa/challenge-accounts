@@ -46,7 +46,7 @@ compile: clean install-dependencies gofmt
 
 .PHONY: setup-down
 setup-down:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) -p ${APP_NAME} down
+	docker-compose -f $(DOCKER_COMPOSE_FILE) -p ${APP_NAME} down --remove-orphans
 
 .PHONY: setup-dev
 setup-dev: setup-down

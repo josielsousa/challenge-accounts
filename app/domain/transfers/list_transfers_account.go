@@ -16,7 +16,7 @@ func (u Usecase) ListTransfersAccount(
 		return nil, fmt.Errorf("%s -> %s: %w", op, "on list transfers", err)
 	}
 
-	out := make([]TransferOutput, 0, len(allTrfs))
+	out := make([]TransferOutput, len(allTrfs))
 
 	for i, transfer := range allTrfs {
 		out[i] = TransferOutput{

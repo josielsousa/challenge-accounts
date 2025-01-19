@@ -37,7 +37,7 @@ func (a Account) Create(ctx context.Context, input AccountInput) error {
 
 	// there are a validation to check if the account already exists
 	// using the constraint of the CPF as unique on the database.
-	err = a.accRepo.Insert(ctx, acc)
+	err = a.R.Insert(ctx, acc)
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on create account", err)
 	}

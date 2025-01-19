@@ -1,6 +1,7 @@
 package transfers
 
 import (
+	"context"
 	"time"
 
 	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
@@ -8,13 +9,28 @@ import (
 )
 
 type Usecase struct {
-	AR accE.Repository
-	R  trfE.Repository
+	AR AccountRepository
+	R  Repository
+}
+
+// Repository - Interface que define as assinaturas para o repository de
+// transfers.
+//
+//go:generate moq -rm -out usecase_mock.go . Repository AccountRepository
+type Repository interface {
+	Insert(ctx context.Context, transfer trfE.TransferData) error
+	ListTransfers(ctx context.Context, accOriginID string) ([]trfE.Transfer, error)
+}
+
+// AccountRepository - Interface que define as assinaturas para o repository de
+// accounts.
+type AccountRepository interface {
+	GetByID(ctx context.Context, id string) (accE.Account, error)
 }
 
 func NewUsecase(
-	trfRepo trfE.Repository,
-	accRepo accE.Repository,
+	trfRepo Repository,
+	accRepo AccountRepository,
 ) *Usecase {
 	return &Usecase{
 		R:  trfRepo,

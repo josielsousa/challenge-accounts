@@ -40,7 +40,7 @@ func TestAccount_Create(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accE.Account) error {
 						return nil
 					},
@@ -63,7 +63,7 @@ func TestAccount_Create(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accE.Account) error {
 						return erring.ErrAccountAlreadyExists
 					},
@@ -86,7 +86,7 @@ func TestAccount_Create(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accE.Account) error {
 						return erring.ErrAccountAlreadyExists
 					},
@@ -109,7 +109,7 @@ func TestAccount_Create(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accE.Account) error {
 						return errUnexpected
 					},

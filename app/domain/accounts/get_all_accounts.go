@@ -8,7 +8,7 @@ import (
 func (a Account) GetAllAccounts(ctx context.Context) ([]AccountOutput, error) {
 	const op = `accounts.GetAllAccounts`
 
-	accs, err := a.accRepo.GetAll(ctx)
+	accs, err := a.R.GetAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("%s -> %s: %w", op, "on get all accounts", err)
 	}

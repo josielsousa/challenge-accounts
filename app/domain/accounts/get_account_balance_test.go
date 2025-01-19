@@ -38,7 +38,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{
 							Balance: 50,
@@ -58,7 +58,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{}, erring.ErrAccountNotFound
 					},
@@ -77,7 +77,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{}, errUnexpected
 					},

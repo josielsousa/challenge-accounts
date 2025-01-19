@@ -5,6 +5,8 @@ package transfers
 
 import (
 	"context"
+	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
 	"sync"
 )
 
@@ -18,10 +20,10 @@ var _ Repository = &RepositoryMock{}
 //
 //		// make and configure a mocked Repository
 //		mockedRepository := &RepositoryMock{
-//			InsertFunc: func(ctx context.Context, transfer TransferData) error {
+//			InsertFunc: func(ctx context.Context, transfer trfE.TransferData) error {
 //				panic("mock out the Insert method")
 //			},
-//			ListTransfersFunc: func(ctx context.Context, accOriginID string) ([]Transfer, error) {
+//			ListTransfersFunc: func(ctx context.Context, accOriginID string) ([]trfE.Transfer, error) {
 //				panic("mock out the ListTransfers method")
 //			},
 //		}
@@ -32,10 +34,10 @@ var _ Repository = &RepositoryMock{}
 //	}
 type RepositoryMock struct {
 	// InsertFunc mocks the Insert method.
-	InsertFunc func(ctx context.Context, transfer TransferData) error
+	InsertFunc func(ctx context.Context, transfer trfE.TransferData) error
 
 	// ListTransfersFunc mocks the ListTransfers method.
-	ListTransfersFunc func(ctx context.Context, accOriginID string) ([]Transfer, error)
+	ListTransfersFunc func(ctx context.Context, accOriginID string) ([]trfE.Transfer, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -44,7 +46,7 @@ type RepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Transfer is the transfer argument value.
-			Transfer TransferData
+			Transfer trfE.TransferData
 		}
 		// ListTransfers holds details about calls to the ListTransfers method.
 		ListTransfers []struct {
@@ -59,13 +61,13 @@ type RepositoryMock struct {
 }
 
 // Insert calls InsertFunc.
-func (mock *RepositoryMock) Insert(ctx context.Context, transfer TransferData) error {
+func (mock *RepositoryMock) Insert(ctx context.Context, transfer trfE.TransferData) error {
 	if mock.InsertFunc == nil {
 		panic("RepositoryMock.InsertFunc: method is nil but Repository.Insert was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
-		Transfer TransferData
+		Transfer trfE.TransferData
 	}{
 		Ctx:      ctx,
 		Transfer: transfer,
@@ -82,11 +84,11 @@ func (mock *RepositoryMock) Insert(ctx context.Context, transfer TransferData) e
 //	len(mockedRepository.InsertCalls())
 func (mock *RepositoryMock) InsertCalls() []struct {
 	Ctx      context.Context
-	Transfer TransferData
+	Transfer trfE.TransferData
 } {
 	var calls []struct {
 		Ctx      context.Context
-		Transfer TransferData
+		Transfer trfE.TransferData
 	}
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert
@@ -95,7 +97,7 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 }
 
 // ListTransfers calls ListTransfersFunc.
-func (mock *RepositoryMock) ListTransfers(ctx context.Context, accOriginID string) ([]Transfer, error) {
+func (mock *RepositoryMock) ListTransfers(ctx context.Context, accOriginID string) ([]trfE.Transfer, error) {
 	if mock.ListTransfersFunc == nil {
 		panic("RepositoryMock.ListTransfersFunc: method is nil but Repository.ListTransfers was just called")
 	}
@@ -127,5 +129,77 @@ func (mock *RepositoryMock) ListTransfersCalls() []struct {
 	mock.lockListTransfers.RLock()
 	calls = mock.calls.ListTransfers
 	mock.lockListTransfers.RUnlock()
+	return calls
+}
+
+// Ensure, that AccountRepositoryMock does implement AccountRepository.
+// If this is not the case, regenerate this file with moq.
+var _ AccountRepository = &AccountRepositoryMock{}
+
+// AccountRepositoryMock is a mock implementation of AccountRepository.
+//
+//	func TestSomethingThatUsesAccountRepository(t *testing.T) {
+//
+//		// make and configure a mocked AccountRepository
+//		mockedAccountRepository := &AccountRepositoryMock{
+//			GetByIDFunc: func(ctx context.Context, id string) (accE.Account, error) {
+//				panic("mock out the GetByID method")
+//			},
+//		}
+//
+//		// use mockedAccountRepository in code that requires AccountRepository
+//		// and then make assertions.
+//
+//	}
+type AccountRepositoryMock struct {
+	// GetByIDFunc mocks the GetByID method.
+	GetByIDFunc func(ctx context.Context, id string) (accE.Account, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// GetByID holds details about calls to the GetByID method.
+		GetByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
+	}
+	lockGetByID sync.RWMutex
+}
+
+// GetByID calls GetByIDFunc.
+func (mock *AccountRepositoryMock) GetByID(ctx context.Context, id string) (accE.Account, error) {
+	if mock.GetByIDFunc == nil {
+		panic("AccountRepositoryMock.GetByIDFunc: method is nil but AccountRepository.GetByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockGetByID.Lock()
+	mock.calls.GetByID = append(mock.calls.GetByID, callInfo)
+	mock.lockGetByID.Unlock()
+	return mock.GetByIDFunc(ctx, id)
+}
+
+// GetByIDCalls gets all the calls that were made to GetByID.
+// Check the length with:
+//
+//	len(mockedAccountRepository.GetByIDCalls())
+func (mock *AccountRepositoryMock) GetByIDCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockGetByID.RLock()
+	calls = mock.calls.GetByID
+	mock.lockGetByID.RUnlock()
 	return calls
 }

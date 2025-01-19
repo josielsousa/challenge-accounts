@@ -1,17 +1,19 @@
 package auth
 
 import (
+	"context"
+
 	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
 type Usecase struct {
-	R accE.Repository
+	R Repository
 	H Hasher
 	S Signer
 }
 
-//go:generate moq -rm -out usecase_mock.go . Signer Hasher
+//go:generate moq -rm -out usecase_mock.go . Signer Hasher Repository
 type Signer interface {
 	SignToken(id, username string) (types.Auth, error)
 }
@@ -20,7 +22,12 @@ type Hasher interface {
 	VerifySecret(hashedSecret, secret string) error
 }
 
-func NewUsecase(repo accE.Repository, sig Signer, hasher Hasher) *Usecase {
+// Repository - Interface que define as assinaturas para o repository de accounts.
+type Repository interface {
+	GetByCPF(ctx context.Context, cpf string) (accE.Account, error)
+}
+
+func NewUsecase(repo Repository, sig Signer, hasher Hasher) *Usecase {
 	return &Usecase{
 		R: repo,
 		H: hasher,

@@ -4,6 +4,8 @@
 package auth
 
 import (
+	"context"
+	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/types"
 	"sync"
 )
@@ -149,5 +151,77 @@ func (mock *HasherMock) VerifySecretCalls() []struct {
 	mock.lockVerifySecret.RLock()
 	calls = mock.calls.VerifySecret
 	mock.lockVerifySecret.RUnlock()
+	return calls
+}
+
+// Ensure, that RepositoryMock does implement Repository.
+// If this is not the case, regenerate this file with moq.
+var _ Repository = &RepositoryMock{}
+
+// RepositoryMock is a mock implementation of Repository.
+//
+//	func TestSomethingThatUsesRepository(t *testing.T) {
+//
+//		// make and configure a mocked Repository
+//		mockedRepository := &RepositoryMock{
+//			GetByCPFFunc: func(ctx context.Context, cpf string) (accE.Account, error) {
+//				panic("mock out the GetByCPF method")
+//			},
+//		}
+//
+//		// use mockedRepository in code that requires Repository
+//		// and then make assertions.
+//
+//	}
+type RepositoryMock struct {
+	// GetByCPFFunc mocks the GetByCPF method.
+	GetByCPFFunc func(ctx context.Context, cpf string) (accE.Account, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// GetByCPF holds details about calls to the GetByCPF method.
+		GetByCPF []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Cpf is the cpf argument value.
+			Cpf string
+		}
+	}
+	lockGetByCPF sync.RWMutex
+}
+
+// GetByCPF calls GetByCPFFunc.
+func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (accE.Account, error) {
+	if mock.GetByCPFFunc == nil {
+		panic("RepositoryMock.GetByCPFFunc: method is nil but Repository.GetByCPF was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Cpf string
+	}{
+		Ctx: ctx,
+		Cpf: cpf,
+	}
+	mock.lockGetByCPF.Lock()
+	mock.calls.GetByCPF = append(mock.calls.GetByCPF, callInfo)
+	mock.lockGetByCPF.Unlock()
+	return mock.GetByCPFFunc(ctx, cpf)
+}
+
+// GetByCPFCalls gets all the calls that were made to GetByCPF.
+// Check the length with:
+//
+//	len(mockedRepository.GetByCPFCalls())
+func (mock *RepositoryMock) GetByCPFCalls() []struct {
+	Ctx context.Context
+	Cpf string
+} {
+	var calls []struct {
+		Ctx context.Context
+		Cpf string
+	}
+	mock.lockGetByCPF.RLock()
+	calls = mock.calls.GetByCPF
+	mock.lockGetByCPF.RUnlock()
 	return calls
 }

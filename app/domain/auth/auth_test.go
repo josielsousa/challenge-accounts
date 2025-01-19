@@ -16,7 +16,7 @@ func TestUsecase_Signin(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
-		R accE.Repository
+		R Repository
 		H Hasher
 		S Signer
 	}
@@ -41,7 +41,7 @@ func TestUsecase_Signin(t *testing.T) {
 				},
 			},
 			fields: fields{
-				R: &accE.RepositoryMock{
+				R: &RepositoryMock{
 					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{}, nil
 					},
@@ -59,7 +59,7 @@ func TestUsecase_Signin(t *testing.T) {
 				},
 			},
 			fields: fields{
-				R: &accE.RepositoryMock{
+				R: &RepositoryMock{
 					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{
 							ID: "acc-id-001",
@@ -84,7 +84,7 @@ func TestUsecase_Signin(t *testing.T) {
 				},
 			},
 			fields: fields{
-				R: &accE.RepositoryMock{
+				R: &RepositoryMock{
 					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{
 							ID: "acc-id-001",
@@ -114,7 +114,7 @@ func TestUsecase_Signin(t *testing.T) {
 				},
 			},
 			fields: fields{
-				R: &accE.RepositoryMock{
+				R: &RepositoryMock{
 					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
 						return accE.Account{
 							ID: "acc-id-001",

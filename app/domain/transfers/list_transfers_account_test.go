@@ -18,7 +18,7 @@ func TestUsecase_ListTransfersAccount(t *testing.T) {
 	errUnknown := errors.New("unknown error")
 
 	type fields struct {
-		R trfE.Repository
+		R Repository
 	}
 
 	type args struct {
@@ -38,7 +38,7 @@ func TestUsecase_ListTransfersAccount(t *testing.T) {
 				accOriginID: "acc-id-001",
 			},
 			fields: fields{
-				R: &trfE.RepositoryMock{
+				R: &RepositoryMock{
 					ListTransfersFunc: func(_ context.Context, id string) ([]trfE.Transfer, error) {
 						require.Equal(t, "acc-id-001", id)
 
@@ -55,7 +55,7 @@ func TestUsecase_ListTransfersAccount(t *testing.T) {
 				accOriginID: "acc-id-001",
 			},
 			fields: fields{
-				R: &trfE.RepositoryMock{
+				R: &RepositoryMock{
 					ListTransfersFunc: func(_ context.Context, id string) ([]trfE.Transfer, error) {
 						require.Equal(t, "acc-id-001", id)
 

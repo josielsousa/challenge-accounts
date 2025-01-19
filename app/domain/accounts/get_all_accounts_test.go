@@ -37,7 +37,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
 						return nil, nil
 					},
@@ -70,7 +70,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
 						return []accE.Account{
 							{
@@ -103,7 +103,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			setupUC: func() *Account {
 				t.Helper()
 
-				mockAccRepo := &accE.RepositoryMock{
+				mockAccRepo := &RepositoryMock{
 					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
 						return nil, errUnexpected
 					},

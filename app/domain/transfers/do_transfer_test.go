@@ -15,8 +15,8 @@ func TestUsecase_DoTransfer(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
-		AR accE.Repository
-		R  trfE.Repository
+		AR AccountRepository
+		R  Repository
 	}
 
 	type args struct {
@@ -50,7 +50,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				AR: &accE.RepositoryMock{
+				AR: &AccountRepositoryMock{
 					GetByIDFunc: func(_ context.Context, id string) (accE.Account, error) {
 						accounts := map[string]accE.Account{
 							"acc-id-001": {Balance: 15_00},
@@ -73,7 +73,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				AR: &accE.RepositoryMock{
+				AR: &AccountRepositoryMock{
 					GetByIDFunc: func(_ context.Context, id string) (accE.Account, error) {
 						accounts := map[string]accE.Account{
 							"acc-id-001": {Balance: 15_00},
@@ -100,7 +100,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				AR: &accE.RepositoryMock{
+				AR: &AccountRepositoryMock{
 					GetByIDFunc: func(_ context.Context, id string) (accE.Account, error) {
 						accounts := map[string]accE.Account{
 							"acc-id-002": {Balance: 15_00},
@@ -127,7 +127,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				AR: &accE.RepositoryMock{
+				AR: &AccountRepositoryMock{
 					GetByIDFunc: func(_ context.Context, id string) (accE.Account, error) {
 						accounts := map[string]accE.Account{
 							"acc-id-002": {ID: "acc-id-002", Balance: 15_00},
@@ -142,7 +142,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 						return acc, nil
 					},
 				},
-				R: &trfE.RepositoryMock{
+				R: &RepositoryMock{
 					InsertFunc: func(_ context.Context, data trfE.TransferData) error {
 						require.Equal(t, 10_00, data.Amount)
 						require.Equal(t, 5_00, data.AccountOrigin.Balance)

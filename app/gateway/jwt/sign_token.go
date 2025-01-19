@@ -16,7 +16,7 @@ func (j Jwt) SignToken(id, username string) (types.Auth, error) {
 	token := jwtgo.NewWithClaims(jwtgo.SigningMethodHS256, &types.Claims{
 		AccountID: id,
 		Username:  username,
-		ExpiresAt: time.Now().Add(TTLToken).Unix(),
+		ExpiresAt: j.C.Now().Add(TTLToken).Unix(),
 	})
 
 	tokenString, err := token.SignedString(j.appKey)

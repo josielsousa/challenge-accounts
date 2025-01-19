@@ -30,11 +30,11 @@ func (j Jwt) Authorize(token string) (types.Claims, error) {
 		return types.Claims{}, erring.ErrInvalidToken
 	}
 
-	minutesElapsedLastAuth := time.Until(time.Unix(claims.ExpiresAt, 0))
+	minutesElapsedLastAuth := j.C.Until(time.Unix(claims.ExpiresAt, 0))
 
 	if minutesElapsedLastAuth <= 0 {
 		return types.Claims{}, erring.ErrExpiredToken
 	}
 
-	return types.Claims{}, nil
+	return *claims, nil
 }

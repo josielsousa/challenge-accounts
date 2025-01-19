@@ -32,9 +32,6 @@ var _ Repository = &RepositoryMock{}
 //			InsertFunc: func(ctx context.Context, account entities.Account) error {
 //				panic("mock out the Insert method")
 //			},
-//			UpdateBalanceFunc: func(ctx context.Context, accountID string, balance int) error {
-//				panic("mock out the UpdateBalance method")
-//			},
 //		}
 //
 //		// use mockedRepository in code that requires Repository
@@ -53,9 +50,6 @@ type RepositoryMock struct {
 
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, account entities.Account) error
-
-	// UpdateBalanceFunc mocks the UpdateBalance method.
-	UpdateBalanceFunc func(ctx context.Context, accountID string, balance int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -85,21 +79,11 @@ type RepositoryMock struct {
 			// Account is the account argument value.
 			Account entities.Account
 		}
-		// UpdateBalance holds details about calls to the UpdateBalance method.
-		UpdateBalance []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// AccountID is the accountID argument value.
-			AccountID string
-			// Balance is the balance argument value.
-			Balance int
-		}
 	}
-	lockGetAll        sync.RWMutex
-	lockGetByCPF      sync.RWMutex
-	lockGetByID       sync.RWMutex
-	lockInsert        sync.RWMutex
-	lockUpdateBalance sync.RWMutex
+	lockGetAll   sync.RWMutex
+	lockGetByCPF sync.RWMutex
+	lockGetByID  sync.RWMutex
+	lockInsert   sync.RWMutex
 }
 
 // GetAll calls GetAllFunc.
@@ -239,45 +223,5 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert
 	mock.lockInsert.RUnlock()
-	return calls
-}
-
-// UpdateBalance calls UpdateBalanceFunc.
-func (mock *RepositoryMock) UpdateBalance(ctx context.Context, accountID string, balance int) error {
-	if mock.UpdateBalanceFunc == nil {
-		panic("RepositoryMock.UpdateBalanceFunc: method is nil but Repository.UpdateBalance was just called")
-	}
-	callInfo := struct {
-		Ctx       context.Context
-		AccountID string
-		Balance   int
-	}{
-		Ctx:       ctx,
-		AccountID: accountID,
-		Balance:   balance,
-	}
-	mock.lockUpdateBalance.Lock()
-	mock.calls.UpdateBalance = append(mock.calls.UpdateBalance, callInfo)
-	mock.lockUpdateBalance.Unlock()
-	return mock.UpdateBalanceFunc(ctx, accountID, balance)
-}
-
-// UpdateBalanceCalls gets all the calls that were made to UpdateBalance.
-// Check the length with:
-//
-//	len(mockedRepository.UpdateBalanceCalls())
-func (mock *RepositoryMock) UpdateBalanceCalls() []struct {
-	Ctx       context.Context
-	AccountID string
-	Balance   int
-} {
-	var calls []struct {
-		Ctx       context.Context
-		AccountID string
-		Balance   int
-	}
-	mock.lockUpdateBalance.RLock()
-	calls = mock.calls.UpdateBalance
-	mock.lockUpdateBalance.RUnlock()
 	return calls
 }

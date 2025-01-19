@@ -9,9 +9,7 @@ var (
 	ErrMalformedToken       = errors.New("token mal formado")
 	ErrParseTokenWithClaims = errors.New("o token não pode ser analisado")
 	ErrSignatureKeyInvalid  = errors.New("a chave de assinatura do token é inválida")
-
-	ErrUnexpected   = errors.New("erro Inesperado")
-	ErrUnauthorized = errors.New("não autenticado")
-
-	ErrRecordNotFound = errors.New("record not found")
+	ErrUnexpected           = errors.New("erro Inesperado")
+	ErrUnauthorized         = errors.New("não autenticado")
+	ErrRecordNotFound       = errors.New("record not found")
 )

@@ -8,6 +8,7 @@ import (
 
 	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
 func TestUsecase_DoTransfer(t *testing.T) {
@@ -37,7 +38,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					Amount:               0,
 				},
 			},
-			wantErr: accE.ErrInvalidAmount,
+			wantErr: erring.ErrInvalidAmount,
 		},
 		{
 			name: "give an insufficient funds error",
@@ -60,7 +61,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					},
 				},
 			},
-			wantErr: accE.ErrInsufficientFunds,
+			wantErr: erring.ErrInsufficientFunds,
 		},
 		{
 			name: "give an account origin not found error",
@@ -80,14 +81,14 @@ func TestUsecase_DoTransfer(t *testing.T) {
 
 						acc, ok := accounts[id]
 						if !ok {
-							return accE.Account{}, accE.ErrAccountOriginNotFound
+							return accE.Account{}, erring.ErrAccountOriginNotFound
 						}
 
 						return acc, nil
 					},
 				},
 			},
-			wantErr: accE.ErrAccountOriginNotFound,
+			wantErr: erring.ErrAccountOriginNotFound,
 		},
 		{
 			name: "give an account destination not found error",
@@ -107,14 +108,14 @@ func TestUsecase_DoTransfer(t *testing.T) {
 
 						acc, ok := accounts[id]
 						if !ok {
-							return accE.Account{}, accE.ErrAccountDestinationNotFound
+							return accE.Account{}, erring.ErrAccountDestinationNotFound
 						}
 
 						return acc, nil
 					},
 				},
 			},
-			wantErr: accE.ErrAccountDestinationNotFound,
+			wantErr: erring.ErrAccountDestinationNotFound,
 		},
 		{
 			name: "should do a transfer",
@@ -135,7 +136,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 
 						acc, ok := accounts[id]
 						if !ok {
-							return accE.Account{}, accE.ErrAccountDestinationNotFound
+							return accE.Account{}, erring.ErrAccountDestinationNotFound
 						}
 
 						return acc, nil

@@ -6,7 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
 func (*Repository) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID string, balance int) error {
@@ -30,7 +30,7 @@ func (*Repository) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID strin
 	}
 
 	if cmTag.RowsAffected() != 1 {
-		return fmt.Errorf("%s-> %s: %w", operation, "on check rows affected", accounts.ErrUpdateAccountNotPerformed)
+		return fmt.Errorf("%s-> %s: %w", operation, "on check rows affected", erring.ErrUpdateAccountNotPerformed)
 	}
 
 	return nil

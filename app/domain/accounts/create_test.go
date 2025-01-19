@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
@@ -64,13 +65,13 @@ func TestAccount_Create(t *testing.T) {
 
 				mockAccRepo := &accE.RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accE.Account) error {
-						return accE.ErrAccountAlreadyExists
+						return erring.ErrAccountAlreadyExists
 					},
 				}
 
 				return NewUsecase(mockAccRepo)
 			},
-			wantErr: accE.ErrAccountAlreadyExists,
+			wantErr: erring.ErrAccountAlreadyExists,
 		},
 		{
 			name: "should return an error when create a new account, invalid cpf number",
@@ -87,7 +88,7 @@ func TestAccount_Create(t *testing.T) {
 
 				mockAccRepo := &accE.RepositoryMock{
 					InsertFunc: func(_ context.Context, _ accE.Account) error {
-						return accE.ErrAccountAlreadyExists
+						return erring.ErrAccountAlreadyExists
 					},
 				}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
 const (
@@ -39,11 +40,11 @@ const (
 )
 
 func (r *Repository) GetByCPF(ctx context.Context, numCPF string) (accounts.Account, error) {
-	const operation = `Repository.Accounts.GetAccountByCPF`
+	const op = `Repository.Accounts.GetByCPF`
 
 	acc, err := r.getAccount(ctx, numCPF, queryByCPF)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", operation, "on query by CPF", err)
+		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, "on query by CPF", err)
 	}
 
 	return acc, nil
@@ -61,7 +62,7 @@ func (r *Repository) GetByID(ctx context.Context, id string) (accounts.Account, 
 }
 
 func (r *Repository) getAccount(ctx context.Context, param, query string) (accounts.Account, error) {
-	const operation = `Repository.Accounts.getAccount`
+	const op = `Repository.Accounts.getAccount`
 
 	row := r.db.QueryRow(
 		ctx,
@@ -84,10 +85,15 @@ func (r *Repository) getAccount(ctx context.Context, param, query string) (accou
 		const action = "on get account by cpf"
 
 		if errors.Is(err, pgx.ErrNoRows) {
-			return accounts.Account{}, fmt.Errorf("%s -> %s: %w", operation, action, accounts.ErrAccountNotFound)
+			return accounts.Account{}, fmt.Errorf(
+				"%s -> %s: %w",
+				op,
+				action,
+				erring.ErrAccountNotFound,
+			)
 		}
 
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", operation, action, err)
+		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, action, err)
 	}
 
 	return acc, nil

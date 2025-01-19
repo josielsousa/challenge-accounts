@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
@@ -89,7 +90,7 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 					require.NoError(t, err)
 				}
 			},
-			wantErr: accounts.ErrAccountNotFound,
+			wantErr: erring.ErrAccountNotFound,
 		},
 	}
 
@@ -188,7 +189,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 				}
 			},
 			check:   nil,
-			wantErr: accounts.ErrAccountNotFound,
+			wantErr: erring.ErrAccountNotFound,
 		},
 	}
 

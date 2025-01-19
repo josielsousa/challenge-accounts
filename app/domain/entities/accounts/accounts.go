@@ -1,21 +1,11 @@
 package accounts
 
 import (
-	"errors"
 	"time"
 
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
-)
-
-var (
-	ErrInvalidAmount              = errors.New("invalid amount")
-	ErrAccountNotFound            = errors.New("account not found")
-	ErrUpdateAccountNotPerformed  = errors.New("update account not performed")
-	ErrAccountOriginNotFound      = errors.New("account origin not found")
-	ErrAccountDestinationNotFound = errors.New("account destination not found")
-	ErrAccountAlreadyExists       = errors.New("account already exists")
-	ErrInsufficientFunds          = errors.New("insufficient amount")
 )
 
 // Account - Estrutura da entidade `account`.
@@ -31,7 +21,7 @@ type Account struct {
 
 func (a *Account) Deposit(amount int) error {
 	if amount <= 0 {
-		return ErrInvalidAmount
+		return erring.ErrInvalidAmount
 	}
 
 	a.Balance += amount
@@ -41,11 +31,11 @@ func (a *Account) Deposit(amount int) error {
 
 func (a *Account) Withdraw(amount int) error {
 	if amount <= 0 {
-		return ErrInvalidAmount
+		return erring.ErrInvalidAmount
 	}
 
 	if amount > a.Balance {
-		return ErrInsufficientFunds
+		return erring.ErrInsufficientFunds
 	}
 
 	a.Balance -= amount

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
@@ -134,7 +135,7 @@ func TestRepository_Insert(t *testing.T) {
 			checkErr: func(t *testing.T, err error) {
 				t.Helper()
 
-				require.ErrorIs(t, err, accounts.ErrAccountAlreadyExists)
+				require.ErrorIs(t, err, erring.ErrAccountAlreadyExists)
 			},
 		},
 	}

@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
 func (r *Repository) Insert(ctx context.Context, trf transfers.TransferData) error {
@@ -67,19 +67,45 @@ func (r *Repository) Insert(ctx context.Context, trf transfers.TransferData) err
 	)
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			return fmt.Errorf("%s-> %s: %w", op, "on insert transfer", accounts.ErrAccountAlreadyExists)
+		if errors.As(err, &pgErr) &&
+			pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
+			return fmt.Errorf(
+				"%s-> %s: %w",
+				op,
+				"on insert transfer",
+				erring.ErrAccountAlreadyExists,
+			)
 		}
 
-		return fmt.Errorf("%s-> %s: %w", op, "on insert transfer", err)
+		return fmt.Errorf(
+			"%s-> %s: %w",
+			op,
+			"on insert transfer",
+			err,
+		)
 	}
 
-	err = r.accRepo.UpdateBalance(ctx, tx, trf.AccountOriginID, trf.AccountOrigin.Balance)
+	err = r.accRepo.UpdateBalance(
+		ctx,
+		tx,
+		trf.AccountOriginID,
+		trf.AccountOrigin.Balance,
+	)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on update account origin", err)
+		return fmt.Errorf(
+			"%s-> %s: %w",
+			op,
+			"on update account origin",
+			err,
+		)
 	}
 
-	err = r.accRepo.UpdateBalance(ctx, tx, trf.AccountDestinationID, trf.AccountDestination.Balance)
+	err = r.accRepo.UpdateBalance(
+		ctx,
+		tx,
+		trf.AccountDestinationID,
+		trf.AccountDestination.Balance,
+	)
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on update account destination", err)
 	}

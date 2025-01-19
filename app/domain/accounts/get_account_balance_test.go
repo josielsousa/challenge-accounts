@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
 func TestAccount_GetAccountBalance(t *testing.T) {
@@ -59,13 +60,13 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 
 				mockAccRepo := &accE.RepositoryMock{
 					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{}, accE.ErrAccountNotFound
+						return accE.Account{}, erring.ErrAccountNotFound
 					},
 				}
 
 				return NewUsecase(mockAccRepo)
 			},
-			wantErr: accE.ErrAccountNotFound,
+			wantErr: erring.ErrAccountNotFound,
 		},
 		{
 			name: "should return an unexpected error",

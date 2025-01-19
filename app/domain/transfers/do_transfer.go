@@ -7,29 +7,37 @@ import (
 
 	"github.com/google/uuid"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
 func (u Usecase) DoTransfer(ctx context.Context, input TransferInput) error {
 	const op = `transfers.DoTransfer`
 
 	if input.Amount <= 0 {
-		return accE.ErrInvalidAmount
+		return erring.ErrInvalidAmount
 	}
 
 	accOri, err := u.AR.GetByID(ctx, input.AccountOriginID)
 	if err != nil {
-		return fmt.Errorf("on get account origin: %w -> %w", err, accE.ErrAccountOriginNotFound)
+		return fmt.Errorf(
+			"on get account origin: %w -> %w",
+			err,
+			erring.ErrAccountOriginNotFound,
+		)
 	}
 
 	if accOri.Balance < input.Amount {
-		return accE.ErrInsufficientFunds
+		return erring.ErrInsufficientFunds
 	}
 
 	accDest, err := u.AR.GetByID(ctx, input.AccountDestinationID)
 	if err != nil {
-		return fmt.Errorf("on get account destination: %w -> %w", err, accE.ErrAccountDestinationNotFound)
+		return fmt.Errorf(
+			"on get account destination: %w -> %w",
+			err,
+			erring.ErrAccountDestinationNotFound,
+		)
 	}
 
 	err = accOri.Withdraw(input.Amount)

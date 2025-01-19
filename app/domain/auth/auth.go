@@ -3,11 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/dgrijalva/jwt-go/v4"
-
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -36,26 +32,10 @@ func (u Usecase) Signin(ctx context.Context, credential types.Credentials) (type
 	}
 
 	// Tempo de expiração do token
-	authToken, err := u.SignToken(acc)
+	authToken, err := u.S.SignToken(acc.ID, acc.CPF.Value())
 	if err != nil {
 		return types.Auth{}, erring.ErrUnexpected
 	}
 
 	return authToken, nil
-}
-
-func (u Usecase) SignToken(acc accE.Account) (types.Auth, error) {
-	// JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &types.Claims{
-		AccountID: acc.ID,
-		Username:  acc.CPF.Value(),
-		ExpiresAt: time.Now().Add(TTLToken).Unix(),
-	})
-
-	tokenString, err := token.SignedString(u.appKey)
-	if err != nil {
-		return types.Auth{}, fmt.Errorf("on signed token: %w", err)
-	}
-
-	return types.Auth{Token: tokenString}, nil
 }

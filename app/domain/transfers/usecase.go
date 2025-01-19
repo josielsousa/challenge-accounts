@@ -24,6 +24,7 @@ type Repository interface {
 // AccountRepository - Interface que define as assinaturas para o repository de
 // accounts.
 type AccountRepository interface {
+	// TODO: add update balance inside a transactioner
 	GetByID(ctx context.Context, id string) (entities.Account, error)
 }
 

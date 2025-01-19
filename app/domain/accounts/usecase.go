@@ -32,7 +32,6 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (entities.Account, error)
 	GetByCPF(ctx context.Context, cpf string) (entities.Account, error)
 	Insert(ctx context.Context, account entities.Account) error
-	UpdateBalance(ctx context.Context, accountID string, balance int) error
 }
 
 type Account struct {

@@ -20,7 +20,7 @@ func (u Usecase) DoTransfer(ctx context.Context, input TransferInput) error {
 
 	accOri, err := u.AR.GetByID(ctx, input.AccountOriginID)
 	if err != nil {
-		return accE.ErrAccountOriginNotFound
+		return fmt.Errorf("on get account origin: %w -> %w", err, accE.ErrAccountOriginNotFound)
 	}
 
 	if accOri.Balance < input.Amount {
@@ -29,7 +29,7 @@ func (u Usecase) DoTransfer(ctx context.Context, input TransferInput) error {
 
 	accDest, err := u.AR.GetByID(ctx, input.AccountDestinationID)
 	if err != nil {
-		return accE.ErrAccountDestinationNotFound
+		return fmt.Errorf("on get account destination: %w -> %w", err, accE.ErrAccountDestinationNotFound)
 	}
 
 	err = accOri.Withdraw(input.Amount)

@@ -48,7 +48,10 @@ func main() {
 	}
 
 	// JWT string chave utilizada para geração do token.
-	// jwt := jwt.New([]byte("api-challenge-accounts"))
+	// signer := jwt.New([]byte("api-challenge-accounts"))
+
+	// Hasher é um helper usado para gerar e validar a secret.
+	// hasher := hasher.NewHelper()
 
 	dbPool, err := postgres.ConnectPoolWithMigrations(cfg.Postgres.URL())
 	if err != nil {

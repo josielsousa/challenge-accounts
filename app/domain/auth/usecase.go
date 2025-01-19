@@ -1,30 +1,29 @@
 package auth
 
 import (
-	"github.com/josielsousa/challenge-accounts/app/domain/auth/helpers"
 	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
 type Usecase struct {
-	R      accE.Repository
-	H      *helpers.Helper
-	S      Signer
-	appKey []byte
+	R accE.Repository
+	H Hasher
+	S Signer
 }
 
-//go:generate moq -rm -out usecase_mock.go . Signer
+//go:generate moq -rm -out usecase_mock.go . Signer Hasher
 type Signer interface {
-	SignToken(id string, username string) (types.Auth, error)
+	SignToken(id, username string) (types.Auth, error)
 }
 
-func NewUsecase(repo accE.Repository, sig Signer) *Usecase {
+type Hasher interface {
+	VerifySecret(hashedSecret, secret string) error
+}
+
+func NewUsecase(repo accE.Repository, sig Signer, hasher Hasher) *Usecase {
 	return &Usecase{
 		R: repo,
-		H: helpers.NewHelper(),
+		H: hasher,
 		S: sig,
-
-		// JWT string chave utilizada para geração do token.
-		appKey: []byte("api-challenge-accounts"),
 	}
 }

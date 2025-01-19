@@ -4,9 +4,8 @@
 package auth
 
 import (
-	"sync"
-
 	"github.com/josielsousa/challenge-accounts/types"
+	"sync"
 )
 
 // Ensure, that SignerMock does implement Signer.
@@ -78,5 +77,77 @@ func (mock *SignerMock) SignTokenCalls() []struct {
 	mock.lockSignToken.RLock()
 	calls = mock.calls.SignToken
 	mock.lockSignToken.RUnlock()
+	return calls
+}
+
+// Ensure, that HasherMock does implement Hasher.
+// If this is not the case, regenerate this file with moq.
+var _ Hasher = &HasherMock{}
+
+// HasherMock is a mock implementation of Hasher.
+//
+//	func TestSomethingThatUsesHasher(t *testing.T) {
+//
+//		// make and configure a mocked Hasher
+//		mockedHasher := &HasherMock{
+//			VerifySecretFunc: func(hashedSecret string, secret string) error {
+//				panic("mock out the VerifySecret method")
+//			},
+//		}
+//
+//		// use mockedHasher in code that requires Hasher
+//		// and then make assertions.
+//
+//	}
+type HasherMock struct {
+	// VerifySecretFunc mocks the VerifySecret method.
+	VerifySecretFunc func(hashedSecret string, secret string) error
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// VerifySecret holds details about calls to the VerifySecret method.
+		VerifySecret []struct {
+			// HashedSecret is the hashedSecret argument value.
+			HashedSecret string
+			// Secret is the secret argument value.
+			Secret string
+		}
+	}
+	lockVerifySecret sync.RWMutex
+}
+
+// VerifySecret calls VerifySecretFunc.
+func (mock *HasherMock) VerifySecret(hashedSecret string, secret string) error {
+	if mock.VerifySecretFunc == nil {
+		panic("HasherMock.VerifySecretFunc: method is nil but Hasher.VerifySecret was just called")
+	}
+	callInfo := struct {
+		HashedSecret string
+		Secret       string
+	}{
+		HashedSecret: hashedSecret,
+		Secret:       secret,
+	}
+	mock.lockVerifySecret.Lock()
+	mock.calls.VerifySecret = append(mock.calls.VerifySecret, callInfo)
+	mock.lockVerifySecret.Unlock()
+	return mock.VerifySecretFunc(hashedSecret, secret)
+}
+
+// VerifySecretCalls gets all the calls that were made to VerifySecret.
+// Check the length with:
+//
+//	len(mockedHasher.VerifySecretCalls())
+func (mock *HasherMock) VerifySecretCalls() []struct {
+	HashedSecret string
+	Secret       string
+} {
+	var calls []struct {
+		HashedSecret string
+		Secret       string
+	}
+	mock.lockVerifySecret.RLock()
+	calls = mock.calls.VerifySecret
+	mock.lockVerifySecret.RUnlock()
 	return calls
 }

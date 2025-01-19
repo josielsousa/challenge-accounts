@@ -1,11 +1,11 @@
-package helpers_test
+package hasher_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/auth/helpers"
+	"github.com/josielsousa/challenge-accounts/app/gateway/hasher"
 )
 
 func TestAuthHelpers(t *testing.T) {
@@ -15,7 +15,7 @@ func TestAuthHelpers(t *testing.T) {
 		t.Parallel()
 
 		seed := "api-hash"
-		helperAuth := helpers.NewHelper()
+		helperAuth := hasher.NewHelper()
 
 		secretHashed, err := helperAuth.Hash(seed)
 		require.NoError(t, err)

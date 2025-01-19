@@ -47,6 +47,9 @@ func main() {
 		logger.Error("on loading configuration", slog.Any("error", err))
 	}
 
+	// JWT string chave utilizada para geração do token.
+	// jwt := jwt.New([]byte("api-challenge-accounts"))
+
 	dbPool, err := postgres.ConnectPoolWithMigrations(cfg.Postgres.URL())
 	if err != nil {
 		logger.Error("on connect to pool", slog.Any("error", err))

@@ -11,7 +11,7 @@ import (
 
 const TTLToken = 5 * time.Minute
 
-func (j Jwt) SignToken(id string, username string) (types.Auth, error) {
+func (j Jwt) SignToken(id, username string) (types.Auth, error) {
 	// JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
 	token := jwtgo.NewWithClaims(jwtgo.SigningMethodHS256, &types.Claims{
 		AccountID: id,

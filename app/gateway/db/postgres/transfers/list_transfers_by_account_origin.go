@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
 const (
@@ -21,10 +21,10 @@ const (
 	`
 )
 
-func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]transfers.Transfer, error) {
+func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]entities.Transfer, error) {
 	const op = `Repository.Transfers.ListTransfers`
 
-	trfs := make([]transfers.Transfer, 0)
+	trfs := make([]entities.Transfer, 0)
 
 	rows, err := r.db.Query(ctx, queryGetAllTransfersByAccOriginID, accOriginID)
 	if err != nil {
@@ -33,7 +33,7 @@ func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]t
 	defer rows.Close()
 
 	for rows.Next() {
-		var trf transfers.Transfer
+		var trf entities.Transfer
 
 		err := rows.Scan(
 			&trf.ID,

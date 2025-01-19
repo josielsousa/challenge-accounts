@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
@@ -39,8 +39,8 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{
+					GetByIDFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{
 							Balance: 50,
 						}, nil
 					},
@@ -59,8 +59,8 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{}, erring.ErrAccountNotFound
+					GetByIDFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{}, erring.ErrAccountNotFound
 					},
 				}
 
@@ -78,8 +78,8 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					GetByIDFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{}, errUnexpected
+					GetByIDFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{}, errUnexpected
 					},
 				}
 

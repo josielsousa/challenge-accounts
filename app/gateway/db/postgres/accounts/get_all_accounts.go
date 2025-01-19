@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 	`
 )
 
-func (r *Repository) GetAll(ctx context.Context) ([]accounts.Account, error) {
+func (r *Repository) GetAll(ctx context.Context) ([]entities.Account, error) {
 	const operation = `Repository.Accounts.GetAll`
 
 	rows, err := r.db.Query(
@@ -34,10 +34,10 @@ func (r *Repository) GetAll(ctx context.Context) ([]accounts.Account, error) {
 
 	defer rows.Close()
 
-	accs := make([]accounts.Account, 0)
+	accs := make([]entities.Account, 0)
 
 	for rows.Next() {
-		var acc accounts.Account
+		var acc entities.Account
 
 		err := rows.Scan(
 			&acc.ID,

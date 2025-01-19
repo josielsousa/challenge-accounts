@@ -10,11 +10,11 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
-func (r *Repository) Insert(ctx context.Context, trf transfers.TransferData) error {
+func (r *Repository) Insert(ctx context.Context, trf entities.TransferData) error {
 	const op = `Repository.Transfers.Insert`
 
 	tx, err := r.db.Begin(ctx)

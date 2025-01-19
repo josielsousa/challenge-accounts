@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
-	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
 type Usecase struct {
@@ -18,14 +17,14 @@ type Usecase struct {
 //
 //go:generate moq -rm -out usecase_mock.go . Repository AccountRepository
 type Repository interface {
-	Insert(ctx context.Context, transfer trfE.TransferData) error
-	ListTransfers(ctx context.Context, accOriginID string) ([]trfE.Transfer, error)
+	Insert(ctx context.Context, transfer entities.TransferData) error
+	ListTransfers(ctx context.Context, accOriginID string) ([]entities.Transfer, error)
 }
 
 // AccountRepository - Interface que define as assinaturas para o repository de
 // accounts.
 type AccountRepository interface {
-	GetByID(ctx context.Context, id string) (accE.Account, error)
+	GetByID(ctx context.Context, id string) (entities.Account, error)
 }
 
 func NewUsecase(

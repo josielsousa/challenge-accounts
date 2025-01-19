@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
@@ -33,7 +33,7 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 		name      string
 		args      args
 		beforeRun func(t *testing.T, db *pgxpool.Pool)
-		check     func(t *testing.T, got accounts.Account)
+		check     func(t *testing.T, got entities.Account)
 		wantErr   error
 	}{
 		{
@@ -41,10 +41,10 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 			args: args{
 				numCPF: "88350057017",
 			},
-			check: func(t *testing.T, got accounts.Account) {
+			check: func(t *testing.T, got entities.Account) {
 				t.Helper()
 
-				acc := accounts.Account{
+				acc := entities.Account{
 					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 					Name:      "Teste",
 					Balance:   350_00,
@@ -60,7 +60,7 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 				t.Helper()
 
 				{
-					acc := accounts.Account{
+					acc := entities.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   350_00,
@@ -85,7 +85,7 @@ func TestRepository_GetAccountByCPF(t *testing.T) {
 			beforeRun: func(t *testing.T, dbTest *pgxpool.Pool) {
 				t.Helper()
 				{
-					acc := accounts.Account{ID: "cdd3e9ed-b33b-4b18-b5a4-31a791969a30", Name: "Teste", Balance: 350_00, CPF: newCpf, Secret: secretHash, CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local), UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local)}
+					acc := entities.Account{ID: "cdd3e9ed-b33b-4b18-b5a4-31a791969a30", Name: "Teste", Balance: 350_00, CPF: newCpf, Secret: secretHash, CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local), UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local)}
 					err = pgtest.AccountsInsert(t, dbTest, acc)
 					require.NoError(t, err)
 				}
@@ -132,7 +132,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 		name      string
 		args      args
 		beforeRun func(t *testing.T, db *pgxpool.Pool)
-		check     func(t *testing.T, got accounts.Account)
+		check     func(t *testing.T, got entities.Account)
 		wantErr   error
 	}{
 		{
@@ -140,10 +140,10 @@ func TestRepository_GetAccountByID(t *testing.T) {
 			args: args{
 				id: "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 			},
-			check: func(t *testing.T, got accounts.Account) {
+			check: func(t *testing.T, got entities.Account) {
 				t.Helper()
 
-				acc := accounts.Account{
+				acc := entities.Account{
 					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 					Name:      "Teste",
 					Balance:   350_00,
@@ -159,7 +159,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 				t.Helper()
 
 				{
-					acc := accounts.Account{
+					acc := entities.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   350_00,
@@ -183,7 +183,7 @@ func TestRepository_GetAccountByID(t *testing.T) {
 			beforeRun: func(t *testing.T, dbTest *pgxpool.Pool) {
 				t.Helper()
 				{
-					acc := accounts.Account{ID: "cdd3e9ed-b33b-4b18-b5a4-31a791969a30", Name: "Teste", Balance: 350_00, CPF: newCpf, Secret: secretHash, CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local), UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local)}
+					acc := entities.Account{ID: "cdd3e9ed-b33b-4b18-b5a4-31a791969a30", Name: "Teste", Balance: 350_00, CPF: newCpf, Secret: secretHash, CreatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local), UpdatedAt: time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local)}
 					err = pgtest.AccountsInsert(t, dbTest, acc)
 					require.NoError(t, err)
 				}

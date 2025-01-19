@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
@@ -27,7 +27,7 @@ func TestRepository_Insert(t *testing.T) {
 	require.NoError(t, err)
 
 	type args struct {
-		acc accounts.Account
+		acc entities.Account
 	}
 
 	tests := []struct {
@@ -41,7 +41,7 @@ func TestRepository_Insert(t *testing.T) {
 			args: func(t *testing.T) args {
 				t.Helper()
 
-				acc := accounts.Account{
+				acc := entities.Account{
 					ID:        "",
 					Name:      "Teste",
 					Balance:   350_00,
@@ -67,7 +67,7 @@ func TestRepository_Insert(t *testing.T) {
 			args: func(t *testing.T) args {
 				t.Helper()
 
-				acc := accounts.Account{
+				acc := entities.Account{
 					ID:        "",
 					Name:      "Teste",
 					Balance:   350_00,
@@ -100,7 +100,7 @@ func TestRepository_Insert(t *testing.T) {
 			args: func(t *testing.T) args {
 				t.Helper()
 
-				acc := accounts.Account{
+				acc := entities.Account{
 					ID:        "",
 					Name:      "Teste",
 					Balance:   350_00,
@@ -118,7 +118,7 @@ func TestRepository_Insert(t *testing.T) {
 				t.Helper()
 
 				{
-					acc := accounts.Account{
+					acc := entities.Account{
 						ID:        "",
 						Name:      "Teste",
 						Balance:   350_00,

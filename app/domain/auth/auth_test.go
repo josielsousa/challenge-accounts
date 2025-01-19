@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -42,8 +42,8 @@ func TestUsecase_Signin(t *testing.T) {
 			},
 			fields: fields{
 				R: &RepositoryMock{
-					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{}, nil
+					GetByCPFFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{}, nil
 					},
 				},
 			},
@@ -60,8 +60,8 @@ func TestUsecase_Signin(t *testing.T) {
 			},
 			fields: fields{
 				R: &RepositoryMock{
-					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{
+					GetByCPFFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{
 							ID: "acc-id-001",
 						}, nil
 					},
@@ -85,8 +85,8 @@ func TestUsecase_Signin(t *testing.T) {
 			},
 			fields: fields{
 				R: &RepositoryMock{
-					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{
+					GetByCPFFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{
 							ID: "acc-id-001",
 						}, nil
 					},
@@ -115,8 +115,8 @@ func TestUsecase_Signin(t *testing.T) {
 			},
 			fields: fields{
 				R: &RepositoryMock{
-					GetByCPFFunc: func(_ context.Context, _ string) (accE.Account, error) {
-						return accE.Account{
+					GetByCPFFunc: func(_ context.Context, _ string) (entities.Account, error) {
+						return entities.Account{
 							ID: "acc-id-001",
 						}, nil
 					},

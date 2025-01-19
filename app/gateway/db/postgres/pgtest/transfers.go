@@ -9,10 +9,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
-func TransfersInsert(t *testing.T, db *pgxpool.Pool, trf transfers.Transfer) error {
+func TransfersInsert(t *testing.T, db *pgxpool.Pool, trf entities.Transfer) error {
 	t.Helper()
 
 	const op = `PgTest.TransfersInsert`
@@ -64,7 +64,7 @@ func TransfersInsert(t *testing.T, db *pgxpool.Pool, trf transfers.Transfer) err
 	return nil
 }
 
-func GetTransfer(t *testing.T, db *pgxpool.Pool, id string) (transfers.Transfer, error) {
+func GetTransfer(t *testing.T, db *pgxpool.Pool, id string) (entities.Transfer, error) {
 	t.Helper()
 
 	const op = `PgTest.GetTransfer`
@@ -81,7 +81,7 @@ func GetTransfer(t *testing.T, db *pgxpool.Pool, id string) (transfers.Transfer,
 		WHERE id = $1
     `
 
-	var trf transfers.Transfer
+	var trf entities.Transfer
 
 	row := db.QueryRow(
 		context.Background(),
@@ -98,7 +98,7 @@ func GetTransfer(t *testing.T, db *pgxpool.Pool, id string) (transfers.Transfer,
 		&trf.UpdatedAt,
 	)
 	if err != nil {
-		return transfers.Transfer{}, fmt.Errorf("%s-> %s:%w", op, "on query transfer", err)
+		return entities.Transfer{}, fmt.Errorf("%s-> %s:%w", op, "on query transfer", err)
 	}
 
 	return trf, nil

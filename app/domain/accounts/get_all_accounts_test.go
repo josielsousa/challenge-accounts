@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
@@ -38,7 +38,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
+					GetAllFunc: func(_ context.Context) ([]entities.Account, error) {
 						return nil, nil
 					},
 				}
@@ -71,8 +71,8 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
-						return []accE.Account{
+					GetAllFunc: func(_ context.Context) ([]entities.Account, error) {
+						return []entities.Account{
 							{
 								ID:        "acc-id-01",
 								Name:      "name test account 01",
@@ -104,7 +104,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					GetAllFunc: func(_ context.Context) ([]accE.Account, error) {
+					GetAllFunc: func(_ context.Context) ([]entities.Account, error) {
 						return nil, errUnexpected
 					},
 				}

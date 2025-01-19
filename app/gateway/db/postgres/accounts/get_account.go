@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
@@ -39,29 +39,29 @@ const (
 	`
 )
 
-func (r *Repository) GetByCPF(ctx context.Context, numCPF string) (accounts.Account, error) {
+func (r *Repository) GetByCPF(ctx context.Context, numCPF string) (entities.Account, error) {
 	const op = `Repository.Accounts.GetByCPF`
 
 	acc, err := r.getAccount(ctx, numCPF, queryByCPF)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, "on query by CPF", err)
+		return entities.Account{}, fmt.Errorf("%s-> %s: %w", op, "on query by CPF", err)
 	}
 
 	return acc, nil
 }
 
-func (r *Repository) GetByID(ctx context.Context, id string) (accounts.Account, error) {
+func (r *Repository) GetByID(ctx context.Context, id string) (entities.Account, error) {
 	const operation = `Repository.Accounts.GetAccountByCPF`
 
 	acc, err := r.getAccount(ctx, id, queryByID)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", operation, "on query by id", err)
+		return entities.Account{}, fmt.Errorf("%s-> %s: %w", operation, "on query by id", err)
 	}
 
 	return acc, nil
 }
 
-func (r *Repository) getAccount(ctx context.Context, param, query string) (accounts.Account, error) {
+func (r *Repository) getAccount(ctx context.Context, param, query string) (entities.Account, error) {
 	const op = `Repository.Accounts.getAccount`
 
 	row := r.db.QueryRow(
@@ -70,7 +70,7 @@ func (r *Repository) getAccount(ctx context.Context, param, query string) (accou
 		param,
 	)
 
-	var acc accounts.Account
+	var acc entities.Account
 
 	err := row.Scan(
 		&acc.ID,
@@ -85,7 +85,7 @@ func (r *Repository) getAccount(ctx context.Context, param, query string) (accou
 		const action = "on get account by cpf"
 
 		if errors.Is(err, pgx.ErrNoRows) {
-			return accounts.Account{}, fmt.Errorf(
+			return entities.Account{}, fmt.Errorf(
 				"%s -> %s: %w",
 				op,
 				action,
@@ -93,7 +93,7 @@ func (r *Repository) getAccount(ctx context.Context, param, query string) (accou
 			)
 		}
 
-		return accounts.Account{}, fmt.Errorf("%s-> %s: %w", op, action, err)
+		return entities.Account{}, fmt.Errorf("%s-> %s: %w", op, action, err)
 	}
 
 	return acc, nil

@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -24,7 +24,7 @@ type Hasher interface {
 
 // Repository - Interface que define as assinaturas para o repository de accounts.
 type Repository interface {
-	GetByCPF(ctx context.Context, cpf string) (accE.Account, error)
+	GetByCPF(ctx context.Context, cpf string) (entities.Account, error)
 }
 
 func NewUsecase(repo Repository, sig Signer, hasher Hasher) *Usecase {

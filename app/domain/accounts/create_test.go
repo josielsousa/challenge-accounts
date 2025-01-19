@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
@@ -41,7 +41,7 @@ func TestAccount_Create(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					InsertFunc: func(_ context.Context, _ accE.Account) error {
+					InsertFunc: func(_ context.Context, _ entities.Account) error {
 						return nil
 					},
 				}
@@ -64,7 +64,7 @@ func TestAccount_Create(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					InsertFunc: func(_ context.Context, _ accE.Account) error {
+					InsertFunc: func(_ context.Context, _ entities.Account) error {
 						return erring.ErrAccountAlreadyExists
 					},
 				}
@@ -87,7 +87,7 @@ func TestAccount_Create(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					InsertFunc: func(_ context.Context, _ accE.Account) error {
+					InsertFunc: func(_ context.Context, _ entities.Account) error {
 						return erring.ErrAccountAlreadyExists
 					},
 				}
@@ -110,7 +110,7 @@ func TestAccount_Create(t *testing.T) {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
-					InsertFunc: func(_ context.Context, _ accE.Account) error {
+					InsertFunc: func(_ context.Context, _ entities.Account) error {
 						return errUnexpected
 					},
 				}

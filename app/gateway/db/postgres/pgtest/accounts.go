@@ -9,10 +9,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
-func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error {
+func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc entities.Account) error {
 	t.Helper()
 
 	const op = `Pgtest.AccountsInsert`
@@ -66,7 +66,7 @@ func AccountsInsert(t *testing.T, db *pgxpool.Pool, acc accounts.Account) error 
 	return nil
 }
 
-func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, error) {
+func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (entities.Account, error) {
 	t.Helper()
 
 	const op = `Pgtest.GetAccount`
@@ -84,7 +84,7 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, er
 		WHERE id = $1
     `
 
-	var acc accounts.Account
+	var acc entities.Account
 
 	row := db.QueryRow(
 		context.Background(),
@@ -102,7 +102,7 @@ func GetAccount(t *testing.T, db *pgxpool.Pool, id string) (accounts.Account, er
 		&acc.UpdatedAt,
 	)
 	if err != nil {
-		return accounts.Account{}, fmt.Errorf("%s-> %s:%w", op, "on query account", err)
+		return entities.Account{}, fmt.Errorf("%s-> %s:%w", op, "on query account", err)
 	}
 
 	return acc, nil

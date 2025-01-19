@@ -7,7 +7,7 @@ import (
 	"context"
 	"sync"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
 // Ensure, that RepositoryMock does implement Repository.
@@ -20,16 +20,16 @@ var _ Repository = &RepositoryMock{}
 //
 //		// make and configure a mocked Repository
 //		mockedRepository := &RepositoryMock{
-//			GetAllFunc: func(ctx context.Context) ([]accE.Account, error) {
+//			GetAllFunc: func(ctx context.Context) ([]entities.Account, error) {
 //				panic("mock out the GetAll method")
 //			},
-//			GetByCPFFunc: func(ctx context.Context, cpf string) (accE.Account, error) {
+//			GetByCPFFunc: func(ctx context.Context, cpf string) (entities.Account, error) {
 //				panic("mock out the GetByCPF method")
 //			},
-//			GetByIDFunc: func(ctx context.Context, id string) (accE.Account, error) {
+//			GetByIDFunc: func(ctx context.Context, id string) (entities.Account, error) {
 //				panic("mock out the GetByID method")
 //			},
-//			InsertFunc: func(ctx context.Context, account accE.Account) error {
+//			InsertFunc: func(ctx context.Context, account entities.Account) error {
 //				panic("mock out the Insert method")
 //			},
 //			UpdateBalanceFunc: func(ctx context.Context, accountID string, balance int) error {
@@ -43,16 +43,16 @@ var _ Repository = &RepositoryMock{}
 //	}
 type RepositoryMock struct {
 	// GetAllFunc mocks the GetAll method.
-	GetAllFunc func(ctx context.Context) ([]accE.Account, error)
+	GetAllFunc func(ctx context.Context) ([]entities.Account, error)
 
 	// GetByCPFFunc mocks the GetByCPF method.
-	GetByCPFFunc func(ctx context.Context, cpf string) (accE.Account, error)
+	GetByCPFFunc func(ctx context.Context, cpf string) (entities.Account, error)
 
 	// GetByIDFunc mocks the GetByID method.
-	GetByIDFunc func(ctx context.Context, id string) (accE.Account, error)
+	GetByIDFunc func(ctx context.Context, id string) (entities.Account, error)
 
 	// InsertFunc mocks the Insert method.
-	InsertFunc func(ctx context.Context, account accE.Account) error
+	InsertFunc func(ctx context.Context, account entities.Account) error
 
 	// UpdateBalanceFunc mocks the UpdateBalance method.
 	UpdateBalanceFunc func(ctx context.Context, accountID string, balance int) error
@@ -83,7 +83,7 @@ type RepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Account is the account argument value.
-			Account accE.Account
+			Account entities.Account
 		}
 		// UpdateBalance holds details about calls to the UpdateBalance method.
 		UpdateBalance []struct {
@@ -103,7 +103,7 @@ type RepositoryMock struct {
 }
 
 // GetAll calls GetAllFunc.
-func (mock *RepositoryMock) GetAll(ctx context.Context) ([]accE.Account, error) {
+func (mock *RepositoryMock) GetAll(ctx context.Context) ([]entities.Account, error) {
 	if mock.GetAllFunc == nil {
 		panic("RepositoryMock.GetAllFunc: method is nil but Repository.GetAll was just called")
 	}
@@ -135,7 +135,7 @@ func (mock *RepositoryMock) GetAllCalls() []struct {
 }
 
 // GetByCPF calls GetByCPFFunc.
-func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (accE.Account, error) {
+func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (entities.Account, error) {
 	if mock.GetByCPFFunc == nil {
 		panic("RepositoryMock.GetByCPFFunc: method is nil but Repository.GetByCPF was just called")
 	}
@@ -171,7 +171,7 @@ func (mock *RepositoryMock) GetByCPFCalls() []struct {
 }
 
 // GetByID calls GetByIDFunc.
-func (mock *RepositoryMock) GetByID(ctx context.Context, id string) (accE.Account, error) {
+func (mock *RepositoryMock) GetByID(ctx context.Context, id string) (entities.Account, error) {
 	if mock.GetByIDFunc == nil {
 		panic("RepositoryMock.GetByIDFunc: method is nil but Repository.GetByID was just called")
 	}
@@ -207,13 +207,13 @@ func (mock *RepositoryMock) GetByIDCalls() []struct {
 }
 
 // Insert calls InsertFunc.
-func (mock *RepositoryMock) Insert(ctx context.Context, account accE.Account) error {
+func (mock *RepositoryMock) Insert(ctx context.Context, account entities.Account) error {
 	if mock.InsertFunc == nil {
 		panic("RepositoryMock.InsertFunc: method is nil but Repository.Insert was just called")
 	}
 	callInfo := struct {
 		Ctx     context.Context
-		Account accE.Account
+		Account entities.Account
 	}{
 		Ctx:     ctx,
 		Account: account,
@@ -230,11 +230,11 @@ func (mock *RepositoryMock) Insert(ctx context.Context, account accE.Account) er
 //	len(mockedRepository.InsertCalls())
 func (mock *RepositoryMock) InsertCalls() []struct {
 	Ctx     context.Context
-	Account accE.Account
+	Account entities.Account
 } {
 	var calls []struct {
 		Ctx     context.Context
-		Account accE.Account
+		Account entities.Account
 	}
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert

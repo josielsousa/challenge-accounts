@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
@@ -25,7 +25,7 @@ func TestRepository_UpdateBalance(t *testing.T) {
 	require.NoError(t, err)
 
 	type args struct {
-		acc accounts.Account
+		acc entities.Account
 	}
 
 	tests := []struct {
@@ -40,7 +40,7 @@ func TestRepository_UpdateBalance(t *testing.T) {
 			args: func(t *testing.T) args {
 				t.Helper()
 
-				acc := accounts.Account{
+				acc := entities.Account{
 					ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 					Name:      "",
 					Balance:   250_00,
@@ -58,7 +58,7 @@ func TestRepository_UpdateBalance(t *testing.T) {
 				t.Helper()
 
 				{
-					acc := accounts.Account{
+					acc := entities.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   350_00,
@@ -82,7 +82,7 @@ func TestRepository_UpdateBalance(t *testing.T) {
 					newCpf, err := cpf.NewCPF("88350057017")
 					require.NoError(t, err)
 
-					expected := accounts.Account{
+					expected := entities.Account{
 						ID:        "cdd3e9ed-b33b-4b18-b5a4-31a791969a30",
 						Name:      "Teste",
 						Balance:   250_00,

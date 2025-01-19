@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 )
@@ -25,7 +25,7 @@ func (a Account) Create(ctx context.Context, input AccountInput) error {
 		return fmt.Errorf("%s -> %s: %w", op, "on new hashed secret from input", err)
 	}
 
-	acc := accE.Account{
+	acc := entities.Account{
 		ID:        uuid.NewString(),
 		Name:      input.Name,
 		Balance:   input.Balance,

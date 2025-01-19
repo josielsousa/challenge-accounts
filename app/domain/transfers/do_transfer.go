@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
@@ -50,19 +50,19 @@ func (u Usecase) DoTransfer(ctx context.Context, input TransferInput) error {
 		return fmt.Errorf("%s-> %s: %w", op, "on deposit", err)
 	}
 
-	err = u.R.Insert(ctx, trfE.TransferData{
-		Transfer: trfE.Transfer{
+	err = u.R.Insert(ctx, entities.TransferData{
+		Transfer: entities.Transfer{
 			ID:                   uuid.NewString(),
 			Amount:               input.Amount,
 			CreatedAt:            time.Now(),
 			AccountOriginID:      accOri.ID,
 			AccountDestinationID: accDest.ID,
 		},
-		AccountDestination: trfE.AccountData{
+		AccountDestination: entities.AccountData{
 			ID:      accDest.ID,
 			Balance: accDest.Balance,
 		},
-		AccountOrigin: trfE.AccountData{
+		AccountOrigin: entities.AccountData{
 			ID:      accOri.ID,
 			Balance: accOri.Balance,
 		},

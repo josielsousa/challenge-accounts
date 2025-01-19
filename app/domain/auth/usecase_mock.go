@@ -5,7 +5,7 @@ package auth
 
 import (
 	"context"
-	accE "github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/types"
 	"sync"
 )
@@ -164,7 +164,7 @@ var _ Repository = &RepositoryMock{}
 //
 //		// make and configure a mocked Repository
 //		mockedRepository := &RepositoryMock{
-//			GetByCPFFunc: func(ctx context.Context, cpf string) (accE.Account, error) {
+//			GetByCPFFunc: func(ctx context.Context, cpf string) (entities.Account, error) {
 //				panic("mock out the GetByCPF method")
 //			},
 //		}
@@ -175,7 +175,7 @@ var _ Repository = &RepositoryMock{}
 //	}
 type RepositoryMock struct {
 	// GetByCPFFunc mocks the GetByCPF method.
-	GetByCPFFunc func(ctx context.Context, cpf string) (accE.Account, error)
+	GetByCPFFunc func(ctx context.Context, cpf string) (entities.Account, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -191,7 +191,7 @@ type RepositoryMock struct {
 }
 
 // GetByCPF calls GetByCPFFunc.
-func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (accE.Account, error) {
+func (mock *RepositoryMock) GetByCPF(ctx context.Context, cpf string) (entities.Account, error) {
 	if mock.GetByCPFFunc == nil {
 		panic("RepositoryMock.GetByCPFFunc: method is nil but Repository.GetByCPF was just called")
 	}

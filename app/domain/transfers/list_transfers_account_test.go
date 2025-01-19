@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	trfE "github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 )
 
 func TestUsecase_ListTransfersAccount(t *testing.T) {
@@ -39,10 +39,10 @@ func TestUsecase_ListTransfersAccount(t *testing.T) {
 			},
 			fields: fields{
 				R: &RepositoryMock{
-					ListTransfersFunc: func(_ context.Context, id string) ([]trfE.Transfer, error) {
+					ListTransfersFunc: func(_ context.Context, id string) ([]entities.Transfer, error) {
 						require.Equal(t, "acc-id-001", id)
 
-						return []trfE.Transfer{}, errUnknown
+						return []entities.Transfer{}, errUnknown
 					},
 				},
 			},
@@ -56,10 +56,10 @@ func TestUsecase_ListTransfersAccount(t *testing.T) {
 			},
 			fields: fields{
 				R: &RepositoryMock{
-					ListTransfersFunc: func(_ context.Context, id string) ([]trfE.Transfer, error) {
+					ListTransfersFunc: func(_ context.Context, id string) ([]entities.Transfer, error) {
 						require.Equal(t, "acc-id-001", id)
 
-						return []trfE.Transfer{
+						return []entities.Transfer{
 							{
 								ID:                   "trf-id-001",
 								AccountOriginID:      "acc-id-002",

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
@@ -44,7 +44,7 @@ func TestRepository_GetAll(t *testing.T) {
 		name      string
 		wantErr   error
 		beforeRun func(t *testing.T, db *pgxpool.Pool)
-		check     func(t *testing.T, accs []accounts.Account)
+		check     func(t *testing.T, accs []entities.Account)
 	}{
 		{
 			name:    "should got a accounts list with successfully",
@@ -57,7 +57,7 @@ func TestRepository_GetAll(t *testing.T) {
 						newCpf, err := cpf.NewCPF(fakeData[i].numCPF)
 						require.NoError(t, err)
 
-						acc := accounts.Account{
+						acc := entities.Account{
 							ID:        fakeData[i].id,
 							Balance:   350_00 * i,
 							CPF:       newCpf,
@@ -72,7 +72,7 @@ func TestRepository_GetAll(t *testing.T) {
 					}
 				}
 			},
-			check: func(t *testing.T, accs []accounts.Account) {
+			check: func(t *testing.T, accs []entities.Account) {
 				t.Helper()
 
 				{
@@ -82,7 +82,7 @@ func TestRepository_GetAll(t *testing.T) {
 						newCpf, err := cpf.NewCPF(fakeData[i].numCPF)
 						require.NoError(t, err)
 
-						acc := accounts.Account{
+						acc := entities.Account{
 							ID:        fakeData[i].id,
 							Balance:   350_00 * i,
 							CPF:       newCpf,

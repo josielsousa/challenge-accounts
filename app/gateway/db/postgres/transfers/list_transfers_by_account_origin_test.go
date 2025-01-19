@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
 )
 
@@ -31,7 +31,7 @@ func TestRepository_ListTransfers(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		want      []transfers.Transfer
+		want      []entities.Transfer
 		wantErr   error
 		beforeRun func(t *testing.T, db *pgxpool.Pool)
 	}{
@@ -40,7 +40,7 @@ func TestRepository_ListTransfers(t *testing.T) {
 			args: args{
 				accOriginID: accOriginID,
 			},
-			want:    []transfers.Transfer{},
+			want:    []entities.Transfer{},
 			wantErr: nil,
 		},
 		{
@@ -48,7 +48,7 @@ func TestRepository_ListTransfers(t *testing.T) {
 			args: args{
 				accOriginID: accOriginID,
 			},
-			want: []transfers.Transfer{
+			want: []entities.Transfer{
 				{
 					ID:                   trfID1,
 					AccountOriginID:      accOriginID,
@@ -71,7 +71,7 @@ func TestRepository_ListTransfers(t *testing.T) {
 				t.Helper()
 
 				{
-					trfs := []transfers.Transfer{
+					trfs := []entities.Transfer{
 						{
 							ID:                   trfID1,
 							AccountOriginID:      accOriginID,

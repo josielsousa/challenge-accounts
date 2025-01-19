@@ -11,8 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/transfers"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/pgtest"
@@ -35,7 +34,7 @@ func TestRepository_Insert(t *testing.T) {
 	require.NoError(t, err)
 
 	type args struct {
-		trf transfers.TransferData
+		trf entities.TransferData
 	}
 
 	tests := []struct {
@@ -48,8 +47,8 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should insert a transfer with successfully",
 			args: args{
-				trf: transfers.TransferData{
-					Transfer: transfers.Transfer{
+				trf: entities.TransferData{
+					Transfer: entities.Transfer{
 						ID:                   trfID,
 						AccountOriginID:      accOriginID,
 						AccountDestinationID: accDestinationID,
@@ -57,11 +56,11 @@ func TestRepository_Insert(t *testing.T) {
 						CreatedAt:            time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 						UpdatedAt:            time.Date(2022, time.January, 4, 1, 0, 0, 0, time.Local),
 					},
-					AccountOrigin: transfers.AccountData{
+					AccountOrigin: entities.AccountData{
 						ID:      accOriginID,
 						Balance: 350_00,
 					},
-					AccountDestination: transfers.AccountData{
+					AccountDestination: entities.AccountData{
 						ID:      accDestinationID,
 						Balance: 50_00,
 					},
@@ -71,7 +70,7 @@ func TestRepository_Insert(t *testing.T) {
 				t.Helper()
 
 				{
-					accs := []accounts.Account{
+					accs := []entities.Account{
 						{
 							ID:        accOriginID,
 							Name:      "Teste 01",
@@ -105,7 +104,7 @@ func TestRepository_Insert(t *testing.T) {
 					got, err := pgtest.GetTransfer(t, pgPool, trfID)
 					require.NoError(t, err)
 
-					expected := transfers.Transfer{
+					expected := entities.Transfer{
 						ID:                   trfID,
 						AccountOriginID:      accOriginID,
 						AccountDestinationID: accDestinationID,
@@ -120,7 +119,7 @@ func TestRepository_Insert(t *testing.T) {
 					got01, err := pgtest.GetAccount(t, pgPool, accOriginID)
 					require.NoError(t, err)
 
-					expected01 := accounts.Account{
+					expected01 := entities.Account{
 						ID:        accOriginID,
 						Name:      "Teste 01",
 						Balance:   350_00,
@@ -139,7 +138,7 @@ func TestRepository_Insert(t *testing.T) {
 					got02, err := pgtest.GetAccount(t, pgPool, accDestinationID)
 					require.NoError(t, err)
 
-					expected02 := accounts.Account{
+					expected02 := entities.Account{
 						ID:        accDestinationID,
 						Name:      "Teste 02",
 						Balance:   50_00,
@@ -164,8 +163,8 @@ func TestRepository_Insert(t *testing.T) {
 		{
 			name: "should return an error when insert a transfer",
 			args: args{
-				trf: transfers.TransferData{
-					Transfer: transfers.Transfer{
+				trf: entities.TransferData{
+					Transfer: entities.Transfer{
 						ID:                   trfID,
 						AccountOriginID:      accOriginID,
 						AccountDestinationID: accDestinationID,

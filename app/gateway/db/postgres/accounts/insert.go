@@ -10,11 +10,11 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/entities/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
-func (r *Repository) Insert(ctx context.Context, acc accounts.Account) error {
+func (r *Repository) Insert(ctx context.Context, acc entities.Account) error {
 	const operation = `Repository.Accounts.Insert`
 
 	if len(acc.ID) == 0 {

@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/josielsousa/challenge-accounts/app/gateway/http/rest/response"
+	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
 )
 
 const (

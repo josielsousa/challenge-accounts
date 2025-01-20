@@ -8,8 +8,10 @@ import (
 
 	"github.com/josielsousa/challenge-accounts/app/domain/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
+	"github.com/josielsousa/challenge-accounts/app/gateway/api/middleware"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
+	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -36,21 +38,25 @@ type Handler struct {
 }
 
 func RegisterAuthHandlers(authUC authUsecase, router chi.Router) {
-	h := &Handler{authUC: authUC}
+	handler := &Handler{authUC: authUC}
 
-	router.Post("/login", rest.Handler(h.Login))
+	router.Post("/login", rest.Handler(handler.Login))
 }
 
 func RegisterAccountsHandlers(accUC accUsecase, router chi.Router) {
-	h := &Handler{accUC: accUC}
+	handler := &Handler{accUC: accUC}
 
-	router.Post("/", rest.Handler(h.NoContent))
+	router.Post("/", rest.Handler(handler.NoContent))
 }
 
-func RegisterTransfersHandlers(trfUC trfUsecase, router chi.Router) {
-	h := &Handler{trfUC: trfUC}
+func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Router) {
+	handler := &Handler{trfUC: trfUC}
 
-	router.Post("/", rest.Handler(h.NoContent))
+	// List all transfers
+	router.Get("/", middleware.Authorize(signer, rest.Handler(handler.NoContent)))
+
+	// Create a transfer
+	router.Post("/", middleware.Authorize(signer, rest.Handler(handler.NoContent)))
 }
 
 func (Handler) NoContent(_ *http.Request) *response.Response {

@@ -17,6 +17,11 @@ type AppErr struct {
 	Error      Error
 }
 
+var UnauthorizedErr = Error{
+	Code:    "app:unauthorized",
+	Message: erring.ErrUnauthorized.Error(),
+}
+
 var appErrors = map[error]AppErr{
 	erring.ErrAccountNotFound: {
 		StatusCode: http.StatusNotFound,
@@ -132,10 +137,7 @@ var appErrors = map[error]AppErr{
 
 	erring.ErrUnauthorized: {
 		StatusCode: http.StatusUnauthorized,
-		Error: Error{
-			Code:    "app:unauthorized",
-			Message: erring.ErrUnauthorized.Error(),
-		},
+		Error:      UnauthorizedErr,
 	},
 
 	erring.ErrRecordNotFound: {

@@ -56,7 +56,7 @@ func NewAPI(
 		})
 
 		baseRouter.Route("/transfers", func(trfRouter chi.Router) {
-			handler.RegisterTransfersHandlers(trfUC, trfRouter)
+			handler.RegisterTransfersHandlers(trfUC, signer, trfRouter)
 		})
 	})
 

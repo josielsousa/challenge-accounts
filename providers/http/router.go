@@ -38,7 +38,6 @@ func (rp *RouterProvider) ServeHTTP() {
 	rp.mux.HandleFunc("/", homeHandler).Methods("GET")
 
 	// Inicia as rotas de login e informa qual método interno vai receber as requisições.
-	rp.mux.HandleFunc("/login", rp.srvAuth.Login).Methods("POST")
 
 	// Inicia as rotas de accounts e informa qual método interno vai receber as requisições.
 	rp.mux.HandleFunc("/accounts", rp.srvAccount.GetAllAccounts).Methods("GET")

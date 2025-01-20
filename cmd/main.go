@@ -4,8 +4,11 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/josielsousa/challenge-accounts/app"
 	"github.com/josielsousa/challenge-accounts/app/configuration"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
+	"github.com/josielsousa/challenge-accounts/app/gateway/hasher"
+	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
 )
 
 // import (
@@ -47,17 +50,21 @@ func main() {
 		logger.Error("on loading configuration", slog.Any("error", err))
 	}
 
+	pgClient, err := postgres.NewClient(cfg.Postgres.URL())
+	if err != nil {
+		logger.Error("on create configuration", slog.Any("error", err))
+
+		panic(err)
+	}
+	defer pgClient.Pool.Close()
+
 	// JWT string chave utilizada para geração do token.
-	// signer := jwt.New([]byte("api-challenge-accounts"))
+	signer := jwt.New([]byte("api-challenge-accounts"))
 
 	// Hasher é um helper usado para gerar e validar a secret.
-	// hasher := hasher.NewHelper()
+	hasher := hasher.NewHelper()
 
-	dbPool, err := postgres.ConnectPoolWithMigrations(cfg.Postgres.URL())
-	if err != nil {
-		logger.Error("on connect to pool", slog.Any("error", err))
-	}
+	application := app.NewApp(pgClient, signer, hasher)
 
-	defer dbPool.Close()
-	logger.Info("api available...")
+	logger.Info("api available...", slog.Any("name", application.Name))
 }

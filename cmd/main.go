@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"net"
 	"net/http"
@@ -80,16 +79,14 @@ func main() {
 	gracefulGroup, gracefulGroupCtx := errgroup.WithContext(gracefulCtx)
 
 	gracefulGroup.Go(func() error {
-		log.Printf("api available on server port: %s", server.Addr)
+		logger.Info("api available", slog.String("port", server.Addr))
 
 		return server.ListenAndServe()
 	})
 
-	//nolint:contextcheck
+	<-gracefulGroupCtx.Done()
 	gracefulGroup.Go(func() error {
-		<-gracefulGroupCtx.Done()
-
-		log.Printf("exit signal received terminating...")
+		logger.Info("exit signal received terminating...")
 
 		timeoutCtx, cancel := context.WithTimeout(context.Background(), GracefulTimeout)
 		defer cancel()
@@ -102,6 +99,10 @@ func main() {
 
 		return nil
 	})
+
+	if err := gracefulGroup.Wait(); err != nil {
+		logger.Error("exiting", slog.Any("reason", err))
+	}
 
 	cancelGraceful()
 }

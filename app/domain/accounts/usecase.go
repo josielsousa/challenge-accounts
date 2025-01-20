@@ -34,10 +34,10 @@ type Repository interface {
 	Insert(ctx context.Context, account entities.Account) error
 }
 
-type Account struct {
+type Usecase struct {
 	R Repository
 }
 
-func NewUsecase(r Repository) *Account {
-	return &Account{R: r}
+func NewUsecase(r Repository) *Usecase {
+	return &Usecase{R: r}
 }

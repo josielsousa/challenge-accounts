@@ -13,6 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type logger struct{}
+
 func Connect(dbURL string, log *logrus.Entry) (*pgx.Conn, error) {
 	config, err := pgx.ParseConfig(dbURL)
 	if err != nil {
@@ -86,8 +88,6 @@ func RunMigrationsConn(dbURL string) error {
 
 	return nil
 }
-
-type logger struct{}
 
 func (l logger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
 	attrs := make([]slog.Attr, 0, len(data))

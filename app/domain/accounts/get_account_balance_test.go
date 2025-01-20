@@ -26,7 +26,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 		args    args
 		want    int
 		wantErr error
-		setupUC func() *Account
+		setupUC func() *Usecase
 	}{
 		{
 			name: "should return balance by account id",
@@ -35,7 +35,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 			},
 			wantErr: nil,
 			want:    50,
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -55,7 +55,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 				accountID: "d079de7d-b3d2-47fa-b1d6-b5c7d7cf5389",
 			},
 			want: 0,
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -74,7 +74,7 @@ func TestAccount_GetAccountBalance(t *testing.T) {
 				accountID: "d079de7d-b3d2-47fa-b1d6-b5c7d7cf5389",
 			},
 			want: 0,
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{

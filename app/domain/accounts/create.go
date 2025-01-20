@@ -12,7 +12,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 )
 
-func (a Account) Create(ctx context.Context, input AccountInput) error {
+func (u Usecase) Create(ctx context.Context, input AccountInput) error {
 	const op = `accounts.Create`
 
 	cpf, err := cpf.NewCPF(input.CPF)
@@ -37,7 +37,7 @@ func (a Account) Create(ctx context.Context, input AccountInput) error {
 
 	// there are a validation to check if the account already exists
 	// using the constraint of the CPF as unique on the database.
-	err = a.R.Insert(ctx, acc)
+	err = u.R.Insert(ctx, acc)
 	if err != nil {
 		return fmt.Errorf("%s-> %s: %w", op, "on create account", err)
 	}

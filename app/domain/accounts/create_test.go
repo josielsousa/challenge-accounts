@@ -25,7 +25,7 @@ func TestAccount_Create(t *testing.T) {
 		name    string
 		args    args
 		wantErr error
-		setupUC func() *Account
+		setupUC func() *Usecase
 	}{
 		{
 			name: "should create a new account from values",
@@ -37,7 +37,7 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -60,7 +60,7 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -83,7 +83,7 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -106,7 +106,7 @@ func TestAccount_Create(t *testing.T) {
 					Secret:  "stringSecret",
 				},
 			},
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{

@@ -28,13 +28,13 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 		name    string
 		want    []AccountOutput
 		wantErr error
-		setupUC func() *Account
+		setupUC func() *Usecase
 	}{
 		{
 			name:    "should return an empty list when db is empty",
 			wantErr: nil,
 			want:    []AccountOutput{},
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -67,7 +67,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 					UpdatedAt: time.Date(2022, time.January, 4, 0, 0, 0, 0, time.Local),
 				},
 			},
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{
@@ -100,7 +100,7 @@ func TestAccount_GetAllAccounts(t *testing.T) {
 			name:    "should return an unexpected error",
 			wantErr: errUnexpected,
 			want:    nil,
-			setupUC: func() *Account {
+			setupUC: func() *Usecase {
 				t.Helper()
 
 				mockAccRepo := &RepositoryMock{

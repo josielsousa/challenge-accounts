@@ -40,7 +40,7 @@ type Handler struct {
 func RegisterAuthHandlers(authUC authUsecase, router chi.Router) {
 	handler := &Handler{authUC: authUC}
 
-	router.Post("/login", rest.Handler(handler.Login))
+	router.Post("/signin", rest.Handler(handler.Signin))
 }
 
 func RegisterAccountsHandlers(accUC accUsecase, router chi.Router) {

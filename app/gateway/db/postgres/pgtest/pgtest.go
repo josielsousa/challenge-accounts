@@ -110,7 +110,11 @@ func getDockerResource(pool *dockertest.Pool) (*dockertest.Resource, error) {
 		Name:       defaultContainerName,
 		Repository: "postgres",
 		Tag:        "16-alpine",
-		Env:        []string{"POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres", "POSTGRES_DB=" + defaultDBName},
+		Env: []string{
+			"POSTGRES_USER=postgres",
+			"POSTGRES_PASSWORD=postgres",
+			"POSTGRES_DB=" + defaultDBName,
+		},
 	}, func(c *docker.HostConfig) {
 		c.AutoRemove = true
 		c.RestartPolicy = docker.RestartPolicy{Name: "no"}

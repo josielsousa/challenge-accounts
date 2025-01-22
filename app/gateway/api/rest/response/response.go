@@ -49,6 +49,13 @@ func InternalServerErr(err error) *Response {
 	}
 }
 
+func Unauthorized() *Response {
+	return &Response{
+		StatusCode: http.StatusUnauthorized,
+		Body:       unauthorizedErr,
+	}
+}
+
 func AppError(err error) *Response {
 	appErr := ToAppErr(err)
 

@@ -35,6 +35,7 @@ func NewAPI(
 		middleware.CleanPath,
 		middleware.StripSlashes,
 		middleware.Recoverer,
+		middleware.SetContentTypeJSON,
 	)
 
 	router.Route("/api/v1/challenge-accounts", func(baseRouter chi.Router) {

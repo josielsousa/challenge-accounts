@@ -1,43 +1,20 @@
 package rest
 
 import (
-	"encoding/json"
-	"fmt"
-	"log/slog"
 	"net/http"
 
-	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
-)
+	"github.com/go-chi/render"
 
-const (
-	HeaderContentType     = "Content-Type"
-	HeaderApplicationJSON = "application/json"
+	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
 )
 
 type handlerFunc func(req *http.Request) *response.Response
 
 func Handler(fn handlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp := fn(r)
+	return func(rw http.ResponseWriter, req *http.Request) {
+		resp := fn(req)
 
-		if err := WriteJSON(w, resp.StatusCode, resp.Body); err != nil {
-			slog.Error("write response", slog.Any("error", err))
-		}
+		render.Status(req, resp.StatusCode)
+		render.JSON(rw, req, resp.Body)
 	}
-}
-
-func WriteJSON(rw http.ResponseWriter, statusCode int, payload any) error {
-	rw.WriteHeader(statusCode)
-
-	if payload == nil {
-		return nil
-	}
-
-	rw.Header().Set(HeaderContentType, HeaderApplicationJSON)
-
-	if err := json.NewEncoder(rw).Encode(payload); err != nil {
-		return fmt.Errorf("encode response body: %w", err)
-	}
-
-	return nil
 }

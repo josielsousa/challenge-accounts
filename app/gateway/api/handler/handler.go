@@ -47,6 +47,7 @@ func RegisterAccountsHandlers(accUC accUsecase, router chi.Router) {
 	handler := &Handler{accUC: accUC}
 
 	router.Post("/", rest.Handler(handler.CreateAccount))
+	router.Get("/", rest.Handler(handler.ListAccounts))
 }
 
 func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Router) {

@@ -2,6 +2,7 @@ package validator
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -17,6 +18,13 @@ type RulerError struct {
 
 func (v RulerError) Error() string {
 	return v.Message
+}
+
+func (v RulerError) addField(field string) RulerError {
+	v.Code = fmt.Sprintf("%s:%s", field, v.Code)
+	v.Message = fmt.Sprintf("%s %s", field, v.Message)
+
+	return v
 }
 
 type Ruler struct {
@@ -73,7 +81,7 @@ func handleValidationError(err error) error {
 				continue
 			}
 
-			return validation.vError
+			return validation.vError.addField(vError.Field())
 		}
 	}
 

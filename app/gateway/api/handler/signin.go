@@ -2,9 +2,11 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
+	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/validator"
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
@@ -20,6 +22,12 @@ type (
 )
 
 func (r SinginRequest) Validate() error {
+	globalValidator := validator.GetGlobalValidator()
+
+	if err := globalValidator.ValidateStructModel(r); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
 	return nil
 }
 

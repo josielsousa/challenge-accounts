@@ -151,7 +151,7 @@ var appErrors = map[error]AppErr{
 
 func ToAppErr(err error) AppErr {
 	for value, appErr := range appErrors {
-		if errors.Is(value, err) {
+		if errors.Is(err, value) {
 			return appErr
 		}
 	}

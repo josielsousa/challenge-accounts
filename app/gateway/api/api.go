@@ -51,12 +51,9 @@ func NewAPI(
 			handler.RegisterAuthHandlers(authUC, authRouter)
 		})
 
-		baseRouter.Route("/accounts", func(accRouter chi.Router) {
-			handler.RegisterAccountsHandlers(accUC, accRouter)
-		})
-
-		baseRouter.Route("/transfers", func(trfRouter chi.Router) {
-			handler.RegisterTransfersHandlers(trfUC, signer, trfRouter)
+		baseRouter.Route("/accounts", func(baseRouter chi.Router) {
+			handler.RegisterAccountsHandlers(accUC, baseRouter)
+			handler.RegisterTransfersHandlers(trfUC, signer, baseRouter)
 		})
 	})
 

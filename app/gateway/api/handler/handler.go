@@ -53,8 +53,8 @@ func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Rou
 	handler := &Handler{trfUC: trfUC}
 
 	// List all transfers
-	router.Get("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.ListTransfers)))
+	router.Get("/{account_id}/transfers", middleware.Authorize(signer, rest.Handler(handler.ListTransfers)))
 
 	// Create a transfer
-	router.Post("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.DoTransfer)))
+	router.Post("/{account_id}/transfers", middleware.Authorize(signer, rest.Handler(handler.DoTransfer)))
 }

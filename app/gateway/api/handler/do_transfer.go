@@ -23,7 +23,7 @@ type (
 		Amount               int    `json:"amount"                 validate:"required"`
 	}
 
-	DoTransferResponse struct {
+	TransferResponse struct {
 		ID                   string `json:"id"`
 		AccountOriginID      string `json:"account_origin_id"`
 		AccountDestinationID string `json:"account_destination_id"`
@@ -85,7 +85,7 @@ func (h Handler) DoTransfer(req *http.Request) *response.Response {
 		return response.AppError(err)
 	}
 
-	return response.Ok(DoTransferResponse{
+	return response.Ok(TransferResponse{
 		ID:                   out.ID,
 		AccountOriginID:      out.AccountOriginID,
 		AccountDestinationID: out.AccountDestinationID,

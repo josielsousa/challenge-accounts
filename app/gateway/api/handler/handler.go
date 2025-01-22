@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/middleware"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
-	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
 	"github.com/josielsousa/challenge-accounts/types"
 )
@@ -55,12 +53,8 @@ func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Rou
 	handler := &Handler{trfUC: trfUC}
 
 	// List all transfers
-	router.Get("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.NoContent)))
+	router.Get("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.ListTransfers)))
 
 	// Create a transfer
 	router.Post("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.DoTransfer)))
-}
-
-func (Handler) NoContent(_ *http.Request) *response.Response {
-	return response.NoContent()
 }

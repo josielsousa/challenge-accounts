@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -19,7 +18,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/types"
 )
 
-func TestDoTransfer(t *testing.T) {
+func TestListAllTransfers(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
@@ -35,7 +34,6 @@ func TestDoTransfer(t *testing.T) {
 		accountID       string
 		claimsAccountID string
 		authenticated   bool
-		input           DoTransferRequest
 	}
 
 	tests := []struct {
@@ -45,15 +43,11 @@ func TestDoTransfer(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "do transfer success",
+			name: "list all transfers success",
 			args: args{
 				accountID:       "acc-id-001",
 				claimsAccountID: "acc-id-001",
 				authenticated:   true,
-				input: DoTransferRequest{
-					AccountDestinationID: "acc-id-002",
-					Amount:               4_50,
-				},
 			},
 			fields: fields{
 				trfUC: &trfUsecaseMock{
@@ -63,7 +57,18 @@ func TestDoTransfer(t *testing.T) {
 							AccountOriginID:      "acc-id-001",
 							AccountDestinationID: "acc-id-002",
 							Amount:               4_50,
-							CreatedAt:            time.Date(2025, time.January, 22, 18, 0o5, 0, 0, time.UTC),
+							CreatedAt:            time.Date(2025, time.January, 22, 18, 5, 0, 0, time.UTC),
+						}, nil
+					},
+					ListTransfersAccountFunc: func(_ context.Context, _ string) ([]transfers.TransferOutput, error) {
+						return []transfers.TransferOutput{
+							{
+								ID:                   "trf-id-001",
+								AccountOriginID:      "acc-id-001",
+								AccountDestinationID: "acc-id-002",
+								Amount:               4_50,
+								CreatedAt:            time.Date(2025, time.January, 22, 18, 5, 0, 0, time.UTC),
+							},
 						}, nil
 					},
 				},
@@ -72,11 +77,16 @@ func TestDoTransfer(t *testing.T) {
 				statusCode: http.StatusOK,
 				body: json.RawMessage(`
 					{
-						"id": "trf-id-001",
-						"account_origin_id": "acc-id-001",
-						"account_destination_id": "acc-id-002",
-						"amount": 450,
-						"created_at": "2025-01-22T18:05:00Z"
+						"data": [
+							{
+								"id": "trf-id-001",
+								"account_origin_id": "acc-id-001",
+								"account_destination_id": "acc-id-002",
+								"amount": 450,
+								"created_at": "2025-01-22T18:05:00Z"
+							}
+						],
+						"success": true
 					}
 				`),
 			},
@@ -87,10 +97,6 @@ func TestDoTransfer(t *testing.T) {
 				accountID:       "acc-id-001",
 				claimsAccountID: "acc-id-001",
 				authenticated:   false,
-				input: DoTransferRequest{
-					AccountDestinationID: "acc-id-002",
-					Amount:               4_50,
-				},
 			},
 			fields: fields{
 				trfUC: &trfUsecaseMock{
@@ -115,10 +121,6 @@ func TestDoTransfer(t *testing.T) {
 				accountID:       "acc-id-009",
 				claimsAccountID: "acc-id-001",
 				authenticated:   true,
-				input: DoTransferRequest{
-					AccountDestinationID: "acc-id-002",
-					Amount:               4_50,
-				},
 			},
 			fields: fields{
 				trfUC: &trfUsecaseMock{
@@ -148,10 +150,7 @@ func TestDoTransfer(t *testing.T) {
 			}
 
 			router := chi.NewRouter()
-			router.Post("/transfers/{account_id}", rest.Handler(hand.DoTransfer))
-
-			bodyBytes, err := json.Marshal(tt.args.input)
-			require.NoError(t, err)
+			router.Get("/transfers/{account_id}", rest.Handler(hand.ListTransfers))
 
 			ctx := context.Background()
 
@@ -163,9 +162,9 @@ func TestDoTransfer(t *testing.T) {
 
 			req, err := http.NewRequestWithContext(
 				ctx,
-				http.MethodPost,
+				http.MethodGet,
 				"/transfers/"+tt.args.accountID,
-				bytes.NewReader(bodyBytes),
+				nil,
 			)
 			require.NoError(t, err)
 

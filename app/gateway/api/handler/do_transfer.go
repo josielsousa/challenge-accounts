@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -41,8 +42,9 @@ func (r DoTransferRequest) Validate() error {
 	return nil
 }
 
-func (r DoTransferRequest) ToTransferInput() transfers.TransferInput {
+func (r DoTransferRequest) ToTransferInput(accountOriginID string) transfers.TransferInput {
 	return transfers.TransferInput{
+		AccountOriginID:      accountOriginID,
 		AccountDestinationID: r.AccountDestinationID,
 		Amount:               r.Amount,
 	}
@@ -50,6 +52,8 @@ func (r DoTransferRequest) ToTransferInput() transfers.TransferInput {
 
 func (h Handler) DoTransfer(req *http.Request) *response.Response {
 	id := chi.URLParam(req, "account_id")
+
+	logger := slog.Default()
 
 	if len(strings.TrimSpace(id)) == 0 {
 		return response.BadRequest(erring.ErrEmptyAccountID)
@@ -66,13 +70,17 @@ func (h Handler) DoTransfer(req *http.Request) *response.Response {
 		return response.Forbidden()
 	}
 
-	var input DoTransferRequest
+	var request DoTransferRequest
 
-	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return response.BadRequest(err)
 	}
 
-	out, err := h.trfUC.DoTransfer(ctx, input.ToTransferInput())
+	input := request.ToTransferInput(id)
+
+	logger.Info("on do transfer", slog.Any("input", input))
+
+	out, err := h.trfUC.DoTransfer(ctx, input)
 	if err != nil {
 		return response.AppError(err)
 	}

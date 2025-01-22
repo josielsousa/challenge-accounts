@@ -17,7 +17,7 @@ import (
 
 //go:generate moq -rm -out handler_mock.go . accUsecase authUsecase trfUsecase
 type accUsecase interface {
-	Create(ctx context.Context, input accounts.AccountInput) error
+	Create(ctx context.Context, input accounts.AccountInput) (accounts.AccountOutput, error)
 	GetAccountBalance(ctx context.Context, accountID string) (int, error)
 	GetAllAccounts(ctx context.Context) ([]accounts.AccountOutput, error)
 }
@@ -46,7 +46,7 @@ func RegisterAuthHandlers(authUC authUsecase, router chi.Router) {
 func RegisterAccountsHandlers(accUC accUsecase, router chi.Router) {
 	handler := &Handler{accUC: accUC}
 
-	router.Post("/", rest.Handler(handler.NoContent))
+	router.Post("/", rest.Handler(handler.CreateAccount))
 }
 
 func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Router) {

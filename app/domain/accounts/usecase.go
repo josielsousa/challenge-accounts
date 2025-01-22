@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
-	"github.com/josielsousa/challenge-accounts/app/domain/vos/cpf"
 )
 
 type AccountInput struct {
@@ -19,7 +18,7 @@ type AccountOutput struct {
 	ID        string
 	Name      string
 	Balance   int
-	CPF       cpf.CPF
+	CPF       string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

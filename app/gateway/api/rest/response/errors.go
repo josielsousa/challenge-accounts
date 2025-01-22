@@ -66,7 +66,7 @@ var appErrors = map[error]AppErr{
 	erring.ErrAccountAlreadyExists: {
 		StatusCode: http.StatusConflict,
 		Error: Error{
-			Code:    "app:invalid_amount",
+			Code:    "app:account_already_exists",
 			Message: erring.ErrAccountAlreadyExists.Error(),
 		},
 	},

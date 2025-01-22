@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
@@ -25,6 +26,7 @@ func TestAccount_Create(t *testing.T) {
 		name    string
 		args    args
 		wantErr error
+		want    AccountOutput
 		setupUC func() *Usecase
 	}{
 		{
@@ -47,6 +49,14 @@ func TestAccount_Create(t *testing.T) {
 				}
 
 				return NewUsecase(mockAccRepo)
+			},
+			want: AccountOutput{
+				ID:        "",
+				Name:      "username test",
+				Balance:   50,
+				CPF:       "88350057017",
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
 			},
 			wantErr: nil,
 		},
@@ -71,6 +81,7 @@ func TestAccount_Create(t *testing.T) {
 
 				return NewUsecase(mockAccRepo)
 			},
+			want:    AccountOutput{},
 			wantErr: erring.ErrAccountAlreadyExists,
 		},
 		{
@@ -94,6 +105,7 @@ func TestAccount_Create(t *testing.T) {
 
 				return NewUsecase(mockAccRepo)
 			},
+			want:    AccountOutput{},
 			wantErr: cpf.ErrInvalid,
 		},
 		{
@@ -117,6 +129,7 @@ func TestAccount_Create(t *testing.T) {
 
 				return NewUsecase(mockAccRepo)
 			},
+			want:    AccountOutput{},
 			wantErr: errUnexpected,
 		},
 	}
@@ -127,8 +140,13 @@ func TestAccount_Create(t *testing.T) {
 
 			a := tt.setupUC()
 
-			err := a.Create(context.Background(), tt.args.input)
-			assert.ErrorIs(t, err, tt.wantErr)
+			out, err := a.Create(context.Background(), tt.args.input)
+			require.ErrorIs(t, err, tt.wantErr)
+
+			out.ID = ""
+			out.CreatedAt = time.Time{}
+			out.UpdatedAt = time.Time{}
+			require.Equal(t, tt.want, out)
 		})
 	}
 }

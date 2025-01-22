@@ -21,7 +21,7 @@ var _ accUsecase = &accUsecaseMock{}
 //
 //		// make and configure a mocked accUsecase
 //		mockedaccUsecase := &accUsecaseMock{
-//			CreateFunc: func(ctx context.Context, input accounts.AccountInput) error {
+//			CreateFunc: func(ctx context.Context, input accounts.AccountInput) (accounts.AccountOutput, error) {
 //				panic("mock out the Create method")
 //			},
 //			GetAccountBalanceFunc: func(ctx context.Context, accountID string) (int, error) {
@@ -38,7 +38,7 @@ var _ accUsecase = &accUsecaseMock{}
 //	}
 type accUsecaseMock struct {
 	// CreateFunc mocks the Create method.
-	CreateFunc func(ctx context.Context, input accounts.AccountInput) error
+	CreateFunc func(ctx context.Context, input accounts.AccountInput) (accounts.AccountOutput, error)
 
 	// GetAccountBalanceFunc mocks the GetAccountBalance method.
 	GetAccountBalanceFunc func(ctx context.Context, accountID string) (int, error)
@@ -74,7 +74,7 @@ type accUsecaseMock struct {
 }
 
 // Create calls CreateFunc.
-func (mock *accUsecaseMock) Create(ctx context.Context, input accounts.AccountInput) error {
+func (mock *accUsecaseMock) Create(ctx context.Context, input accounts.AccountInput) (accounts.AccountOutput, error) {
 	if mock.CreateFunc == nil {
 		panic("accUsecaseMock.CreateFunc: method is nil but accUsecase.Create was just called")
 	}

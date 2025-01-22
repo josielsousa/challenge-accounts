@@ -12,18 +12,30 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 )
 
-func (u Usecase) Create(ctx context.Context, input AccountInput) error {
+func (u Usecase) Create(ctx context.Context, input AccountInput) (AccountOutput, error) {
 	const op = `accounts.Create`
 
 	cpf, err := cpf.NewCPF(input.CPF)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on new instance CPF from input", err)
+		return AccountOutput{}, fmt.Errorf(
+			"%s-> %s: %w",
+			op,
+			"on new instance CPF from input",
+			err,
+		)
 	}
 
 	secret, err := hash.NewHash(input.Secret)
 	if err != nil {
-		return fmt.Errorf("%s -> %s: %w", op, "on new hashed secret from input", err)
+		return AccountOutput{}, fmt.Errorf(
+			"%s -> %s: %w",
+			op,
+			"on new hashed secret from input",
+			err,
+		)
 	}
+
+	now := time.Now()
 
 	acc := entities.Account{
 		ID:        uuid.NewString(),
@@ -31,16 +43,28 @@ func (u Usecase) Create(ctx context.Context, input AccountInput) error {
 		Balance:   input.Balance,
 		CPF:       cpf,
 		Secret:    secret,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	// there are a validation to check if the account already exists
 	// using the constraint of the CPF as unique on the database.
 	err = u.R.Insert(ctx, acc)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on create account", err)
+		return AccountOutput{}, fmt.Errorf(
+			"%s-> %s: %w",
+			op,
+			"on create account",
+			err,
+		)
 	}
 
-	return nil
+	return AccountOutput{
+		ID:        acc.ID,
+		Name:      acc.Name,
+		Balance:   acc.Balance,
+		CPF:       acc.CPF.Value(),
+		CreatedAt: acc.CreatedAt,
+		UpdatedAt: acc.UpdatedAt,
+	}, nil
 }

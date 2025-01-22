@@ -20,7 +20,7 @@ func (u Usecase) GetAllAccounts(ctx context.Context) ([]AccountOutput, error) {
 			ID:        acc.ID,
 			Name:      acc.Name,
 			Balance:   acc.Balance,
-			CPF:       acc.CPF,
+			CPF:       acc.CPF.Value(),
 			CreatedAt: acc.CreatedAt,
 			UpdatedAt: acc.UpdatedAt,
 		})

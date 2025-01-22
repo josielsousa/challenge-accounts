@@ -23,7 +23,7 @@ type accUsecase interface {
 }
 
 type trfUsecase interface {
-	DoTransfer(ctx context.Context, input transfers.TransferInput) error
+	DoTransfer(ctx context.Context, input transfers.TransferInput) (transfers.TransferOutput, error)
 	ListTransfersAccount(ctx context.Context, accOriginID string) ([]transfers.TransferOutput, error)
 }
 
@@ -48,17 +48,17 @@ func RegisterAccountsHandlers(accUC accUsecase, router chi.Router) {
 
 	router.Post("/", rest.Handler(handler.CreateAccount))
 	router.Get("/", rest.Handler(handler.ListAccounts))
-	router.Get("/{id}/balance", rest.Handler(handler.GetAccountBalance))
+	router.Get("/{account_id}/balance", rest.Handler(handler.GetAccountBalance))
 }
 
 func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Router) {
 	handler := &Handler{trfUC: trfUC}
 
 	// List all transfers
-	router.Get("/", middleware.Authorize(signer, rest.Handler(handler.NoContent)))
+	router.Get("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.NoContent)))
 
 	// Create a transfer
-	router.Post("/", middleware.Authorize(signer, rest.Handler(handler.NoContent)))
+	router.Post("/{account_id}", middleware.Authorize(signer, rest.Handler(handler.DoTransfer)))
 }
 
 func (Handler) NoContent(_ *http.Request) *response.Response {

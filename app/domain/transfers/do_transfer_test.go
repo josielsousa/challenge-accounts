@@ -3,6 +3,7 @@ package transfers
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -26,6 +27,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    TransferOutput
 		wantErr error
 	}{
 		{
@@ -37,6 +39,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					Amount:               0,
 				},
 			},
+			want:    TransferOutput{},
 			wantErr: erring.ErrInvalidAmount,
 		},
 		{
@@ -60,6 +63,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					},
 				},
 			},
+			want:    TransferOutput{},
 			wantErr: erring.ErrInsufficientFunds,
 		},
 		{
@@ -87,6 +91,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					},
 				},
 			},
+			want:    TransferOutput{},
 			wantErr: erring.ErrAccountOriginNotFound,
 		},
 		{
@@ -114,6 +119,7 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					},
 				},
 			},
+			want:    TransferOutput{},
 			wantErr: erring.ErrAccountDestinationNotFound,
 		},
 		{
@@ -151,6 +157,13 @@ func TestUsecase_DoTransfer(t *testing.T) {
 					},
 				},
 			},
+			want: TransferOutput{
+				ID:                   "",
+				AccountOriginID:      "acc-id-002",
+				AccountDestinationID: "acc-id-001",
+				Amount:               10_00,
+				CreatedAt:            time.Time{},
+			},
 			wantErr: nil,
 		},
 	}
@@ -164,8 +177,12 @@ func TestUsecase_DoTransfer(t *testing.T) {
 				R:  tt.fields.R,
 			}
 
-			err := usecase.DoTransfer(context.Background(), tt.args.input)
+			out, err := usecase.DoTransfer(context.Background(), tt.args.input)
 			require.ErrorIs(t, err, tt.wantErr)
+
+			out.ID = ""
+			out.CreatedAt = time.Time{}
+			require.Equal(t, tt.want, out)
 		})
 	}
 }

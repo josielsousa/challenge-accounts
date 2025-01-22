@@ -56,6 +56,26 @@ func Unauthorized() *Response {
 	}
 }
 
+func Unauthenticated() *Response {
+	return &Response{
+		StatusCode: http.StatusUnauthorized,
+		Body: Error{
+			Code:    "app:unauthenticated",
+			Message: "unauthenticated",
+		},
+	}
+}
+
+func Forbidden() *Response {
+	return &Response{
+		StatusCode: http.StatusForbidden,
+		Body: Error{
+			Code:    "app:forbidden",
+			Message: "forbidden",
+		},
+	}
+}
+
 func AppError(err error) *Response {
 	appErr := ToAppErr(err)
 

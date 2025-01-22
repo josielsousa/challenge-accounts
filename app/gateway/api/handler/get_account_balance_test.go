@@ -64,7 +64,7 @@ func TestGetAccountBalance(t *testing.T) {
 			}
 
 			router := chi.NewRouter()
-			router.Get("/accounts/{id}/balance", rest.Handler(hand.GetAccountBalance))
+			router.Get("/accounts/{account_id}/balance", rest.Handler(hand.GetAccountBalance))
 
 			req, err := http.NewRequestWithContext(
 				context.Background(),

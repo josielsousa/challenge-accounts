@@ -17,7 +17,7 @@ type (
 )
 
 func (h Handler) GetAccountBalance(req *http.Request) *response.Response {
-	id := chi.URLParam(req, "id")
+	id := chi.URLParam(req, "account_id")
 
 	if len(strings.TrimSpace(id)) == 0 {
 		return response.BadRequest(erring.ErrEmptyAccountID)

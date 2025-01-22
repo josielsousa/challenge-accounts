@@ -259,7 +259,7 @@ var _ trfUsecase = &trfUsecaseMock{}
 //
 //		// make and configure a mocked trfUsecase
 //		mockedtrfUsecase := &trfUsecaseMock{
-//			DoTransferFunc: func(ctx context.Context, input transfers.TransferInput) error {
+//			DoTransferFunc: func(ctx context.Context, input transfers.TransferInput) (transfers.TransferOutput, error) {
 //				panic("mock out the DoTransfer method")
 //			},
 //			ListTransfersAccountFunc: func(ctx context.Context, accOriginID string) ([]transfers.TransferOutput, error) {
@@ -273,7 +273,7 @@ var _ trfUsecase = &trfUsecaseMock{}
 //	}
 type trfUsecaseMock struct {
 	// DoTransferFunc mocks the DoTransfer method.
-	DoTransferFunc func(ctx context.Context, input transfers.TransferInput) error
+	DoTransferFunc func(ctx context.Context, input transfers.TransferInput) (transfers.TransferOutput, error)
 
 	// ListTransfersAccountFunc mocks the ListTransfersAccount method.
 	ListTransfersAccountFunc func(ctx context.Context, accOriginID string) ([]transfers.TransferOutput, error)
@@ -300,7 +300,7 @@ type trfUsecaseMock struct {
 }
 
 // DoTransfer calls DoTransferFunc.
-func (mock *trfUsecaseMock) DoTransfer(ctx context.Context, input transfers.TransferInput) error {
+func (mock *trfUsecaseMock) DoTransfer(ctx context.Context, input transfers.TransferInput) (transfers.TransferOutput, error) {
 	if mock.DoTransferFunc == nil {
 		panic("trfUsecaseMock.DoTransferFunc: method is nil but trfUsecase.DoTransfer was just called")
 	}

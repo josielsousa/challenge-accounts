@@ -20,6 +20,7 @@ type (
 	}
 
 	AccountResponse struct {
+		ID        string `json:"id"`
 		Name      string `json:"name"`
 		Balance   int    `json:"balance"`
 		CPF       string `json:"cpf"`
@@ -63,6 +64,7 @@ func (h Handler) CreateAccount(req *http.Request) *response.Response {
 	}
 
 	return response.Ok(AccountResponse{
+		ID:        out.ID,
 		Name:      out.Name,
 		Balance:   out.Balance,
 		CPF:       out.CPF,

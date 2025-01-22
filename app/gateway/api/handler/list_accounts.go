@@ -24,6 +24,7 @@ func (h Handler) ListAccounts(req *http.Request) *response.Response {
 
 	for _, acc := range out {
 		accs = append(accs, AccountResponse{
+			ID:        acc.ID,
 			Name:      acc.Name,
 			Balance:   acc.Balance,
 			CPF:       acc.CPF,

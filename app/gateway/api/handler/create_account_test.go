@@ -54,6 +54,7 @@ func TestCreateAccount(t *testing.T) {
 				accUC: &accUsecaseMock{
 					CreateFunc: func(_ context.Context, _ accounts.AccountInput) (accounts.AccountOutput, error) {
 						return accounts.AccountOutput{
+							ID:        "1",
 							Name:      "Joshep",
 							Balance:   10_00,
 							CPF:       "75811508018",
@@ -67,6 +68,7 @@ func TestCreateAccount(t *testing.T) {
 				statusCode: http.StatusOK,
 				body: json.RawMessage(`
 					{
+						"id": "1",
 						"name": "Joshep",
 						"balance": 1000,
 						"cpf": "75811508018",

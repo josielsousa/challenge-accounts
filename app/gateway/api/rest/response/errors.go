@@ -147,6 +147,14 @@ var appErrors = map[error]AppErr{
 			Message: erring.ErrRecordNotFound.Error(),
 		},
 	},
+
+	erring.ErrEmptyAccountID: {
+		StatusCode: http.StatusBadRequest,
+		Error: Error{
+			Code:    "app:bad_request",
+			Message: erring.ErrEmptyAccountID.Error(),
+		},
+	},
 }
 
 func ToAppErr(err error) AppErr {

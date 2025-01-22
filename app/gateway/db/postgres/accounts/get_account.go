@@ -82,7 +82,7 @@ func (r *Repository) getAccount(ctx context.Context, param, query string) (entit
 		&acc.UpdatedAt,
 	)
 	if err != nil {
-		const action = "on get account by cpf"
+		const action = "on get account"
 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return entities.Account{}, fmt.Errorf(

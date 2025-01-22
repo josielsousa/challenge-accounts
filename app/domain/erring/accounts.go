@@ -10,4 +10,5 @@ var (
 	ErrAccountDestinationNotFound = errors.New("account destination not found")
 	ErrAccountAlreadyExists       = errors.New("account already exists")
 	ErrInsufficientFunds          = errors.New("insufficient amount")
+	ErrEmptyAccountID             = errors.New("empty account id")
 )

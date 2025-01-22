@@ -3,21 +3,20 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/josielsousa/challenge-accounts/app/domain/accounts"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
 )
 
-func TestListAccounts(t *testing.T) {
+func TestGetAccountBalance(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
@@ -30,24 +29,18 @@ func TestListAccounts(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		fields fields
-		want   want
+		name      string
+		accountID string
+		fields    fields
+		want      want
 	}{
 		{
-			name: "list accounts success",
+			name:      "get account balance success",
+			accountID: "1",
 			fields: fields{
 				accUC: &accUsecaseMock{
-					GetAllAccountsFunc: func(_ context.Context) ([]accounts.AccountOutput, error) {
-						return []accounts.AccountOutput{
-							{
-								ID:        "1",
-								Name:      "Joshep",
-								Balance:   1000,
-								CPF:       "75811508018",
-								CreatedAt: time.Date(2025, time.January, 22, 18, 0o5, 0, 0, time.UTC),
-							},
-						}, nil
+					GetAccountBalanceFunc: func(_ context.Context, _ string) (int, error) {
+						return 1000, nil
 					},
 				},
 			},
@@ -55,16 +48,7 @@ func TestListAccounts(t *testing.T) {
 				statusCode: http.StatusOK,
 				body: json.RawMessage(`
 					{
-						"data": [
-							{
-								"id": "1",
-								"name": "Joshep",
-								"balance": 1000,
-								"cpf": "75811508018",
-								"created_at": "2025-01-22T18:05:00Z"
-							}
-						],
-						"success": true
+						"balance": 1000
 					}
 				`),
 			},
@@ -80,12 +64,12 @@ func TestListAccounts(t *testing.T) {
 			}
 
 			router := chi.NewRouter()
-			router.Get("/accounts", rest.Handler(hand.ListAccounts))
+			router.Get("/accounts/{id}/balance", rest.Handler(hand.GetAccountBalance))
 
 			req, err := http.NewRequestWithContext(
 				context.Background(),
 				http.MethodGet,
-				"/accounts",
+				fmt.Sprintf("/accounts/%s/balance", tt.accountID),
 				nil,
 			)
 			require.NoError(t, err)

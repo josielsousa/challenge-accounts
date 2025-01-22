@@ -48,6 +48,7 @@ func RegisterAccountsHandlers(accUC accUsecase, router chi.Router) {
 
 	router.Post("/", rest.Handler(handler.CreateAccount))
 	router.Get("/", rest.Handler(handler.ListAccounts))
+	router.Get("/{id}/balance", rest.Handler(handler.GetAccountBalance))
 }
 
 func RegisterTransfersHandlers(trfUC trfUsecase, signer *jwt.Jwt, router chi.Router) {

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	onceValidator   sync.Once
+	mutex           sync.Mutex
 	globalValidator Validator
 )
 
@@ -20,6 +20,9 @@ func (v *Validator) ValidateStructModel(structModel any) error {
 }
 
 func GetGlobalValidator() Validator {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if globalValidator.validator == nil {
 		setGlobalValidator()
 	}

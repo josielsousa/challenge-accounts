@@ -48,28 +48,26 @@ var validations = map[string]Ruler{
 func setGlobalValidator() {
 	const maxSplitTags = 2
 
-	onceValidator.Do(func() {
-		validate := validator.New(validator.WithRequiredStructEnabled())
+	validate := validator.New(validator.WithRequiredStructEnabled())
 
-		// This code sets the field value as the json tag.
-		validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-			name := strings.SplitN(fld.Tag.Get("json"), ",", maxSplitTags)[0]
-			// skip if tag key says it should be ignored
-			if name == "-" {
-				return ""
-			}
-
-			return name
-		})
-
-		for key, val := range validations {
-			_ = validate.RegisterValidation(key, val.fn)
+	// This code sets the field value as the json tag.
+	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("json"), ",", maxSplitTags)[0]
+		// skip if tag key says it should be ignored
+		if name == "-" {
+			return ""
 		}
 
-		globalValidator = Validator{
-			validator: validate,
-		}
+		return name
 	})
+
+	for key, val := range validations {
+		_ = validate.RegisterValidation(key, val.fn)
+	}
+
+	globalValidator = Validator{
+		validator: validate,
+	}
 }
 
 func handleValidationError(err error) error {

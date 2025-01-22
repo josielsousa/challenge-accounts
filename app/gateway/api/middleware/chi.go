@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	StripSlashes       = middleware.StripSlashes
-	CleanPath          = middleware.CleanPath
-	SetContentTypeJSON = render.SetContentType(render.ContentTypeJSON)
+	StripSlashes = middleware.StripSlashes
+	CleanPath    = middleware.CleanPath
 )
 
 func Recoverer(next http.Handler) http.Handler {

@@ -13,9 +13,6 @@ import (
 	"github.com/golang-migrate/migrate/v4/source/httpfs"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
-
-	// needed to run migrations.
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 )
 
 //go:embed migrations

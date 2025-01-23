@@ -7,21 +7,20 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ConnectPoolWithMigrations(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
-	return connectPool(ctx, dbURL, true)
+func ConnectPoolWithMigrations(ctx context.Context, connConfig string) (*pgxpool.Pool, error) {
+	return connectPool(ctx, connConfig, true)
 }
 
-func ConnectPoolWithoutMigrations(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
-	return connectPool(ctx, dbURL, false)
+func ConnectPoolWithoutMigrations(ctx context.Context, connConfig string) (*pgxpool.Pool, error) {
+	return connectPool(ctx, connConfig, false)
 }
 
-func connectPool(ctx context.Context, dbURL string, runMigrations bool) (*pgxpool.Pool, error) {
-	config, err := pgxpool.ParseConfig(dbURL)
+func connectPool(ctx context.Context, connConfig string, runMigrations bool) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(connConfig)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	// TODO: add trace
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to pgx pool: %w", err)

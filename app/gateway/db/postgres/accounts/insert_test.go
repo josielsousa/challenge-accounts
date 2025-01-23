@@ -92,8 +92,7 @@ func TestRepository_Insert(t *testing.T) {
 
 				var pgErr *pgconn.PgError
 				require.ErrorAs(t, err, &pgErr)
-
-				assert.Contains(t, `column "name" of relation "accounts" does not exist`, pgErr.Message)
+				assert.Equal(t, `column "name" of relation "accounts" does not exist`, pgErr.Message)
 			},
 		},
 		{

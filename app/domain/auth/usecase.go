@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 type Usecase struct {

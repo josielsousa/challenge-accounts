@@ -6,7 +6,7 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go/v4"
 
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 const TTLToken = 5 * time.Minute

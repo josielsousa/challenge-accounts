@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func (u Usecase) Signin(ctx context.Context, credential types.Credentials) (types.Auth, error) {

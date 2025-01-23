@@ -7,7 +7,7 @@ import (
 	"context"
 	"github.com/josielsousa/challenge-accounts/app/domain/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 	"sync"
 )
 

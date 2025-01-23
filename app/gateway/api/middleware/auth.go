@@ -9,7 +9,7 @@ import (
 
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 const minBearerTokenParts = 2

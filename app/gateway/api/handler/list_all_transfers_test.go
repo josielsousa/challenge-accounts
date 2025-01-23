@@ -15,7 +15,7 @@ import (
 
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func TestListAllTransfers(t *testing.T) {

@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine as builder
+FROM golang:1.23.1-alpine AS builder
 
 # Load the public keys from github and configure ssh url.
 RUN apk update && apk add openssh git tzdata ca-certificates && update-ca-certificates

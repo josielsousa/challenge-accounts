@@ -29,7 +29,7 @@ func (p PostgresConfig) URL() string {
 	connConfig = fmt.Sprintf("%s pool_min_conns=%s", connConfig, p.PoolMinSize)
 
 	if p.Hostname != "" {
-		connConfig = fmt.Sprintf("%s&application_name=%s", connConfig, p.Hostname)
+		connConfig = fmt.Sprintf("%s application_name=%s", connConfig, p.Hostname)
 	}
 
 	return connConfig

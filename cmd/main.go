@@ -39,7 +39,7 @@ func main() {
 		logger.Error("on loading configuration", slog.Any("error", err))
 	}
 
-	pgClient, err := postgres.NewClient(cfg.Postgres.URL())
+	pgClient, err := postgres.NewClient(ctx, cfg.Postgres.URL())
 	if err != nil {
 		logger.Error("on create configuration", slog.Any("error", err))
 

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
@@ -56,8 +56,9 @@ func StartupNewPool() (func(), error) {
 	}
 
 	dbDefaultURL := getPgConnURL(dbPort, defaultDBName)
+	ctx := context.Background()
 
-	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(dbDefaultURL)
+	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(ctx, dbDefaultURL)
 	if err != nil {
 		return nil, fmt.Errorf("on connect pool: %w", err)
 	}
@@ -70,7 +71,7 @@ func StartupNewPool() (func(), error) {
 
 	dbURL := getPgConnURL(dbPort, dbName)
 
-	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL)
+	dbPool, err := postgres.ConnectPoolWithMigrations(ctx, dbURL)
 	if err != nil {
 		return nil, fmt.Errorf("on connect pool with migrations: %w", err)
 	}
@@ -129,21 +130,20 @@ func getDockerResource(pool *dockertest.Pool) (*dockertest.Resource, error) {
 func NewDB(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 
+	ctx := context.Background()
+
 	atomic.AddInt32(&instances, 1)
 	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt32(&instances), time.Now().UnixNano())
 	cconn := concurrentConn
 
-	_, err := concurrentConn.Exec(
-		context.Background(),
-		"create database "+dbName,
-	)
+	_, err := concurrentConn.Exec(ctx, "create database "+dbName)
 	require.NoError(t, err)
 
 	orig := cconn.Config().ConnString()
 	dbOrig := cconn.Config().ConnConfig.Database
 
 	connString := strings.Replace(orig, dbOrig, dbName, 1)
-	newPool, err := postgres.ConnectPoolWithMigrations(connString)
+	newPool, err := postgres.ConnectPoolWithMigrations(ctx, connString)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -160,7 +160,7 @@ func retryDBHelper(port, dbName string) func() error {
 	return func() error {
 		dbURL := getPgConnURL(port, dbName)
 
-		connPool, err := postgres.ConnectPoolWithoutMigrations(dbURL)
+		connPool, err := postgres.ConnectPoolWithoutMigrations(context.Background(), dbURL)
 		if err != nil {
 			return fmt.Errorf("on connect pool: %w", err)
 		}

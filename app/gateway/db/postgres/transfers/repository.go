@@ -1,14 +1,13 @@
 package transfers
 
 import (
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres/accounts"
 )
 
 type Repository struct {
-	db      postgres.Pool
+	db      *pgxpool.Pool
 	accRepo accounts.Repository
 }
 

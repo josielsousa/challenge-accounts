@@ -2,10 +2,8 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
-	"github.com/golang-migrate/migrate/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -20,7 +18,7 @@ func ConnectPoolWithoutMigrations(ctx context.Context, dbURL string) (*pgxpool.P
 func connectPool(ctx context.Context, dbURL string, runMigrations bool) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
-		return nil, fmt.Errorf("on pgx pool parse config: %w", err)
+		return nil, fmt.Errorf("%w", err)
 	}
 
 	// TODO: add trace
@@ -30,28 +28,10 @@ func connectPool(ctx context.Context, dbURL string, runMigrations bool) (*pgxpoo
 	}
 
 	if runMigrations {
-		err = RunMigrationsConn(dbURL)
-		if err != nil {
+		if err := RunMigrations(config.ConnConfig); err != nil {
 			return nil, fmt.Errorf("on run migrations: %w", err)
 		}
 	}
 
-	return pool, err
-}
-
-func RunMigrationsConn(dbURL string) error {
-	migHandler, err := GetMigrationHandler(dbURL)
-	if err != nil {
-		return fmt.Errorf("on get migration handler: %w", err)
-	}
-
-	defer migHandler.Close()
-
-	if err := migHandler.Up(); err != nil {
-		if !errors.Is(err, migrate.ErrNoChange) {
-			return fmt.Errorf("on up migration version: %w", err)
-		}
-	}
-
-	return nil
+	return pool, nil
 }

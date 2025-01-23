@@ -9,7 +9,10 @@ import (
 	"strings"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/httpfs"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
 
 	// needed to run migrations.
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -37,22 +40,29 @@ func (l *migrateLogger) Verbose() bool {
 	return l.verbose
 }
 
-func GetMigrationHandler(dbURL string) (*migrate.Migrate, error) {
+func GetMigrationHandler(connConfig *pgx.ConnConfig) (*migrate.Migrate, error) {
 	source, err := httpfs.New(http.FS(MigrationsFS), "migrations")
 	if err != nil {
 		return nil, fmt.Errorf("on create source instance: %w", err)
 	}
 
-	mig, err := migrate.NewWithSourceInstance("httpfs", source, dbURL)
+	driver, err := postgres.WithInstance(stdlib.OpenDB(*connConfig), &postgres.Config{
+		DatabaseName: connConfig.Database,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("on create migrate instance: %w", err)
+		return nil, fmt.Errorf("[migrations] failed to get postgres driver: %w", err)
+	}
+
+	mig, err := migrate.NewWithInstance("httpfs", source, connConfig.Database, driver)
+	if err != nil {
+		return nil, fmt.Errorf("[migrations] failed to create migrate source instance: %w", err)
 	}
 
 	return mig, nil
 }
 
-func RunMigrations(dbURL string) error {
-	migHandler, err := GetMigrationHandler(dbURL)
+func RunMigrations(connConfig *pgx.ConnConfig) error {
+	migHandler, err := GetMigrationHandler(connConfig)
 	if err != nil {
 		return err
 	}

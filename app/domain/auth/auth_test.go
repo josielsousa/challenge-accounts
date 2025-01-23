@@ -9,7 +9,7 @@ import (
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func TestUsecase_Signin(t *testing.T) {

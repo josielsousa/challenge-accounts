@@ -7,7 +7,7 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go/v4"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func (j Jwt) getAppKey(_ *jwtgo.Token) (interface{}, error) {

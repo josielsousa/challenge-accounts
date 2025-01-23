@@ -10,7 +10,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/middleware"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 //go:generate moq -rm -out handler_mock.go . accUsecase authUsecase trfUsecase

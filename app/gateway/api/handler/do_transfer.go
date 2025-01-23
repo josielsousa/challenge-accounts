@@ -14,7 +14,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/validator"
-	"github.com/josielsousa/challenge-accounts/types"
+	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 type (

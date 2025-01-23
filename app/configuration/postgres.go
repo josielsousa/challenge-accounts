@@ -16,6 +16,7 @@ type PostgresConfig struct {
 }
 
 func (p PostgresConfig) URL() string {
+	// TODO: check unrecognized configuration parameter "pool_max_conns" error.
 	connString := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		p.User,
@@ -26,7 +27,7 @@ func (p PostgresConfig) URL() string {
 	)
 
 	if p.Hostname != "" {
-		connString = fmt.Sprintf("%s application_name=%s", connString, p.Hostname)
+		connString = fmt.Sprintf("%s&application_name=%s", connString, p.Hostname)
 	}
 
 	return connString

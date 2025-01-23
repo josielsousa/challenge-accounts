@@ -3,6 +3,7 @@ APP_NAME=challange-accounts
 PROJECT_PATH ?= github.com/josielsousa/challenge-accounts
 PKG ?= $(PROJECT_PATH)
 ENVIRONMENT_STAGE=dev
+VERSION ?= local
 
 # docker files
 DOCKER_FILE=api.dockerfile
@@ -25,6 +26,13 @@ define goBuild
 	${PKG}/$2
 endef
 
+define build
+	@echo "==> Building Docker image: $1"
+	@@DOCKER_BUILDKIT=1 docker build \
+		--build-arg BUILD_TIME=$(GIT_BUILD_TIME) --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg GIT_TAG=$(GIT_TAG) --build-arg GO_CMD=$1 \
+		--pull --ssh default -f $(DOCKER_FILE) -t $(PROJECT_PATH)-$1:$(VERSION) .
+endef
+
 default: test-coverage
 
 .PHONY: tools
@@ -39,10 +47,13 @@ clean:
 	@rm -f build/${APP_NAME}
 
 .PHONY: compile
-compile: clean install-dependencies gofmt
+compile: clean tools gofmt
 	@echo "==> Compiling releases"
 	$(call goBuild,${APP_NAME},cmd)
-	zip -r build/${APP_NAME}.zip  build/${APP_NAME}
+
+.PHONY: build
+build: compile
+	$(call build,"api")
 
 .PHONY: setup-down
 setup-down:

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
@@ -55,9 +55,10 @@ func StartupNewPool() (func(), error) {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
 
-	dbDefaultURL := getPgConnURL(dbPort, defaultDBName)
+	dbDefaultConnConfig := getConnConfig(dbPort, defaultDBName)
+	ctx := context.Background()
 
-	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(dbDefaultURL)
+	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(ctx, dbDefaultConnConfig)
 	if err != nil {
 		return nil, fmt.Errorf("on connect pool: %w", err)
 	}
@@ -68,9 +69,9 @@ func StartupNewPool() (func(), error) {
 		return nil, fmt.Errorf("on create database %s: %w", dbName, err)
 	}
 
-	dbURL := getPgConnURL(dbPort, dbName)
+	dbConnConfig := getConnConfig(dbPort, dbName)
 
-	dbPool, err := postgres.ConnectPoolWithMigrations(dbURL)
+	dbPool, err := postgres.ConnectPoolWithMigrations(ctx, dbConnConfig)
 	if err != nil {
 		return nil, fmt.Errorf("on connect pool with migrations: %w", err)
 	}
@@ -129,21 +130,20 @@ func getDockerResource(pool *dockertest.Pool) (*dockertest.Resource, error) {
 func NewDB(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 
+	ctx := context.Background()
+
 	atomic.AddInt32(&instances, 1)
 	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt32(&instances), time.Now().UnixNano())
 	cconn := concurrentConn
 
-	_, err := concurrentConn.Exec(
-		context.Background(),
-		"create database "+dbName,
-	)
+	_, err := concurrentConn.Exec(ctx, "create database "+dbName)
 	require.NoError(t, err)
 
 	orig := cconn.Config().ConnString()
 	dbOrig := cconn.Config().ConnConfig.Database
 
 	connString := strings.Replace(orig, dbOrig, dbName, 1)
-	newPool, err := postgres.ConnectPoolWithMigrations(connString)
+	newPool, err := postgres.ConnectPoolWithMigrations(ctx, connString)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -158,9 +158,9 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 
 func retryDBHelper(port, dbName string) func() error {
 	return func() error {
-		dbURL := getPgConnURL(port, dbName)
+		dbConnConfig := getConnConfig(port, dbName)
 
-		connPool, err := postgres.ConnectPoolWithoutMigrations(dbURL)
+		connPool, err := postgres.ConnectPoolWithoutMigrations(context.Background(), dbConnConfig)
 		if err != nil {
 			return fmt.Errorf("on connect pool: %w", err)
 		}
@@ -171,8 +171,12 @@ func retryDBHelper(port, dbName string) func() error {
 	}
 }
 
-func getPgConnURL(port, dbName string) string {
-	return fmt.Sprintf("postgres://postgres:postgres@localhost:%s/%s?sslmode=disable", port, dbName)
+func getConnConfig(port, dbName string) string {
+	return fmt.Sprintf(
+		"user=postgres password=postgres host=localhost port=%s dbname=%s sslmode=disable",
+		port,
+		dbName,
+	)
 }
 
 func dropDB(dbName string, pool *pgxpool.Pool) {

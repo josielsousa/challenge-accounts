@@ -1,13 +1,11 @@
 package accounts
 
 import (
-	"github.com/jackc/pgx/v4/pgxpool"
-
-	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Repository struct {
-	db postgres.Pool
+	db *pgxpool.Pool
 }
 
 func NewRepository(db *pgxpool.Pool) *Repository {

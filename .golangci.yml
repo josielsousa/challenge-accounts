@@ -1,0 +1,75 @@
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 5m
+  tests: true
+
+output:
+  sort-results: true
+  sort-order:
+    - linter
+    - file
+
+linters-settings:
+  exhaustive:
+    default-signifies-exhaustive: true
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/josielsousa)
+      - prefix(github.com/josielsousa/challange-accounts)
+      - blank
+      - dot
+  goimports:
+    local-prefixes: github.com/josielsousa/challange-accounts
+  gomoddirectives:
+    replace-allow-list:
+      - github.com/imdario/mergo
+  misspell:
+    ignore-words:
+      - essencial
+  tagalign:
+    order:
+      - required
+      - envconfig
+      - json
+      - extensions
+      - validate
+      - example
+    sort: true
+  varnamelen:
+    ignore-decls:
+      - i int
+      - rw http.ResponseWriter
+    ignore-names:
+      - id
+      - ok
+      - tc
+      - tt
+      - wg
+      - to
+      - v1
+      - tx
+      - db
+      - op
+    ignore-type-assert-ok: true
+
+linters:
+  enable-all: true
+  disable:
+    - cyclop
+    - depguard
+    - dupl
+    - err113
+    - funlen
+    - gochecknoglobals
+    - godox
+    - ireturn
+    - lll
+    - maintidx
+    - tagliatelle
+    - testpackage
+    - exportloopref
+    - nosprintfhostport
+    - exhaustruct
+    - godot

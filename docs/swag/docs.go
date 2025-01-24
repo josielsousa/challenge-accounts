@@ -104,9 +104,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/challenge-accounts/accounts/{account_id}": {
+        "/api/v1/challenge-accounts/accounts/{account_id}/balance": {
             "get": {
-                "description": "Endpoint utilizado para realizar uma transferência entre contas.",
+                "description": "Endpoint utilizado consultar o saldo da conta.",
                 "consumes": [
                     "application/json"
                 ],
@@ -116,7 +116,7 @@ const docTemplate = `{
                 "tags": [
                     "accounts"
                 ],
-                "summary": "Realizar transferência entre contas.",
+                "summary": "Retorna o saldo da conta.",
                 "parameters": [
                     {
                         "type": "string",

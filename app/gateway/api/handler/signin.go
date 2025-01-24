@@ -11,14 +11,18 @@ import (
 )
 
 type (
+	// @description Dados de identificação para o signin
 	SinginRequest struct {
-		Cpf      string `json:"cpf"      validate:"required,cpf"`
+		// Cpf - número do CPF do titular da conta, usado como username para o signin.
+		Cpf string `json:"cpf" validate:"required,cpf"`
+		// Password - senha de acesso a conta.
 		Password string `json:"password" validate:"required"`
-	}
+	} // @name SinginRequest
 
 	SinginReponse struct {
+		// Token - token de autenticação usado para acessar endpoints privados.
 		Token string `json:"token"`
-	}
+	} // @name SinginReponse
 )
 
 func (r SinginRequest) Validate() error {
@@ -31,6 +35,19 @@ func (r SinginRequest) Validate() error {
 	return nil
 }
 
+// CreateAccount godoc
+//
+//	@Summary		Autoriza o acesso a conta.
+//	@Description	Endpoint utilizado para autorizar o acesso a conta.
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		SinginRequest	true "Dados de identificação"
+//	@Success		200		{object}	SinginReponse	"Conta criada com sucesso."
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		422		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/api/v1/challenge-accounts/auth/signin [post]
 func (h Handler) Signin(req *http.Request) *response.Response {
 	var request SinginRequest
 

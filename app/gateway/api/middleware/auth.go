@@ -20,7 +20,7 @@ func Authorize(signer *jwt.Jwt, next http.Handler) http.HandlerFunc {
 
 		token, ok := sanitizeBearerToken(req.Header.Get("Authorization"))
 		if !ok {
-			logger.Error("on sanitize token")
+			logger.Error("on sanitize token", slog.String("token", token), slog.Bool("ok", ok))
 
 			handleUnauthorized(req, rw)
 
@@ -43,8 +43,6 @@ func Authorize(signer *jwt.Jwt, next http.Handler) http.HandlerFunc {
 }
 
 func sanitizeBearerToken(authorization string) (string, bool) {
-	var token string
-
 	if strings.HasPrefix(authorization, "Bearer") {
 		bearerToken := strings.Split(authorization, " ")
 
@@ -52,14 +50,14 @@ func sanitizeBearerToken(authorization string) (string, bool) {
 			return "", false
 		}
 
-		token = bearerToken[1]
+		return bearerToken[1], true
 	}
 
-	if len(token) == 0 {
+	if len(authorization) == 0 {
 		return "", false
 	}
 
-	return token, true
+	return authorization, true
 }
 
 func handleUnauthorized(req *http.Request, rw http.ResponseWriter) {

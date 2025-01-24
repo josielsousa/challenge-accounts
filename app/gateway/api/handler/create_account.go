@@ -13,19 +13,28 @@ import (
 
 type (
 	CreateAccountRequest struct {
-		Name     string `json:"name"     validate:"required"`
-		Balance  int    `json:"balance"  validate:"required"`
-		CPF      string `json:"cpf"      validate:"required,cpf"`
+		// Name - nome do titular da conta.
+		Name string `json:"name" validate:"required"`
+		// Balance - saldo inicial da conta.
+		Balance int `json:"balance" validate:"required"`
+		// CPF - número do CPF do titular da conta.
+		CPF string `json:"cpf" validate:"required,cpf"`
+		// Password - senha de acesso a conta.
 		Password string `json:"password" validate:"required"`
 	}
 
 	AccountResponse struct {
-		ID        string `json:"id"`
-		Name      string `json:"name"`
-		Balance   int    `json:"balance"`
-		CPF       string `json:"cpf"`
+		// ID - identificador único da conta.
+		ID string `json:"id"`
+		// Name - nome do titular da conta.
+		Name string `json:"name"`
+		// Balance - saldo atual da conta.
+		Balance int `json:"balance"`
+		// CPF - número do CPF do titular da conta.
+		CPF string `json:"cpf"`
+		// CreatedAt - data de criação da conta.
 		CreatedAt string `json:"created_at"`
-	}
+	} //	@name	CreateAccountResponse
 )
 
 func (r CreateAccountRequest) Validate() error {
@@ -47,6 +56,19 @@ func (r CreateAccountRequest) ToCreateAccountInput() accounts.AccountInput {
 	}
 }
 
+// CreateAccount godoc
+//
+//	@Summary		Criar nova conta.
+//	@Description	Endpoint utilizado para criação de uma nova conta.
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		CreateAccountRequest	true	"Dados da conta"
+//	@Success		201		{object}	CreateAccountResponse	"Conta criada com sucesso."
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		422		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/api/v1/challenge-accounts/accounts [post]
 func (h Handler) CreateAccount(req *http.Request) *response.Response {
 	var input CreateAccountRequest
 
@@ -63,7 +85,7 @@ func (h Handler) CreateAccount(req *http.Request) *response.Response {
 		return response.AppError(err)
 	}
 
-	return response.Ok(AccountResponse{
+	return response.Created(AccountResponse{
 		ID:        out.ID,
 		Name:      out.Name,
 		Balance:   out.Balance,

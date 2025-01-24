@@ -65,7 +65,7 @@ func TestCreateAccount(t *testing.T) {
 				},
 			},
 			want: want{
-				statusCode: http.StatusOK,
+				statusCode: http.StatusCreated,
 				body: json.RawMessage(`
 					{
 						"id": "1",

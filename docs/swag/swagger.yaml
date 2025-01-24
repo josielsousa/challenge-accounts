@@ -1,9 +1,129 @@
-basePath: /api/v1/challenge-accounts
-host: localhost:3000
+definitions:
+  CreateAccountResponse:
+    properties:
+      balance:
+        description: Balance - saldo atual da conta.
+        type: integer
+      cpf:
+        description: CPF - número do CPF do titular da conta.
+        type: string
+      created_at:
+        description: CreatedAt - data de criação da conta.
+        type: string
+      id:
+        description: ID - identificador único da conta.
+        type: string
+      name:
+        description: Name - nome do titular da conta.
+        type: string
+    type: object
+  DoTransferRequest:
+    properties:
+      account_destination_id:
+        description: AccountDestinationID - identificador da conta de destino.
+        type: string
+      amount:
+        description: Amount - valor a ser transferido.
+        type: integer
+    required:
+    - account_destination_id
+    - amount
+    type: object
+  ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  GetAccountBalanceResponse:
+    properties:
+      balance:
+        description: Balance - saldo atual da conta.
+        type: integer
+    type: object
+  ListAccountResponse:
+    properties:
+      data:
+        description: Data - lista de contas.
+        items:
+          $ref: '#/definitions/CreateAccountResponse'
+        type: array
+      success:
+        description: Succes - indica se a operação foi bem sucedida.
+        type: boolean
+    type: object
+  ListTransfersResponse:
+    properties:
+      data:
+        description: Data - lista de transferências.
+        items:
+          $ref: '#/definitions/TransferResponse'
+        type: array
+      success:
+        description: Succes - indica se a operação foi bem sucedida.
+        type: boolean
+    type: object
+  SinginReponse:
+    properties:
+      token:
+        description: Token - token de autenticação usado para acessar endpoints privados.
+        type: string
+    type: object
+  SinginRequest:
+    description: Dados de identificação para o signin
+    properties:
+      cpf:
+        description: Cpf - número do CPF do titular da conta, usado como username
+          para o signin.
+        type: string
+      password:
+        description: Password - senha de acesso a conta.
+        type: string
+    required:
+    - cpf
+    - password
+    type: object
+  TransferResponse:
+    properties:
+      account_destination_id:
+        description: AccountDestinationID - identificador da conta de destino.
+        type: string
+      account_origin_id:
+        description: AccountOriginID - identificador da conta de origem.
+        type: string
+      amount:
+        description: Amount - valor transferido.
+        type: integer
+      created_at:
+        description: CreatedAt - data de criação da transferência.
+        type: string
+      id:
+        description: ID - identificador único da transferência.
+        type: string
+    type: object
+  handler.CreateAccountRequest:
+    properties:
+      balance:
+        description: Balance - saldo inicial da conta.
+        type: integer
+      cpf:
+        description: CPF - número do CPF do titular da conta.
+        type: string
+      name:
+        description: Name - nome do titular da conta.
+        type: string
+      password:
+        description: Password - senha de acesso a conta.
+        type: string
+    required:
+    - balance
+    - cpf
+    - name
+    - password
+    type: object
 info:
-  contact:
-    email: support@swagger.io
-    name: Josiel Sousa
+  contact: {}
   description: |-
     Implementação de API para o desafio de backend.
     A API é responsável por gerenciar contas e transferências
@@ -13,7 +133,213 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Challenge Accounts API
   version: "1.0"
-paths: {}
+paths:
+  /api/v1/challenge-accounts/accounts:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint utilizado listar todas as contas.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista todas as contas
+          schema:
+            $ref: '#/definitions/ListAccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Lista as contas.
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: Endpoint utilizado para criação de uma nova conta.
+      parameters:
+      - description: Dados da conta
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Conta criada com sucesso.
+          schema:
+            $ref: '#/definitions/CreateAccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Criar nova conta.
+      tags:
+      - accounts
+  /api/v1/challenge-accounts/accounts/{account_id}:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint utilizado para realizar uma transferência entre contas.
+      parameters:
+      - description: Identificador da conta de origem
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Saldo da conta.
+          schema:
+            $ref: '#/definitions/GetAccountBalanceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Conta não encontrada.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Realizar transferência entre contas.
+      tags:
+      - accounts
+  /api/v1/challenge-accounts/accounts/{account_id}/transfers:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint utilizado para listar as transferências entre contas.
+      parameters:
+      - description: Identificador da conta de origem
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transferência realizada com sucesso.
+          schema:
+            $ref: '#/definitions/ListTransfersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Conta não encontrada.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Lista as transferência da conta.
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: Endpoint utilizado para realizar uma transferência entre contas.
+      parameters:
+      - description: Dados da transação
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/DoTransferRequest'
+      - description: Identificador da conta de origem
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transferência realizada com sucesso.
+          schema:
+            $ref: '#/definitions/TransferResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Conta não encontrada.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Realizar transferência entre contas.
+      tags:
+      - accounts
+  /api/v1/challenge-accounts/auth/signin:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint utilizado para autorizar o acesso a conta.
+      parameters:
+      - description: Dados de identificação
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/SinginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Conta criada com sucesso.
+          schema:
+            $ref: '#/definitions/SinginReponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Autoriza o acesso a conta.
+      tags:
+      - accounts
 securityDefinitions:
   Bearer:
     in: header

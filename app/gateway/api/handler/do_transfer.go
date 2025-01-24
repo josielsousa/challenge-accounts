@@ -19,17 +19,24 @@ import (
 
 type (
 	DoTransferRequest struct {
+		// AccountDestinationID - identificador da conta de destino.
 		AccountDestinationID string `json:"account_destination_id" validate:"required"`
-		Amount               int    `json:"amount"                 validate:"required"`
-	}
+		// Amount - valor a ser transferido.
+		Amount int `json:"amount" validate:"required"`
+	} //	@name	DoTransferRequest
 
 	TransferResponse struct {
-		ID                   string `json:"id"`
-		AccountOriginID      string `json:"account_origin_id"`
+		// ID - identificador único da transferência.
+		ID string `json:"id"`
+		// AccountOriginID - identificador da conta de origem.
+		AccountOriginID string `json:"account_origin_id"`
+		// AccountDestinationID - identificador da conta de destino.
 		AccountDestinationID string `json:"account_destination_id"`
-		Amount               int    `json:"amount"`
-		CreatedAt            string `json:"created_at"`
-	}
+		// Amount - valor transferido.
+		Amount int `json:"amount"`
+		// CreatedAt - data de criação da transferência.
+		CreatedAt string `json:"created_at"`
+	} //	@name	TransferResponse
 )
 
 func (r DoTransferRequest) Validate() error {
@@ -50,6 +57,22 @@ func (r DoTransferRequest) ToTransferInput(accountOriginID string) transfers.Tra
 	}
 }
 
+// DoTransfer godoc
+//
+//	@Summary		Realizar transferência entre contas.
+//	@Description	Endpoint utilizado para realizar uma transferência entre contas.
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Security		Bearer
+//	@Param			request		body		DoTransferRequest	true	"Dados da transação"
+//	@Param			account_id	path		string				true	"Identificador da conta de origem"
+//	@Success		200			{object}	TransferResponse	"Transferência realizada com sucesso."
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse	"Conta não encontrada."
+//	@Failure		422			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/api/v1/challenge-accounts/accounts/{account_id}/transfers [post]
 func (h Handler) DoTransfer(req *http.Request) *response.Response {
 	id := chi.URLParam(req, "account_id")
 

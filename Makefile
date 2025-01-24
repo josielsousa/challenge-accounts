@@ -90,7 +90,6 @@ test-coverage:
 	@gotest -race -failfast -timeout 5m -count=1 -coverprofile=coverage.out ./...
 	@go tool cover -html=coverage.out -o coverage.html
 
-
 ## Format the code using gofmt + gci
 .PHONY: docker-build
 docker-build: compile
@@ -109,6 +108,10 @@ lint:
 ## Execute 'mocks' + 'docs' + 'lint'
 .PHONY: format
 format: mocks gofmt lint
+
+## Execute 'mocks' + 'gofmt' + 'lint' + 'docs'
+.PHONY: pre-commit
+pre-commit: mocks gofmt lint docs test
 
 ## Format the code using gofmt + gci
 .PHONY: goformat

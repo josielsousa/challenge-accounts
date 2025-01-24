@@ -100,7 +100,11 @@ docker-build: compile
 .PHONY: lint
 lint:
 	@echo "==> Installing golangci-lint"
+ifeq (, $(shell which $(GOLANGCI_LINT_PATH)))
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v$(GOLANGCI_LINT_VERSION)
+else
+	@echo "==> golangci-lint already installed"
+endif
 	@echo "==> Running golangci-lint"
 	@$(GOLANGCI_LINT_PATH) run -c ./.golangci.yml --fix
 

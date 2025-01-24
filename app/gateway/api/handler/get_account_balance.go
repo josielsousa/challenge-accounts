@@ -19,8 +19,8 @@ type (
 
 // GetAccountBalance godoc
 //
-//	@Summary		Realizar transferência entre contas.
-//	@Description	Endpoint utilizado para realizar uma transferência entre contas.
+//	@Summary		Retorna o saldo da conta.
+//	@Description	Endpoint utilizado consultar o saldo da conta.
 //	@Tags			accounts
 //	@Accept			json
 //	@Produce		json
@@ -29,7 +29,7 @@ type (
 //	@Failure		400			{object}	ErrorResponse
 //	@Failure		404			{object}	ErrorResponse	"Conta não encontrada."
 //	@Failure		500			{object}	ErrorResponse
-//	@Router			/api/v1/challenge-accounts/accounts/{account_id} [get]
+//	@Router			/api/v1/challenge-accounts/accounts/{account_id}/balance [get]
 //
 // TODO: add authorization here.
 func (h Handler) GetAccountBalance(req *http.Request) *response.Response {

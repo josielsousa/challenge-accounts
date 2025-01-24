@@ -190,11 +190,11 @@ paths:
       summary: Criar nova conta.
       tags:
       - accounts
-  /api/v1/challenge-accounts/accounts/{account_id}:
+  /api/v1/challenge-accounts/accounts/{account_id}/balance:
     get:
       consumes:
       - application/json
-      description: Endpoint utilizado para realizar uma transferência entre contas.
+      description: Endpoint utilizado consultar o saldo da conta.
       parameters:
       - description: Identificador da conta de origem
         in: path
@@ -220,7 +220,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/ErrorResponse'
-      summary: Realizar transferência entre contas.
+      summary: Retorna o saldo da conta.
       tags:
       - accounts
   /api/v1/challenge-accounts/accounts/{account_id}/transfers:

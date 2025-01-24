@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/accounts"
 	"github.com/josielsousa/challenge-accounts/app/domain/auth"
@@ -11,6 +12,9 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/handler"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/middleware"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
+
+	// import swag docs
+	_ "github.com/josielsousa/challenge-accounts/docs/swag"
 )
 
 type API struct {
@@ -21,6 +25,25 @@ type API struct {
 	signer  *jwt.Jwt
 	Handler http.Handler
 }
+
+//	@title			Challenge Accounts API
+//	@version		1.0
+//	@description	Implementação de API para o desafio de backend.
+//	@description	A API é responsável por gerenciar contas e transferências
+//	@description	entre contas.
+
+//	@contact.name	Josiel Sousa
+//	@contact.email	support@swagger.io
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+//	@host		localhost:3000
+//	@BasePath	/api/v1/challenge-accounts
+
+//	@securityDefinitions.apiKey	Bearer
+//	@in							header
+//	@name						Authorization
 
 func NewAPI(
 	accUC *accounts.Usecase,
@@ -38,6 +61,10 @@ func NewAPI(
 	)
 
 	router.Route("/api/v1/challenge-accounts", func(baseRouter chi.Router) {
+		baseRouter.Get("/swagger/*", httpSwagger.Handler(
+			httpSwagger.URL("/api/v1/challenge-accounts/swagger/doc.json"),
+		))
+
 		baseRouter.Get("/healthcheck", func(rw http.ResponseWriter, _ *http.Request) {
 			rw.WriteHeader(http.StatusOK)
 		})

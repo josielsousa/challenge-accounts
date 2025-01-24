@@ -1,0 +1,22 @@
+basePath: /api/v1/challenge-accounts
+host: localhost:3000
+info:
+  contact:
+    email: support@swagger.io
+    name: Josiel Sousa
+  description: |-
+    Implementação de API para o desafio de backend.
+    A API é responsável por gerenciar contas e transferências
+    entre contas.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Challenge Accounts API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

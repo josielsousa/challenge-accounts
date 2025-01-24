@@ -49,6 +49,21 @@ compile: clean tools gofmt
 	@echo "==> Compiling releases"
 	$(call goBuild,${APP_NAME},cmd)
 
+.PHONY: run
+run: compile
+	@echo "==> Running application"
+	@./build/${APP_NAME}
+
+.PHONY: docs
+docs:
+	@echo "==> Generating docs"
+	@echo "==> Installing swaggo"
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "==> Formatting swag comments"
+	@swag fmt --dir ./app/gateway/api --generalInfo ./app/gateway/api/api.go
+	@echo "==> Generating the docs"
+	@swag init --generalInfo ./app/gateway/api/api.go -o docs/swag
+
 .PHONY: build
 build: compile
 	$(call build,"api")
@@ -75,30 +90,28 @@ test-coverage:
 	@gotest -race -failfast -timeout 5m -count=1 -coverprofile=coverage.out ./...
 	@go tool cover -html=coverage.out -o coverage.html
 
+
+## Format the code using gofmt + gci
 .PHONY: docker-build
 docker-build: compile
 	@echo "==> Compiling docker images"
 	docker image build --label "challange.accounts.vcs-ref=$(VCS_REF)" -t josielsousa/${APP_NAME}:${ENVIRONMENT_STAGE} build -f api.dockerfile
 
-## Execute 'codelint'
-lint: codelint
-
-## Lint code using golangci-lint
-codelint:
+## exectue linter golangci-lint
+.PHONY: lint
+lint:
 	@echo "==> Installing golangci-lint"
-ifeq (,$(findstring $(GOLANGCI_LINT_VERSION),$(shell which $(GOLANGCI_LINT_PATH) && eval $(GOLANGCI_LINT_PATH) version)))
-	@echo "installing golangci-lint v$(GOLANGCI_LINT_VERSION)"
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v$(GOLANGCI_LINT_VERSION)
-else
-	@echo "already installed: $(shell eval $(GOLANGCI_LINT_PATH) version)"
-endif
 	@echo "==> Running golangci-lint"
 	@$(GOLANGCI_LINT_PATH) run -c ./.golangci.yml --fix
 
 
 ## Execute 'mocks' + 'docs' + 'lint'
+.PHONY: format
 format: mocks gofmt lint
 
+## Format the code using gofmt + gci
+.PHONY: goformat
 gofmt:
 	@echo "==> Tidy modules"
 	@go mod tidy
@@ -109,12 +122,14 @@ gofmt:
 	@go fmt ./...
 
 ## Generate mocks files
+.PHONY: mocks
 mocks:
 	@echo "==> Generating mocks files"
 	@git submodule update --init --remote
 	@go generate ./...
 
 ## Check for vuln. using govulncheck
+.PHONY: vuln
 vuln:
 	@echo "==> Installing go vuln check"
 	@go install golang.org/x/vuln/cmd/govulncheck@latest

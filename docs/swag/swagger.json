@@ -1,0 +1,26 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Implementação de API para o desafio de backend.\nA API é responsável por gerenciar contas e transferências\nentre contas.",
+        "title": "Challenge Accounts API",
+        "contact": {
+            "name": "Josiel Sousa",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/api/v1/challenge-accounts",
+    "paths": {},
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

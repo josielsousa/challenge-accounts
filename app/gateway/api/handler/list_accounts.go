@@ -9,11 +9,24 @@ import (
 
 type (
 	ListAccountResponse struct {
-		Data   []AccountResponse `json:"data"`
-		Succes bool              `json:"success"`
-	}
+		// Data - lista de contas.
+		Data []AccountResponse `json:"data"`
+		// Succes - indica se a operação foi bem sucedida.
+		Succes bool `json:"success"`
+	} //	@name	ListAccountResponse
 )
 
+// ListAccounts godoc
+//
+//	@Summary		Lista as contas.
+//	@Description	Endpoint utilizado listar todas as contas.
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	ListAccountResponse	"Lista todas as contas"
+//	@Failure		400	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/api/v1/challenge-accounts/accounts [get]
 func (h Handler) ListAccounts(req *http.Request) *response.Response {
 	out, err := h.accUC.GetAllAccounts(req.Context())
 	if err != nil {

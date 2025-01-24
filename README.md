@@ -25,12 +25,8 @@ make run
 
 ---
 
-### Testes unitários
+### Documentação
 
-A API foi construída possuindo testes unitários, para executar os testes, basta executar os seguintes comandos:
-
-```bash
-git clone https://github.com/josielsousa/challenge-accounts.git
-cd challenge-accounts
-docker-compose up api-test
-```
+Após a instalação e a aplicação já estiver sendo executada, a documentação
+da API pode ser acessada através do link:
+[http://localhost:3000/docs/v1/challenge-accounts/swagger](http://localhost:3000/docs/v1/challenge-accounts/swagger/index.html)

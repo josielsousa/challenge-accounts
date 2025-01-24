@@ -14,11 +14,28 @@ import (
 
 type (
 	ListTransfersResponse struct {
-		Data   []TransferResponse `json:"data"`
-		Succes bool               `json:"success"`
-	}
+		// Data - lista de transferências.
+		Data []TransferResponse `json:"data"`
+		// Succes - indica se a operação foi bem sucedida.
+		Succes bool `json:"success"`
+	} //	@name	ListTransfersResponse
 )
 
+// ListTransfers godoc
+//
+//	@Summary		Lista as transferência da conta.
+//	@Description	Endpoint utilizado para listar as transferências entre contas.
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Security		Bearer
+//	@Param			account_id	path		string					true	"Identificador da conta de origem"
+//	@Success		200			{object}	ListTransfersResponse	"Transferência realizada com sucesso."
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse	"Conta não encontrada."
+//	@Failure		422			{object}	ErrorResponse
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/api/v1/challenge-accounts/accounts/{account_id}/transfers [get]
 func (h Handler) ListTransfers(req *http.Request) *response.Response {
 	id := chi.URLParam(req, "account_id")
 

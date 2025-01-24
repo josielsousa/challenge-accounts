@@ -12,10 +12,26 @@ import (
 
 type (
 	AccountBalanceResponse struct {
+		// Balance - saldo atual da conta.
 		Balance int `json:"balance"`
-	}
+	} //	@name	GetAccountBalanceResponse
 )
 
+// GetAccountBalance godoc
+//
+//	@Summary		Realizar transferência entre contas.
+//	@Description	Endpoint utilizado para realizar uma transferência entre contas.
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			account_id	path		string						true	"Identificador da conta de origem"
+//	@Success		200			{object}	GetAccountBalanceResponse	"Saldo da conta."
+//	@Failure		400			{object}	ErrorResponse
+//	@Failure		404			{object}	ErrorResponse	"Conta não encontrada."
+//	@Failure		500			{object}	ErrorResponse
+//	@Router			/api/v1/challenge-accounts/accounts/{account_id} [get]
+//
+// TODO: add authorization here.
 func (h Handler) GetAccountBalance(req *http.Request) *response.Response {
 	id := chi.URLParam(req, "account_id")
 

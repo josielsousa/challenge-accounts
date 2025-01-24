@@ -90,7 +90,7 @@ test-coverage:
 	@gotest -race -failfast -timeout 5m -count=1 -coverprofile=coverage.out ./...
 	@go tool cover -html=coverage.out -o coverage.html
 
-## Format the code using gofmt + gci
+## Build a docker image
 .PHONY: docker-build
 docker-build: compile
 	@echo "==> Compiling docker images"

@@ -13,6 +13,11 @@
 build/challange-accounts*
 **/*.db
 
+# Ignore debug_bin
+cmd/__debug_bin
+**/__debug_bin
+*__debug_bin
+
 # Test binary, built with `go test -c`
 *.test
 

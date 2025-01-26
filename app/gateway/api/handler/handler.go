@@ -6,11 +6,11 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/auth"
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/middleware"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 //go:generate moq -rm -out handler_mock.go . accUsecase authUsecase trfUsecase
@@ -26,7 +26,7 @@ type trfUsecase interface {
 }
 
 type authUsecase interface {
-	Signin(ctx context.Context, credential types.Credentials) (types.Auth, error)
+	Signin(ctx context.Context, credential auth.SiginInput) (auth.SiginOutput, error)
 }
 
 type Handler struct {

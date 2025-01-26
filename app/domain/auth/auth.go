@@ -5,15 +5,27 @@ import (
 	"fmt"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
-func (u Usecase) Signin(ctx context.Context, credential types.Credentials) (types.Auth, error) {
+type (
+	// SiginInput - estrutura utilizada para realizar a autenticação.
+	SiginInput struct {
+		Cpf    string
+		Secret string
+	}
+
+	// SiginOutput - estrutura utilizada retornar o token da autenticação.
+	SiginOutput struct {
+		Token string
+	}
+)
+
+func (u Usecase) Signin(ctx context.Context, input SiginInput) (SiginOutput, error) {
 	const op = `auth.Signin`
 
-	acc, err := u.R.GetByCPF(ctx, credential.Cpf)
+	acc, err := u.R.GetByCPF(ctx, input.Cpf)
 	if err != nil {
-		return types.Auth{}, fmt.Errorf(
+		return SiginOutput{}, fmt.Errorf(
 			"%s-> %s: %w",
 			op,
 			"on get account by cpf",
@@ -22,20 +34,20 @@ func (u Usecase) Signin(ctx context.Context, credential types.Credentials) (type
 	}
 
 	if len(acc.ID) == 0 {
-		return types.Auth{}, erring.ErrAccountNotFound
+		return SiginOutput{}, erring.ErrAccountNotFound
 	}
 
 	// Verifica se o secret informado na autenticação, é o mesmo armazenado na `account`.
-	err = u.H.VerifySecret(acc.Secret.Value(), credential.Secret)
+	err = u.H.VerifySecret(acc.Secret.Value(), input.Secret)
 	if err != nil {
-		return types.Auth{}, erring.ErrUnauthorized
+		return SiginOutput{}, erring.ErrUnauthorized
 	}
 
 	// Tempo de expiração do token
 	authToken, err := u.S.SignToken(acc.ID, acc.CPF.Value())
 	if err != nil {
-		return types.Auth{}, erring.ErrUnexpected
+		return SiginOutput{}, erring.ErrUnexpected
 	}
 
-	return authToken, nil
+	return SiginOutput{Token: authToken}, nil
 }

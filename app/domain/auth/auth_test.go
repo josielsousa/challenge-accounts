@@ -9,7 +9,6 @@ import (
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func TestUsecase_Signin(t *testing.T) {
@@ -22,20 +21,20 @@ func TestUsecase_Signin(t *testing.T) {
 	}
 
 	type args struct {
-		credential types.Credentials
+		input SiginInput
 	}
 
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    types.Auth
+		want    SiginOutput
 		wantErr error
 	}{
 		{
 			name: "give a account not found",
 			args: args{
-				credential: types.Credentials{
+				input: SiginInput{
 					Cpf:    "12345678901",
 					Secret: "secr3t",
 				},
@@ -47,13 +46,13 @@ func TestUsecase_Signin(t *testing.T) {
 					},
 				},
 			},
-			want:    types.Auth{},
+			want:    SiginOutput{},
 			wantErr: erring.ErrAccountNotFound,
 		},
 		{
 			name: "give a unauthorized",
 			args: args{
-				credential: types.Credentials{
+				input: SiginInput{
 					Cpf:    "12345678901",
 					Secret: "secr3t",
 				},
@@ -72,13 +71,13 @@ func TestUsecase_Signin(t *testing.T) {
 					},
 				},
 			},
-			want:    types.Auth{},
+			want:    SiginOutput{},
 			wantErr: erring.ErrUnauthorized,
 		},
 		{
 			name: "give a unexpected",
 			args: args{
-				credential: types.Credentials{
+				input: SiginInput{
 					Cpf:    "12345678901",
 					Secret: "secr3t",
 				},
@@ -97,18 +96,18 @@ func TestUsecase_Signin(t *testing.T) {
 					},
 				},
 				S: &SignerMock{
-					SignTokenFunc: func(_, _ string) (types.Auth, error) {
-						return types.Auth{}, erring.ErrUnexpected
+					SignTokenFunc: func(_, _ string) (string, error) {
+						return "", erring.ErrUnexpected
 					},
 				},
 			},
-			want:    types.Auth{},
+			want:    SiginOutput{},
 			wantErr: erring.ErrUnexpected,
 		},
 		{
 			name: "singin success",
 			args: args{
-				credential: types.Credentials{
+				input: SiginInput{
 					Cpf:    "12345678901",
 					Secret: "secr3t",
 				},
@@ -127,14 +126,12 @@ func TestUsecase_Signin(t *testing.T) {
 					},
 				},
 				S: &SignerMock{
-					SignTokenFunc: func(_, _ string) (types.Auth, error) {
-						return types.Auth{
-							Token: "t0k3N",
-						}, nil
+					SignTokenFunc: func(_, _ string) (string, error) {
+						return "t0k3N", nil
 					},
 				},
 			},
-			want: types.Auth{
+			want: SiginOutput{
 				Token: "t0k3N",
 			},
 			wantErr: nil,
@@ -151,7 +148,7 @@ func TestUsecase_Signin(t *testing.T) {
 				S: tt.fields.S,
 			}
 
-			got, err := usecase.Signin(context.Background(), tt.args.credential)
+			got, err := usecase.Signin(context.Background(), tt.args.input)
 			require.ErrorIs(t, err, tt.wantErr)
 
 			assert.Equal(t, tt.want, got)

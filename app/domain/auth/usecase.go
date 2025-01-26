@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 type Usecase struct {
@@ -15,7 +14,7 @@ type Usecase struct {
 
 //go:generate moq -rm -out usecase_mock.go . Signer Hasher Repository
 type Signer interface {
-	SignToken(id, username string) (types.Auth, error)
+	SignToken(id, username string) (string, error)
 }
 
 type Hasher interface {

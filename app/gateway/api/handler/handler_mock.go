@@ -6,8 +6,8 @@ package handler
 import (
 	"context"
 	"github.com/josielsousa/challenge-accounts/app/domain/accounts"
+	"github.com/josielsousa/challenge-accounts/app/domain/auth"
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
-	"github.com/josielsousa/challenge-accounts/app/types"
 	"sync"
 )
 
@@ -187,7 +187,7 @@ var _ authUsecase = &authUsecaseMock{}
 //
 //		// make and configure a mocked authUsecase
 //		mockedauthUsecase := &authUsecaseMock{
-//			SigninFunc: func(ctx context.Context, credential types.Credentials) (types.Auth, error) {
+//			SigninFunc: func(ctx context.Context, credential auth.SiginInput) (auth.SiginOutput, error) {
 //				panic("mock out the Signin method")
 //			},
 //		}
@@ -198,7 +198,7 @@ var _ authUsecase = &authUsecaseMock{}
 //	}
 type authUsecaseMock struct {
 	// SigninFunc mocks the Signin method.
-	SigninFunc func(ctx context.Context, credential types.Credentials) (types.Auth, error)
+	SigninFunc func(ctx context.Context, credential auth.SiginInput) (auth.SiginOutput, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -207,20 +207,20 @@ type authUsecaseMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Credential is the credential argument value.
-			Credential types.Credentials
+			Credential auth.SiginInput
 		}
 	}
 	lockSignin sync.RWMutex
 }
 
 // Signin calls SigninFunc.
-func (mock *authUsecaseMock) Signin(ctx context.Context, credential types.Credentials) (types.Auth, error) {
+func (mock *authUsecaseMock) Signin(ctx context.Context, credential auth.SiginInput) (auth.SiginOutput, error) {
 	if mock.SigninFunc == nil {
 		panic("authUsecaseMock.SigninFunc: method is nil but authUsecase.Signin was just called")
 	}
 	callInfo := struct {
 		Ctx        context.Context
-		Credential types.Credentials
+		Credential auth.SiginInput
 	}{
 		Ctx:        ctx,
 		Credential: credential,
@@ -237,11 +237,11 @@ func (mock *authUsecaseMock) Signin(ctx context.Context, credential types.Creden
 //	len(mockedauthUsecase.SigninCalls())
 func (mock *authUsecaseMock) SigninCalls() []struct {
 	Ctx        context.Context
-	Credential types.Credentials
+	Credential auth.SiginInput
 } {
 	var calls []struct {
 		Ctx        context.Context
-		Credential types.Credentials
+		Credential auth.SiginInput
 	}
 	mock.lockSignin.RLock()
 	calls = mock.calls.Signin

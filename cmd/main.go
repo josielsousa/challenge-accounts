@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -102,7 +103,8 @@ func main() {
 		return nil
 	})
 
-	if err := gracefulGroup.Wait(); err != nil {
+	if err := gracefulGroup.Wait(); err != nil &&
+		!errors.Is(err, http.ErrServerClosed) {
 		logger.Error("exiting", slog.Any("reason", err))
 	}
 

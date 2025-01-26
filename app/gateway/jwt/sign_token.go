@@ -11,7 +11,7 @@ import (
 
 const TTLToken = 5 * time.Minute
 
-func (j Jwt) SignToken(id, username string) (types.Auth, error) {
+func (j Jwt) SignToken(id, username string) (string, error) {
 	// JWT Claims - Payload contendo o CPF do usuário e a data de expiração do token
 	token := jwtgo.NewWithClaims(jwtgo.SigningMethodHS256, &types.Claims{
 		AccountID: id,
@@ -21,8 +21,8 @@ func (j Jwt) SignToken(id, username string) (types.Auth, error) {
 
 	tokenString, err := token.SignedString(j.appKey)
 	if err != nil {
-		return types.Auth{}, fmt.Errorf("on signed token: %w", err)
+		return "", fmt.Errorf("on signed token: %w", err)
 	}
 
-	return types.Auth{Token: tokenString}, nil
+	return tokenString, nil
 }

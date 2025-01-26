@@ -6,8 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func TestJwt_SignToken(t *testing.T) {
@@ -27,7 +25,7 @@ func TestJwt_SignToken(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    types.Auth
+		want    string
 		wantErr error
 	}{
 		{
@@ -44,9 +42,7 @@ func TestJwt_SignToken(t *testing.T) {
 					},
 				},
 			},
-			want: types.Auth{
-				Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVydXNlciIsImFjY291bnRfaWQiOiJhY2MtaWQtMDAxIiwiZXhwaXJlc19hdCI6MTczNzI5Mjc2NX0.EA4Thsie8vbapJh5pIvHB9RpdWbcLTodcjFQQIWLUNY",
-			},
+			want:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVydXNlciIsImFjY291bnRfaWQiOiJhY2MtaWQtMDAxIiwiZXhwaXJlc19hdCI6MTczNzI5Mjc2NX0.EA4Thsie8vbapJh5pIvHB9RpdWbcLTodcjFQQIWLUNY",
 			wantErr: nil,
 		},
 	}

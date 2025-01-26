@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/josielsousa/challenge-accounts/app/domain/auth"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest"
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 func TestHandler_Signin(t *testing.T) {
@@ -49,8 +49,8 @@ func TestHandler_Signin(t *testing.T) {
 			},
 			fields: fields{
 				authUC: &authUsecaseMock{
-					SigninFunc: func(_ context.Context, _ types.Credentials) (types.Auth, error) {
-						return types.Auth{Token: "t0k3n"}, nil
+					SigninFunc: func(_ context.Context, _ auth.SiginInput) (auth.SiginOutput, error) {
+						return auth.SiginOutput{Token: "t0k3n"}, nil
 					},
 				},
 			},
@@ -69,8 +69,8 @@ func TestHandler_Signin(t *testing.T) {
 			},
 			fields: fields{
 				authUC: &authUsecaseMock{
-					SigninFunc: func(_ context.Context, _ types.Credentials) (types.Auth, error) {
-						return types.Auth{Token: "t0k3n"}, nil
+					SigninFunc: func(_ context.Context, _ auth.SiginInput) (auth.SiginOutput, error) {
+						return auth.SiginOutput{Token: "t0k3n"}, nil
 					},
 				},
 			},

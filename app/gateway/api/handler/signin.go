@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/josielsousa/challenge-accounts/app/domain/auth"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/response"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/rest/validator"
-	"github.com/josielsousa/challenge-accounts/app/types"
 )
 
 type (
@@ -60,7 +60,7 @@ func (h Handler) Signin(req *http.Request) *response.Response {
 		return response.BadRequest(err)
 	}
 
-	auth, err := h.authUC.Signin(req.Context(), types.Credentials{
+	out, err := h.authUC.Signin(req.Context(), auth.SiginInput{
 		Cpf:    request.Cpf,
 		Secret: request.Password,
 	})
@@ -68,5 +68,5 @@ func (h Handler) Signin(req *http.Request) *response.Response {
 		return response.AppError(err)
 	}
 
-	return response.Ok(SinginReponse{Token: auth.Token})
+	return response.Ok(SinginReponse{Token: out.Token})
 }

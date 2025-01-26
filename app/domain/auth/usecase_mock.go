@@ -6,7 +6,6 @@ package auth
 import (
 	"context"
 	"github.com/josielsousa/challenge-accounts/app/domain/entities"
-	"github.com/josielsousa/challenge-accounts/app/types"
 	"sync"
 )
 
@@ -20,7 +19,7 @@ var _ Signer = &SignerMock{}
 //
 //		// make and configure a mocked Signer
 //		mockedSigner := &SignerMock{
-//			SignTokenFunc: func(id string, username string) (types.Auth, error) {
+//			SignTokenFunc: func(id string, username string) (string, error) {
 //				panic("mock out the SignToken method")
 //			},
 //		}
@@ -31,7 +30,7 @@ var _ Signer = &SignerMock{}
 //	}
 type SignerMock struct {
 	// SignTokenFunc mocks the SignToken method.
-	SignTokenFunc func(id string, username string) (types.Auth, error)
+	SignTokenFunc func(id string, username string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -47,7 +46,7 @@ type SignerMock struct {
 }
 
 // SignToken calls SignTokenFunc.
-func (mock *SignerMock) SignToken(id string, username string) (types.Auth, error) {
+func (mock *SignerMock) SignToken(id string, username string) (string, error) {
 	if mock.SignTokenFunc == nil {
 		panic("SignerMock.SignTokenFunc: method is nil but Signer.SignToken was just called")
 	}

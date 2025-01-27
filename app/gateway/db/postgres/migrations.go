@@ -43,16 +43,26 @@ func newMigrateHandler(connConfig *pgx.ConnConfig) (*migrate.Migrate, error) {
 		return nil, fmt.Errorf("on create source instance: %w", err)
 	}
 
-	driver, err := postgres.WithInstance(stdlib.OpenDB(*connConfig), &postgres.Config{
-		DatabaseName: connConfig.Database,
-	})
+	driver, err := postgres.WithInstance(
+		stdlib.OpenDB(*connConfig), &postgres.Config{
+			DatabaseName: connConfig.Database,
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("[migrations] failed to get postgres driver: %w", err)
+		return nil, fmt.Errorf(
+			"[migrations] failed to get postgres driver: %w",
+			err,
+		)
 	}
 
-	mig, err := migrate.NewWithInstance("httpfs", source, connConfig.Database, driver)
+	mig, err := migrate.NewWithInstance(
+		"httpfs", source, connConfig.Database, driver,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("[migrations] failed to create migrate source instance: %w", err)
+		return nil, fmt.Errorf(
+			"[migrations] failed to create migrate source instance: %w",
+			err,
+		)
 	}
 
 	return mig, nil

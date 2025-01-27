@@ -49,9 +49,11 @@ func (r DoTransferRequest) Validate() error {
 	return nil
 }
 
-func (r DoTransferRequest) ToTransferInput(accountOriginID string) transfers.TransferInput {
+func (r DoTransferRequest) ToTransferInput(
+	accOriginID string,
+) transfers.TransferInput {
 	return transfers.TransferInput{
-		AccountOriginID:      accountOriginID,
+		AccountOriginID:      accOriginID,
 		AccountDestinationID: r.AccountDestinationID,
 		Amount:               r.Amount,
 	}

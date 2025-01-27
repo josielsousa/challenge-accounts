@@ -26,7 +26,9 @@ func (h *Helper) Hash(secret string) ([]byte, error) {
 
 // VerifySecret - verifica se a senha informada é a mesma salva na account.
 func (h *Helper) VerifySecret(hashedSecret, secret string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedSecret), []byte(secret)); err != nil {
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(hashedSecret), []byte(secret),
+	); err != nil {
 		return fmt.Errorf("comparing hash and secret: %w", err)
 	}
 

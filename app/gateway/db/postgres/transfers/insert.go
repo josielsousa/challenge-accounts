@@ -14,12 +14,14 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
-func (r *Repository) Insert(ctx context.Context, trf entities.TransferData) error {
+func (r *Repository) Insert(
+	ctx context.Context, trf entities.TransferData,
+) error {
 	const op = `Repository.Transfers.Insert`
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on open transaction", err)
+		return fmt.Errorf("%s-> on open transaction: %w", op, err)
 	}
 
 	//nolint:errcheck
@@ -70,18 +72,13 @@ func (r *Repository) Insert(ctx context.Context, trf entities.TransferData) erro
 		if errors.As(err, &pgErr) &&
 			pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
 			return fmt.Errorf(
-				"%s-> %s: %w",
-				op,
-				"on insert transfer",
-				erring.ErrAccountAlreadyExists,
+				"%s-> on insert transfer: %w",
+				op, erring.ErrAccountAlreadyExists,
 			)
 		}
 
 		return fmt.Errorf(
-			"%s-> %s: %w",
-			op,
-			"on insert transfer",
-			err,
+			"%s-> on insert transfer: %w", op, err,
 		)
 	}
 
@@ -93,9 +90,8 @@ func (r *Repository) Insert(ctx context.Context, trf entities.TransferData) erro
 	)
 	if err != nil {
 		return fmt.Errorf(
-			"%s-> %s: %w",
+			"%s-> on update account origin: %w",
 			op,
-			"on update account origin",
 			err,
 		)
 	}
@@ -107,12 +103,12 @@ func (r *Repository) Insert(ctx context.Context, trf entities.TransferData) erro
 		trf.AccountDestination.Balance,
 	)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on update account destination", err)
+		return fmt.Errorf("%s-> on update account destination: %w", op, err)
 	}
 
 	err = tx.Commit(ctx)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", op, "on commit transaction", err)
+		return fmt.Errorf("%s-> on commit transaction: %w", op, err)
 	}
 
 	return nil

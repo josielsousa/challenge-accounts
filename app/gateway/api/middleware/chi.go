@@ -17,6 +17,9 @@ var (
 	CleanPath    = middleware.CleanPath
 )
 
+// Recoverer - middleware to recover from panic.
+// based on default middleware from chi, with custom internal server error
+// response.
 func Recoverer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		defer func(ctx context.Context) {

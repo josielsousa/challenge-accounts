@@ -20,7 +20,11 @@ func Authorize(signer *jwt.Jwt, next http.Handler) http.HandlerFunc {
 
 		token, ok := sanitizeBearerToken(req.Header.Get("Authorization"))
 		if !ok {
-			logger.Error("on sanitize token", slog.String("token", token), slog.Bool("ok", ok))
+			logger.Error(
+				"on sanitize token",
+				slog.String("token", token),
+				slog.Bool("ok", ok),
+			)
 
 			handleUnauthorized(req, rw)
 

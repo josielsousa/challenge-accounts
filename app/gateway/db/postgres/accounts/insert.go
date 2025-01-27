@@ -15,7 +15,7 @@ import (
 )
 
 func (r *Repository) Insert(ctx context.Context, acc entities.Account) error {
-	const operation = `Repository.Accounts.Insert`
+	const op = `Repository.Accounts.Insert`
 
 	if len(acc.ID) == 0 {
 		acc.ID = uuid.NewString()
@@ -55,11 +55,15 @@ func (r *Repository) Insert(ctx context.Context, acc entities.Account) error {
 	)
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			return fmt.Errorf("%s-> %s: %w", operation, "on insert account", erring.ErrAccountAlreadyExists)
+		if errors.As(err, &pgErr) &&
+			pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
+			return fmt.Errorf(
+				"%s-> on insert account: %w",
+				op, erring.ErrAccountAlreadyExists,
+			)
 		}
 
-		return fmt.Errorf("%s-> %s: %w", operation, "on insert account", err)
+		return fmt.Errorf("%s-> on insert account: %w", op, err)
 	}
 
 	return nil

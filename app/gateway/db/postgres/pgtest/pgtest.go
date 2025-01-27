@@ -55,10 +55,12 @@ func StartupNewPool() (func(), error) {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
 
-	dbDefaultConnConfig := getConnConfig(dbPort, defaultDBName)
+	defaultConnConfig := getConnConfig(dbPort, defaultDBName)
 	ctx := context.Background()
 
-	dbDefaultPool, err := postgres.ConnectPoolWithoutMigrations(ctx, dbDefaultConnConfig)
+	dbDefaultPool, err := postgres.NewPool(ctx, postgres.WithConnString(
+		defaultConnConfig,
+	))
 	if err != nil {
 		return nil, fmt.Errorf("on connect pool: %w", err)
 	}
@@ -71,7 +73,7 @@ func StartupNewPool() (func(), error) {
 
 	dbConnConfig := getConnConfig(dbPort, dbName)
 
-	dbPool, err := postgres.ConnectPoolWithMigrations(ctx, dbConnConfig)
+	dbPool, err := postgres.NewPool(ctx, postgres.WithConnString(dbConnConfig))
 	if err != nil {
 		return nil, fmt.Errorf("on connect pool with migrations: %w", err)
 	}
@@ -143,7 +145,9 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 	dbOrig := cconn.Config().ConnConfig.Database
 
 	connString := strings.Replace(orig, dbOrig, dbName, 1)
-	newPool, err := postgres.ConnectPoolWithMigrations(ctx, connString)
+
+	newPool, err := postgres.NewPool(ctx, postgres.WithConnString(connString))
+
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -160,7 +164,10 @@ func retryDBHelper(port, dbName string) func() error {
 	return func() error {
 		dbConnConfig := getConnConfig(port, dbName)
 
-		connPool, err := postgres.ConnectPoolWithoutMigrations(context.Background(), dbConnConfig)
+		connPool, err := postgres.NewPool(
+			context.Background(),
+			postgres.WithConnString(dbConnConfig),
+		)
 		if err != nil {
 			return fmt.Errorf("on connect pool: %w", err)
 		}

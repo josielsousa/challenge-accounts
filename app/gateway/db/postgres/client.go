@@ -12,7 +12,7 @@ type Client struct {
 }
 
 func NewClient(ctx context.Context, dbURL string) (*Client, error) {
-	pool, err := ConnectPoolWithMigrations(ctx, dbURL)
+	pool, err := NewPool(ctx, WithConnString(dbURL))
 	if err != nil {
 		return nil, fmt.Errorf("on connect pgxpool with migrations: %w", err)
 	}

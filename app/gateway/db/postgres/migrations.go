@@ -37,7 +37,7 @@ func (l *migrateLogger) Verbose() bool {
 	return l.verbose
 }
 
-func GetMigrationHandler(connConfig *pgx.ConnConfig) (*migrate.Migrate, error) {
+func newMigrateHandler(connConfig *pgx.ConnConfig) (*migrate.Migrate, error) {
 	source, err := httpfs.New(http.FS(MigrationsFS), "migrations")
 	if err != nil {
 		return nil, fmt.Errorf("on create source instance: %w", err)
@@ -58,8 +58,8 @@ func GetMigrationHandler(connConfig *pgx.ConnConfig) (*migrate.Migrate, error) {
 	return mig, nil
 }
 
-func RunMigrations(connConfig *pgx.ConnConfig) error {
-	migHandler, err := GetMigrationHandler(connConfig)
+func runMigrations(connConfig *pgx.ConnConfig) error {
+	migHandler, err := newMigrateHandler(connConfig)
 	if err != nil {
 		return err
 	}

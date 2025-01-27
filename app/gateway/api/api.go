@@ -58,13 +58,17 @@ func NewAPI(
 	))
 
 	router.Route("/api/v1/challenge-accounts", func(baseRouter chi.Router) {
-		baseRouter.Get("/healthcheck", func(rw http.ResponseWriter, _ *http.Request) {
-			rw.WriteHeader(http.StatusOK)
-		})
+		baseRouter.Get("/healthcheck",
+			func(rw http.ResponseWriter, _ *http.Request) {
+				rw.WriteHeader(http.StatusOK)
+			},
+		)
 
 		baseRouter.Get("/", func(rw http.ResponseWriter, _ *http.Request) {
 			rw.WriteHeader(http.StatusOK)
-			rw.Write([]byte("<h1>Desafio técnico accounts.</h1>")) //nolint:errcheck
+
+			//nolint:errcheck
+			rw.Write([]byte("<h1>Desafio técnico accounts.</h1>"))
 		})
 
 		baseRouter.Route("/auth", func(authRouter chi.Router) {

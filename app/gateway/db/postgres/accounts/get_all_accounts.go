@@ -29,7 +29,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]entities.Account, error) {
 		queryGetAllAccs,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("%s -> %s: %w", operation, "on get all accounts", err)
+		return nil, fmt.Errorf("%s -> on get all accounts: %w", operation, err)
 	}
 
 	defer rows.Close()
@@ -49,7 +49,9 @@ func (r *Repository) GetAll(ctx context.Context) ([]entities.Account, error) {
 			&acc.UpdatedAt,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("%s-> %s: %w", operation, "on scan get all accounts", err)
+			return nil, fmt.Errorf(
+				"%s-> on scan get all accounts: %w", operation, err,
+			)
 		}
 
 		accs = append(accs, acc)

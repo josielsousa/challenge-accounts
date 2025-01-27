@@ -9,7 +9,12 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/erring"
 )
 
-func (*Repository) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID string, balance int) error {
+func (*Repository) UpdateBalance(
+	ctx context.Context,
+	tx pgx.Tx,
+	accountID string,
+	balance int,
+) error {
 	const operation = `Repository.Accounts.UpdateBalance`
 
 	query := `
@@ -26,11 +31,16 @@ func (*Repository) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID strin
 		balance,
 	)
 	if err != nil {
-		return fmt.Errorf("%s-> %s: %w", operation, "on update balance account", err)
+		return fmt.Errorf(
+			"%s-> on update balance account: %w", operation, err,
+		)
 	}
 
 	if cmTag.RowsAffected() != 1 {
-		return fmt.Errorf("%s-> %s: %w", operation, "on check rows affected", erring.ErrUpdateAccountNotPerformed)
+		return fmt.Errorf(
+			"%s-> on check rows affected: %w",
+			operation, erring.ErrUpdateAccountNotPerformed,
+		)
 	}
 
 	return nil

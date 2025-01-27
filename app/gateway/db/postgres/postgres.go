@@ -55,7 +55,7 @@ func (p *Pool) connectPool(ctx context.Context) (*pgxpool.Pool, error) {
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to pgx pool: %w", err)
+		return nil, fmt.Errorf("new pool from config: %w", err)
 	}
 
 	if p.executeMigrations {

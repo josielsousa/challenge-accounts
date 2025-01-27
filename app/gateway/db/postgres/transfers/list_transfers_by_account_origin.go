@@ -21,14 +21,18 @@ const (
 	`
 )
 
-func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]entities.Transfer, error) {
+func (r *Repository) ListTransfers(
+	ctx context.Context, accOriginID string,
+) ([]entities.Transfer, error) {
 	const op = `Repository.Transfers.ListTransfers`
 
 	trfs := make([]entities.Transfer, 0)
 
 	rows, err := r.db.Query(ctx, queryGetAllTransfersByAccOriginID, accOriginID)
 	if err != nil {
-		return nil, fmt.Errorf("%s -> %s: %w", op, "on get all transfers by account origin", err)
+		return nil, fmt.Errorf(
+			"%s -> on get all transfers by account origin: %w", op, err,
+		)
 	}
 	defer rows.Close()
 
@@ -44,7 +48,7 @@ func (r *Repository) ListTransfers(ctx context.Context, accOriginID string) ([]e
 			&trf.UpdatedAt,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("%s -> %s: %w", op, "on scan row", err)
+			return nil, fmt.Errorf("%s -> on scan row: %w", op, err)
 		}
 
 		trfs = append(trfs, trf)

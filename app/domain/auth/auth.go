@@ -20,16 +20,15 @@ type (
 	}
 )
 
-func (u Usecase) Signin(ctx context.Context, input SiginInput) (SiginOutput, error) {
+func (u Usecase) Signin(
+	ctx context.Context, input SiginInput,
+) (SiginOutput, error) {
 	const op = `auth.Signin`
 
 	acc, err := u.R.GetByCPF(ctx, input.Cpf)
 	if err != nil {
 		return SiginOutput{}, fmt.Errorf(
-			"%s-> %s: %w",
-			op,
-			"on get account by cpf",
-			err,
+			"%s-> on get account by cpf: %w", op, err,
 		)
 	}
 
@@ -37,7 +36,8 @@ func (u Usecase) Signin(ctx context.Context, input SiginInput) (SiginOutput, err
 		return SiginOutput{}, erring.ErrAccountNotFound
 	}
 
-	// Verifica se o secret informado na autenticação, é o mesmo armazenado na `account`.
+	// Verifica se o secret informado na autenticação, é o mesmo
+	// armazenado na `account`.
 	err = u.H.VerifySecret(acc.Secret.Value(), input.Secret)
 	if err != nil {
 		return SiginOutput{}, erring.ErrUnauthorized

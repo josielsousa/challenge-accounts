@@ -12,27 +12,19 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/vos/hash"
 )
 
-func (u Usecase) Create(ctx context.Context, input AccountInput) (AccountOutput, error) {
+func (u Usecase) Create(
+	ctx context.Context, input AccountInput,
+) (AccountOutput, error) {
 	const op = `accounts.Create`
 
 	cpf, err := cpf.NewCPF(input.CPF)
 	if err != nil {
-		return AccountOutput{}, fmt.Errorf(
-			"%s-> %s: %w",
-			op,
-			"on new instance CPF from input",
-			err,
-		)
+		return AccountOutput{}, fmt.Errorf("%s-> new cpf: %w", op, err)
 	}
 
 	secret, err := hash.NewHash(input.Secret)
 	if err != nil {
-		return AccountOutput{}, fmt.Errorf(
-			"%s -> %s: %w",
-			op,
-			"on new hashed secret from input",
-			err,
-		)
+		return AccountOutput{}, fmt.Errorf("%s -> hash secret: %w", op, err)
 	}
 
 	now := time.Now()
@@ -52,10 +44,7 @@ func (u Usecase) Create(ctx context.Context, input AccountInput) (AccountOutput,
 	err = u.R.Insert(ctx, acc)
 	if err != nil {
 		return AccountOutput{}, fmt.Errorf(
-			"%s-> %s: %w",
-			op,
-			"on create account",
-			err,
+			"%s-> on create account: %w", op, err,
 		)
 	}
 

@@ -45,12 +45,12 @@ func (u Usecase) DoTransfer(
 
 	err = accOri.Withdraw(input.Amount)
 	if err != nil {
-		return TransferOutput{}, fmt.Errorf("%s-> %s: %w", op, "on withdraw", err)
+		return TransferOutput{}, fmt.Errorf("%s-> on withdraw: %w", op, err)
 	}
 
 	err = accDest.Deposit(input.Amount)
 	if err != nil {
-		return TransferOutput{}, fmt.Errorf("%s-> %s: %w", op, "on deposit", err)
+		return TransferOutput{}, fmt.Errorf("%s-> on deposit: %w", op, err)
 	}
 
 	transferData := entities.TransferData{
@@ -73,7 +73,8 @@ func (u Usecase) DoTransfer(
 
 	err = u.R.Insert(ctx, transferData)
 	if err != nil {
-		return TransferOutput{}, fmt.Errorf("%s-> %s: %w", op, "on do transfer", err)
+		return TransferOutput{}, fmt.Errorf(
+			"%s-> on do transfer: %w", op, err)
 	}
 
 	return TransferOutput{

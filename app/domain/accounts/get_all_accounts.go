@@ -10,7 +10,7 @@ func (u Usecase) GetAllAccounts(ctx context.Context) ([]AccountOutput, error) {
 
 	accs, err := u.R.GetAll(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("%s -> %s: %w", op, "on get all accounts", err)
+		return nil, fmt.Errorf("%s -> on get all accounts: %w", op, err)
 	}
 
 	out := make([]AccountOutput, 0, len(accs))

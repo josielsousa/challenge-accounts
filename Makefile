@@ -19,23 +19,26 @@ GOLANGCI_LINT_VERSION=1.62.2
 
 define goBuild
 	@echo "==> Go Building $2"
-	@env GOOS=${OS} GOARCH=amd64 go build -v -o  build/$1 \
-	-ldflags "-X main.BuildGitCommit=$(GIT_COMMIT) -X main.BuildTime=$(GIT_BUILD_TIME)" \
+	@env GOOS=${OS} GOARCH=amd64 go build -v -a -o  build/$1 \
+	-ldflags "-w -s -X main.BuildHash=$(GIT_COMMIT) -X main.BuildTime=$(GIT_BUILD_TIME)" \
 	${PKG}/$2
 endef
 
 define build
 	@echo "==> Building Docker image: $1"
 	@@DOCKER_BUILDKIT=1 docker build \
-		--build-arg BUILD_TIME=$(GIT_BUILD_TIME) --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg GIT_TAG=$(GIT_TAG) --build-arg GO_CMD=$1 \
-		--pull --ssh default -f $(DOCKER_FILE) -t $(PROJECT_PATH)-$1:$(VERSION) .
+		--build-arg BUILD_TIME=$(GIT_BUILD_TIME) \
+		--build-arg HASH=$(GIT_COMMIT) \
+		--pull --ssh default \
+		-f $(DOCKER_FILE) \
+		-t $(PROJECT_PATH)-$1:$(VERSION) .
 endef
 
 default: test-coverage
 
 .PHONY: tools
 tools:
-	@echo "Installing dependencies"
+	@echo "==> Installing dependencies"
 	go mod tidy
 
 .PHONY: clean

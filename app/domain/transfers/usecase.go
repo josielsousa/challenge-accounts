@@ -18,7 +18,10 @@ type Usecase struct {
 //go:generate moq -rm -out usecase_mock.go . Repository AccountRepository
 type Repository interface {
 	Insert(ctx context.Context, transfer entities.TransferData) error
-	ListTransfers(ctx context.Context, accOriginID string) ([]entities.Transfer, error)
+	ListTransfers(
+		ctx context.Context,
+		accOriginID string,
+	) ([]entities.Transfer, error)
 }
 
 // AccountRepository - Interface que define as assinaturas para o repository de

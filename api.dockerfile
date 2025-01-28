@@ -1,11 +1,18 @@
 FROM golang:1.23.1-alpine AS builder
 
 # Load the public keys from github and configure ssh url.
-RUN apk update && apk add openssh git tzdata ca-certificates && update-ca-certificates
-RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com > ~/.ssh/known_hosts
-RUN git config --global --add url."git@github.com:".insteadOf "https://github.com/"
+RUN apk update \
+    && apk add openssh git tzdata ca-certificates  \
+    && update-ca-certificates
 
-RUN adduser -D -H -h "/nonexistent" -s "/sbin/nologin" -g "" -u "10001" "appuser"
+RUN mkdir -p -m 0700 ~/.ssh \
+    && ssh-keyscan github.com > ~/.ssh/known_hosts
+
+RUN git config --global --add \
+    url."git@github.com:".insteadOf "https://github.com/"
+
+RUN adduser -D -H -h "/nonexistent" \
+    -s "/sbin/nologin" -g "" -u "10001" "appuser"
 
 # Copy files and fetch dependencies.
 WORKDIR $GOPATH/src/challange-accounts/
@@ -17,14 +24,14 @@ COPY go.sum .
 RUN --mount=type=ssh go mod download
 COPY app ./app
 COPY cmd ./cmd
-COPY types ./types
+COPY docs ./docs
 
 # Build the binary.
-ARG GIT_BUILD_TIME
-ARG GIT_COMMIT
-ARG GIT_TAG
-RUN GOOS=linux GOARCH=amd64 go build -a -o /go/bin/challange-accounts \
-    -ldflags="-w -s -X main.BuildTime=$GIT_BUILD_TIME -X main.BuildCommit=$GIT_COMMIT -X main.BuildTag=$GIT_TAG" \
+ARG BUILD_TIME
+ARG HASH
+RUN GOOS=linux GOARCH=amd64 go build -a \
+    -o /go/bin/challange-accounts \
+    -ldflags="-w -s -X main.BuildHash=$HASH -X main.BuildTime=$BUILD_TIME" \
     ./cmd
 
 # Create a minimal image.

@@ -21,7 +21,8 @@ type Hasher interface {
 	VerifySecret(hashedSecret, secret string) error
 }
 
-// Repository - Interface que define as assinaturas para o repository de accounts.
+// Repository - Interface que define as assinaturas para o
+// repository de accounts.
 type Repository interface {
 	GetByCPF(ctx context.Context, cpf string) (entities.Account, error)
 }

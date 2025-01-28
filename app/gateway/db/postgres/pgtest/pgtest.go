@@ -23,8 +23,8 @@ var (
 )
 
 const (
-	defaultDBName        = "pg-test-db-name"
-	defaultContainerName = "pg-test-challenge-accounts"
+	baseDBName   = "pg-test-db-name"
+	baseContName = "pg-test-challenge-accounts"
 )
 
 type DockerContainerConfig struct {
@@ -42,20 +42,22 @@ func StartupNewPool() (func(), error) {
 	}
 
 	atomic.AddInt32(&instances, 1)
-	dbName := fmt.Sprintf("db_%d_%d", time.Now().UnixNano(), atomic.LoadInt32(&instances))
+	baseInstaceName := fmt.Sprintf("%d_%d", time.Now().UnixNano(), atomic.LoadInt32(&instances))
 
-	dockerResource, err := getDockerResource(dockerPool)
+	dbName := "db_" + baseInstaceName
+
+	dockerResource, err := getDockerResource(baseInstaceName, dockerPool)
 	if err != nil {
 		return nil, fmt.Errorf("on get docker resource: %w", err)
 	}
 
 	dbPort := dockerResource.GetPort("5432/tcp")
 
-	if err = dockerPool.Retry(retryDBHelper(dbPort, defaultDBName)); err != nil {
+	if err = dockerPool.Retry(retryDBHelper(dbPort, baseDBName)); err != nil {
 		return nil, fmt.Errorf("on wait living pool: could not connect to docker: %w", err)
 	}
 
-	defaultConnConfig := getConnConfig(dbPort, defaultDBName)
+	defaultConnConfig := getConnConfig(dbPort, baseDBName)
 	ctx := context.Background()
 
 	dbDefaultPool, err := postgres.NewPool(ctx, postgres.WithConnString(
@@ -86,37 +88,23 @@ func StartupNewPool() (func(), error) {
 		dropDB(dbName, dbDefaultPool)
 
 		dbDefaultPool.Close()
+
+		_ = dockerPool.Purge(dockerResource)
 	}
 
 	return teardownFn, nil
 }
 
-func getDockerResource(pool *dockertest.Pool) (*dockertest.Resource, error) {
-	container, _ := pool.Client.InspectContainer(defaultContainerName)
-
-	if container != nil {
-		if container.State.Running {
-			resource := &dockertest.Resource{Container: container}
-
-			return resource, nil
-		}
-
-		if !container.State.Running {
-			if err := pool.RemoveContainerByName(defaultContainerName); err != nil {
-				return nil, fmt.Errorf("could not remove container: %w", err)
-			}
-		}
-	}
-
+func getDockerResource(baseInstaceName string, pool *dockertest.Pool) (*dockertest.Resource, error) {
 	//nolint:exhaustruct
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Name:       defaultContainerName,
+		Name:       baseContName + "_" + baseInstaceName,
 		Repository: "postgres",
 		Tag:        "16-alpine",
 		Env: []string{
 			"POSTGRES_USER=postgres",
 			"POSTGRES_PASSWORD=postgres",
-			"POSTGRES_DB=" + defaultDBName,
+			"POSTGRES_DB=" + baseDBName,
 		},
 	}, func(c *docker.HostConfig) {
 		c.AutoRemove = true
@@ -136,13 +124,12 @@ func NewDB(t *testing.T) *pgxpool.Pool {
 
 	atomic.AddInt32(&instances, 1)
 	dbName := fmt.Sprintf("db_%d_%d_test", atomic.LoadInt32(&instances), time.Now().UnixNano())
-	cconn := concurrentConn
 
 	_, err := concurrentConn.Exec(ctx, "create database "+dbName)
 	require.NoError(t, err)
 
-	orig := cconn.Config().ConnString()
-	dbOrig := cconn.Config().ConnConfig.Database
+	orig := concurrentConn.Config().ConnString()
+	dbOrig := concurrentConn.Config().ConnConfig.Database
 
 	connString := strings.Replace(orig, dbOrig, dbName, 1)
 
@@ -187,7 +174,7 @@ func getConnConfig(port, dbName string) string {
 }
 
 func dropDB(dbName string, pool *pgxpool.Pool) {
-	if dbName == defaultDBName {
+	if dbName == baseDBName {
 		return
 	}
 

@@ -13,7 +13,7 @@ func (u Usecase) ListTransfersAccount(
 
 	allTrfs, err := u.R.ListTransfers(ctx, accOriginID)
 	if err != nil {
-		return nil, fmt.Errorf("%s -> %s: %w", op, "on list transfers", err)
+		return nil, fmt.Errorf("%s -> on list transfers: %w", op, err)
 	}
 
 	out := make([]TransferOutput, len(allTrfs))

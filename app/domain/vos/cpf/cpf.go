@@ -21,7 +21,9 @@ var (
 	ErrInvalid = errors.New("invalid cpf number")
 
 	regexPatternOnlyNumbers = regexp.MustCompile(`[^0-9]+`)
-	regexPatternCPFMasked   = regexp.MustCompile(`^(\d{3})(\d{3})(\d{3})(\d{2})$`)
+	regexPatternCPFMasked   = regexp.MustCompile(
+		`^(\d{3})(\d{3})(\d{3})(\d{2})$`,
+	)
 )
 
 type CPF struct {
@@ -45,7 +47,8 @@ func removeSpecialChars(value string) string {
 	return regexPatternOnlyNumbers.ReplaceAllString(value, "")
 }
 
-// allEquals - Verifica se todos os dígitos do CPF são iguais, e.g.: 111.111.111-11.
+// allEquals - Verifica se todos os dígitos do CPF são iguais
+// e.g.: 111.111.111-11.
 func (c *CPF) allEquals() bool {
 	base := c.value[0]
 	for i := range len(c.value) {
@@ -57,7 +60,8 @@ func (c *CPF) allEquals() bool {
 	return true
 }
 
-// calculateDigit - Calcula o digito verificador do documento informado conforme seu tipo.
+// calculateDigit - Calcula o digito verificador do documento
+// informado conforme seu tipo.
 //
 //	position - representa o peso para a regra de cálculo do digito verificador.
 //
@@ -84,7 +88,8 @@ func (c *CPF) calculateDigit(position int) string {
 	return strconv.Itoa(maxCPFLen - sum)
 }
 
-// IsValid - Verifica se o CPF informado é válido, calculando os dígitos verificadores.
+// IsValid - Verifica se o CPF informado é válido,
+// calculando os dígitos verificadores.
 func (c *CPF) isValid() bool {
 	if len(c.value) != maxCPFLen || c.allEquals() {
 		return false

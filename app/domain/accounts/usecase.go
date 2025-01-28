@@ -23,7 +23,8 @@ type AccountOutput struct {
 	UpdatedAt time.Time
 }
 
-// Repository - Interface que define as assinaturas para o repository de accounts.
+// Repository - Interface que define as assinaturas para o
+// repository de accounts.
 //
 //go:generate moq -fmt goimports -out usecase_mock.go . Repository
 type Repository interface {

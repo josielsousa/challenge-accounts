@@ -3,6 +3,8 @@ version: "3.7"
 volumes:
   pg_data:
     driver: local
+  dragonflydata:
+    driver: local
 
 services:
   chl_acc_postgres:
@@ -17,3 +19,15 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - pg_data:/var/lib/postgresql/data
+
+  ## Alternative to redis.
+  ## extracted from:
+  ## https://raw.githubusercontent.com/dragonflydb/dragonfly/main/contrib/docker/docker-compose.yml
+  chl_acc_dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ulimits:
+      memlock: -1
+    ports:
+      - "6379:6379"
+    volumes:
+      - dragonflydata:/data

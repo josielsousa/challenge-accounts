@@ -2,18 +2,21 @@ package cache
 
 import (
 	"context"
+	"io"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/josielsousa/challenge-accounts/app/gateway/db/cache/cachetest"
 )
 
 func TestCache_SetIdempotency(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		ctx      context.Context
 		key      string
 		response *http.Response
 		ttl      time.Duration
@@ -25,8 +28,15 @@ func TestCache_SetIdempotency(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "test case name here",
-			args:    args{},
+			name: "should set idempotency",
+			args: args{
+				key: "test_key",
+				response: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader("test_body")),
+				},
+				ttl: time.Minute,
+			},
 			wantErr: nil,
 		},
 	}
@@ -35,11 +45,25 @@ func TestCache_SetIdempotency(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			cli, err := cachetest.NewClient()
+			require.NoError(t, err)
+
 			c := &Cache{
-				C: tt.fields.C,
+				C: cli.Client,
 			}
 
-			err := c.SetIdempotency(tt.args.ctx, tt.args.key, tt.args.response)
+			t.Cleanup(func() {
+				require.NoError(t, cli.Teardown())
+			})
+
+			ctx := context.Background()
+
+			err = c.SetIdempotency(
+				ctx,
+				tt.args.key,
+				tt.args.response,
+				tt.args.ttl,
+			)
 			require.ErrorIs(t, err, tt.wantErr)
 		})
 	}

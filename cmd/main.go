@@ -17,6 +17,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app"
 	"github.com/josielsousa/challenge-accounts/app/configuration"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api"
+	"github.com/josielsousa/challenge-accounts/app/gateway/db/cache"
 	"github.com/josielsousa/challenge-accounts/app/gateway/db/postgres"
 	"github.com/josielsousa/challenge-accounts/app/gateway/hasher"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
@@ -38,6 +39,8 @@ func main() {
 	cfg, err := configuration.LoadConfig()
 	if err != nil {
 		logger.Error("on loading configuration", slog.Any("error", err))
+
+		panic(err)
 	}
 
 	pgClient, err := postgres.NewClient(ctx, cfg.Postgres.URL())
@@ -55,11 +58,19 @@ func main() {
 
 	application := app.NewApp(pgClient, signer, hasher)
 
+	cac, err := cache.NewCache(ctx, cfg.Cache)
+	if err != nil {
+		logger.Error("on create configuration", slog.Any("error", err))
+
+		panic(err)
+	}
+
 	challengeAPI := api.NewAPI(
 		application.UA,
 		application.UT,
 		application.UAT,
 		signer,
+		cac,
 	)
 
 	server := &http.Server{

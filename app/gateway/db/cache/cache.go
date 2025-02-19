@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -17,7 +18,7 @@ type Cache struct {
 	C *redis.Client
 }
 
-func NewCache(ctx context.Context, cfg configuration.Cache) (*Cache, error) {
+func NewCache(ctx context.Context, cfg configuration.CacheConfig) (*Cache, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 	})
@@ -37,13 +38,18 @@ func (c *Cache) Close() error {
 	return nil
 }
 
-func (c *Cache) SetIdempotency(ctx context.Context, key string, response *http.Response) error {
+func (c *Cache) SetIdempotency(
+	ctx context.Context,
+	key string,
+	response *http.Response,
+	ttl time.Duration,
+) error {
 	bs, err := httputil.DumpResponse(response, true)
 	if err != nil {
 		return fmt.Errorf("dumping response: %w", err)
 	}
 
-	if err := c.C.Set(ctx, key, string(bs), 0).Err(); err != nil {
+	if err := c.C.Set(ctx, key, string(bs), ttl).Err(); err != nil {
 		return fmt.Errorf("setting cache: %w", err)
 	}
 

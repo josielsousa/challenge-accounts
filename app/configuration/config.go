@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	API      APIConfig
+	Cache    CacheConfig
 	Postgres PostgresConfig
 }
 

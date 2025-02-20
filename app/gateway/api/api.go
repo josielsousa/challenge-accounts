@@ -11,6 +11,7 @@ import (
 	"github.com/josielsousa/challenge-accounts/app/domain/transfers"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/handler"
 	"github.com/josielsousa/challenge-accounts/app/gateway/api/middleware"
+	"github.com/josielsousa/challenge-accounts/app/gateway/db/cache"
 	"github.com/josielsousa/challenge-accounts/app/gateway/jwt"
 
 	// import swag docs
@@ -43,6 +44,7 @@ func NewAPI(
 	trfUC *transfers.Usecase,
 	authUC *auth.Usecase,
 	signer *jwt.Jwt,
+	_ *cache.Cache, // add idempotency cache
 ) *API {
 	router := chi.NewRouter()
 
